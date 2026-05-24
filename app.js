@@ -94,17 +94,6 @@
           bio: "Studies emerging technologies in education, student engagement, digital literacies, and AI in learning. MA Educational Technology, Bahcesehir University."
         }
       ]
-    },
-    {
-      group: "MA Students",
-      items: [
-        {
-          name: "Mina Tran",
-          role: "Research & Teaching Assistant, MA TESOL/Applied Linguistics",
-          chips: ["TESOL", "GenAI Agents", "Teacher Training"],
-          bio: "Works on AI-driven learning environments and generative agents in teacher training."
-        }
-      ]
     }
   ];
 
@@ -135,7 +124,7 @@
     }
   ];
 
-  const labMemberNames = ["Awoyemi", "Abu", "Uddin", "Ghooreian", "Tran", "Amayou", "Searight", "Ogunniran"];
+  const labMemberNames = ["Awoyemi", "Abu", "Uddin", "Ghooreian", "Amayou", "Searight", "Ogunniran"];
   const publicationTags = ["All", "XR", "GenAI", "Analytics", "Game-Based", "STEM", "Teacher Ed", "Review"];
   const avatarTiles = [
     "assets/img/avatar-tile-1.png",
