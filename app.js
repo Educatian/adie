@@ -170,6 +170,8 @@
   }
 
   function renderStats() {
+    const band = $("[data-stats-band]");
+    if (!band) return;
     const stats = siteData.stats || [];
     const researchMentees = (siteData.mentoringMetrics || []).find((item) => item.label.includes("research mentees"));
     const cells = [
@@ -178,7 +180,7 @@
       { value: researchMentees?.value || "10", label: "Research mentees" },
       { value: "4", label: "Collaboration tracks" }
     ];
-    $("[data-stats-band]").innerHTML = cells.map((item) => statCell(item.value, item.label)).join("");
+    band.innerHTML = cells.map((item) => statCell(item.value, item.label)).join("");
   }
 
   function statCell(value, label) {
