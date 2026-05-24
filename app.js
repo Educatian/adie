@@ -35,6 +35,81 @@
     }
   ];
 
+  const verifiedLinks = {
+    scholar: "https://scholar.google.com/citations?user=b-epW38AAAAJ&hl=en",
+    researchGate: "https://www.researchgate.net/profile/Jewoong-Moon",
+    cv: "https://educatian.github.io/cv/",
+    github: "https://github.com/Educatian",
+    email: "mailto:jmoon19@ua.edu"
+  };
+
+  const scholarFallback = {
+    profileUrl: verifiedLinks.scholar,
+    summary: {
+      totalCitations: 2712,
+      hIndex: 24,
+      i10Index: 43,
+      sinceLabel: "Since 2021"
+    },
+    annualCitations: [
+      { year: 2019, citations: 9 },
+      { year: 2020, citations: 38 },
+      { year: 2021, citations: 96 },
+      { year: 2022, citations: 151 },
+      { year: 2023, citations: 222 },
+      { year: 2024, citations: 498 },
+      { year: 2025, citations: 1130 }
+    ]
+  };
+
+  const globalCollaborators = [
+    { name: "Wageningen University & Research", place: "Netherlands", lat: 51.9851, lon: 5.6636 },
+    { name: "Leiden University", place: "Netherlands", lat: 52.1579, lon: 4.4852 },
+    { name: "Daegu National University of Education", place: "South Korea", lat: 35.8576, lon: 128.5906 },
+    { name: "Enuma (EdTech)", place: "USA / South Korea", lat: 37.5665, lon: 126.9780 },
+    { name: "Center for Innovative Research in Autism (CIRA)", place: "UA, USA", lat: 33.2098, lon: -87.5692 },
+    { name: "Center for Youth Development & Intervention (CYDI)", place: "UA, USA", lat: 33.2118, lon: -87.5650 },
+    { name: "UA College of Engineering (Dr. Siyuan Song's Lab)", place: "USA", lat: 33.2140, lon: -87.5450 }
+  ];
+
+  const homeCollaborator = {
+    name: "The University of Alabama",
+    place: "Tuscaloosa, USA",
+    lat: 33.2098,
+    lon: -87.5692
+  };
+
+  const openScienceItems = [
+    { title: "Google Scholar", text: "Citation profile and publication impact metrics.", href: verifiedLinks.scholar },
+    { title: "ResearchGate", text: "Research profile and publication discovery.", href: verifiedLinks.researchGate },
+    { title: "GitHub", text: "Educatian organization for public code and open guides.", href: verifiedLinks.github },
+    { title: "Personal CV", text: "Auto-generated CV site and full scholarly record.", href: verifiedLinks.cv },
+    // Placeholder for future verified repository, OSF, or dataset URLs supplied by the lab.
+    { title: "Code releases", text: "Specific repositories are listed only when verified public URLs are supplied.", href: "" },
+    { title: "Datasets", text: "Dataset links will be added only after a verified public archive URL is available.", href: "" }
+  ];
+
+  const projectSpotlightSpecs = [
+    {
+      title: "VR-based safety and autism training analytics",
+      image: "assets/img/motif-immersive.webp",
+      collaborationTitle: "Learning Analytics System Design & Validation",
+      outcome: "Turns immersive behavior traces into interpretable evidence for training, flexibility, and social-interaction research."
+    },
+    {
+      title: "Generative-AI agents for GEAR-UP and teacher learning",
+      image: "assets/img/motif-genai.webp",
+      collaborationTitle: "Generative-AI-Empowered Immersive Learning",
+      outcome: "Connects AI agents, teacher simulations, and design-based research into mentored GenAI learning environments."
+    },
+    {
+      title: "Engineering-education XR design",
+      image: "assets/img/motif-stem.webp",
+      collaborationTitle: "Engineering Education XR Design",
+      outcome: "Builds immersive simulation and analytics workflows for authentic STEM and safety learning."
+    }
+  ];
+
   const people = [
     {
       group: "People",
@@ -146,7 +221,11 @@
   };
   const PUBLICATION_COLLAPSED_LIMIT = 12;
   let activePublicationTag = "All";
+  let activePublicationSearch = "";
+  let activePublicationAuthor = "All";
   let publicationsExpanded = false;
+  let scholarAnalytics = scholarFallback;
+  const publicationActionStore = new Map();
 
   const $ = (selector, scope = document) => scope.querySelector(selector);
   const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
@@ -160,8 +239,17 @@
       .replaceAll("'", "&#039;");
   }
 
+  function escapeRegExp(value) {
+    return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
   function formatNumber(value) {
     return new Intl.NumberFormat("en-US").format(value);
+  }
+
+  function extractYear(value) {
+    const match = String(value || "").match(/\b(20\d{2}|19\d{2})\b/);
+    return match ? match[1] : "";
   }
 
   function renderStats() {
@@ -367,12 +455,29 @@
 
   function renderPublicationFilters() {
     const allPublications = siteData.publications || [];
-    $("[data-publication-filters]").innerHTML = publicationTags.map((tag) => `
-      <button class="filter-button ${tag === activePublicationTag ? "is-active" : ""}" type="button" data-tag="${escapeHtml(tag)}">
-        <span>${escapeHtml(tag)}</span>
-        <em>${tag === "All" ? allPublications.length : allPublications.filter((pub) => (pub.tags || []).includes(tag)).length}</em>
-      </button>
-    `).join("");
+    const authorOptions = publicationAuthorOptions();
+    $("[data-publication-filters]").innerHTML = `
+      <div class="publication-filter-row" aria-label="Publication topic filters">
+        ${publicationTags.map((tag) => `
+          <button class="filter-button ${tag === activePublicationTag ? "is-active" : ""}" type="button" data-tag="${escapeHtml(tag)}">
+            <span>${escapeHtml(tag)}</span>
+            <em>${tag === "All" ? allPublications.length : allPublications.filter((pub) => (pub.tags || []).includes(tag)).length}</em>
+          </button>
+        `).join("")}
+      </div>
+      <div class="publication-tools">
+        <label class="publication-search">
+          <span>Search publications</span>
+          <input type="search" data-publication-search value="${escapeHtml(activePublicationSearch)}" placeholder="Title or author">
+        </label>
+        <label class="publication-author-filter">
+          <span>Lab author</span>
+          <select data-publication-author>
+            ${authorOptions.map((option) => `<option value="${escapeHtml(option.value)}" ${option.value === activePublicationAuthor ? "selected" : ""}>${escapeHtml(option.label)}</option>`).join("")}
+          </select>
+        </label>
+      </div>
+    `;
     $$("[data-tag]").forEach((button) => {
       button.addEventListener("click", () => {
         activePublicationTag = button.dataset.tag;
@@ -381,15 +486,37 @@
         renderPublications();
       });
     });
+    const search = $("[data-publication-search]");
+    if (search) {
+      search.addEventListener("input", debounce((event) => {
+        activePublicationSearch = event.target.value.trim();
+        publicationsExpanded = false;
+        renderPublications();
+      }, 180));
+    }
+    const author = $("[data-publication-author]");
+    if (author) {
+      author.addEventListener("change", (event) => {
+        activePublicationAuthor = event.target.value;
+        publicationsExpanded = false;
+        renderPublications();
+      });
+    }
   }
 
   function filteredPublications() {
-    const publications = siteData.publications || [];
-    if (activePublicationTag === "All") return publications;
-    return publications.filter((pub) => (pub.tags || []).includes(activePublicationTag));
+    const needle = activePublicationSearch.toLowerCase();
+    return (siteData.publications || []).filter((pub) => {
+      const matchesTag = activePublicationTag === "All" || (pub.tags || []).includes(activePublicationTag);
+      const haystack = `${pub.title || ""} ${pub.authors || ""} ${pub.venue || ""}`.toLowerCase();
+      const matchesSearch = !needle || haystack.includes(needle);
+      const matchesAuthor = activePublicationAuthor === "All" || new RegExp(`\\b${escapeRegExp(activePublicationAuthor)}\\b`, "i").test(pub.authors || "");
+      return matchesTag && matchesSearch && matchesAuthor;
+    });
   }
 
   function renderPublications() {
+    publicationActionStore.clear();
     const publications = filteredPublications();
     const featured = publications.filter(isLabCollaboration).slice(0, 6);
     const visiblePublications = publicationsExpanded ? publications : publications.slice(0, PUBLICATION_COLLAPSED_LIMIT);
@@ -412,6 +539,7 @@
             <div>
               <h3>${escapeHtml(pub.title)}</h3>
               <p>${escapeHtml(pub.authors)}</p>
+              ${publicationCopyActions(pub)}
               <p>${escapeHtml(pub.venue)}${pub.status ? ` · ${escapeHtml(pub.status)}` : ""}</p>
             </div>
             <div class="chips">${(pub.tags || []).slice(0, 3).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>
@@ -426,6 +554,7 @@
         renderPublications();
       });
     }
+    setupPublicationCopyButtons();
   }
 
   function publicationListSummary(visibleCount, totalCount) {
@@ -443,9 +572,114 @@
         <p>${escapeHtml(pub.authors)}</p>
         <p class="publication-venue">${escapeHtml(pub.venue)}</p>
         <div class="chips">${(pub.tags || []).slice(0, 4).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>
+        ${publicationCopyActions(pub)}
         ${link ? `<a class="publication-link" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">DOI / link</a>` : ""}
       </article>
     `;
+  }
+
+  function publicationAuthorOptions() {
+    const surnames = people
+      .flatMap((group) => group.items)
+      .map((person) => person.name.replace(/^Dr\.\s*/i, "").split(/\s+/).filter(Boolean).pop())
+      .filter(Boolean);
+    return [
+      { value: "All", label: "All lab authors" },
+      ...Array.from(new Set(surnames)).map((surname) => ({ value: surname, label: surname }))
+    ];
+  }
+
+  function publicationCopyActions(pub) {
+    const key = `pub-${publicationActionStore.size}`;
+    publicationActionStore.set(key, pub);
+    return `
+      <div class="publication-actions" aria-label="Citation copy actions">
+        <button class="cite-button" type="button" data-pub-action="${key}" data-format="apa">Cite &#10697;</button>
+        <button class="cite-button" type="button" data-pub-action="${key}" data-format="bibtex">BibTeX</button>
+      </div>
+    `;
+  }
+
+  function setupPublicationCopyButtons() {
+    $$("[data-pub-action]").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const pub = publicationActionStore.get(button.dataset.pubAction);
+        if (!pub) return;
+        const format = button.dataset.format === "bibtex" ? "bibtex" : "apa";
+        const text = format === "bibtex" ? formatBibTex(pub) : formatApaCitation(pub);
+        const copied = await copyText(text);
+        const original = button.textContent;
+        button.textContent = copied ? "Copied" : "Copy failed";
+        button.disabled = true;
+        setTimeout(() => {
+          button.textContent = original;
+          button.disabled = false;
+        }, 1300);
+      });
+    });
+  }
+
+  function formatApaCitation(pub) {
+    const authors = String(pub.authors || "Author unknown").trim();
+    const year = String(pub.year || "n.d.").trim();
+    const title = sentenceWithPeriod(pub.title || "Untitled work");
+    const venue = sentenceWithPeriod(pub.venue || "");
+    const status = pub.status ? ` ${sentenceWithPeriod(pub.status)}` : "";
+    return `${authors} (${year}). ${title} ${venue}${status}`.replace(/\s+/g, " ").trim();
+  }
+
+  function formatBibTex(pub) {
+    const year = String(pub.year || "n.d.").replace(/[^0-9a-z]/gi, "") || "nd";
+    const firstAuthor = String(pub.authors || "Moon").split(",")[0].replace(/[^a-z0-9]/gi, "") || "Moon";
+    const firstTitleWord = String(pub.title || "work").split(/\s+/)[0].replace(/[^a-z0-9]/gi, "") || "work";
+    const key = `${firstAuthor}${year}${firstTitleWord}`;
+    return [
+      `@article{${key},`,
+      `  author = {${escapeBibTex(pub.authors || "")}},`,
+      `  title = {${escapeBibTex(pub.title || "")}},`,
+      `  journal = {${escapeBibTex(pub.venue || "")}},`,
+      `  year = {${escapeBibTex(pub.year || "")}},`,
+      `  note = {${escapeBibTex(pub.status || pub.note || "")}}`,
+      "}"
+    ].join("\n");
+  }
+
+  async function copyText(text) {
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        // Fall through to the textarea copy path.
+      }
+    }
+    const textarea = document.createElement("textarea");
+    textarea.value = text;
+    textarea.setAttribute("readonly", "");
+    textarea.style.position = "fixed";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+    let copied = false;
+    try {
+      copied = document.execCommand("copy");
+    } catch {
+      copied = false;
+    }
+    textarea.remove();
+    return copied;
+  }
+
+  function sentenceWithPeriod(value) {
+    const text = String(value || "").trim();
+    if (!text) return "";
+    return /[.!?]$/.test(text) ? text : `${text}.`;
+  }
+
+  function escapeBibTex(value) {
+    return String(value || "")
+      .replace(/[{}]/g, "")
+      .replaceAll("&", "\\&");
   }
 
   function validPublicationUrl(value) {
@@ -459,8 +693,235 @@
     }
   }
 
+  function renderTalks() {
+    const talks = siteData.talks || [];
+    const mount = $("[data-talks]");
+    if (!mount) return;
+    mount.innerHTML = talks.map((talk, index) => `
+      <article class="talk-card reveal">
+        <span>${String(index + 1).padStart(2, "0")}</span>
+        <div>
+          <h3>${escapeHtml(talk.title)}</h3>
+          <p>${escapeHtml(talk.meta)}</p>
+        </div>
+      </article>
+    `).join("");
+  }
+
+  function renderNewsAndHonors() {
+    const newsMount = $("[data-news]");
+    const honorsMount = $("[data-honors]");
+    if (newsMount) {
+      const items = (siteData.news || [])
+        .slice()
+        .sort((a, b) => Number(b.date) - Number(a.date))
+        .slice(0, 5);
+      newsMount.innerHTML = `
+        <h3>News & Updates</h3>
+        ${items.map((item) => `
+          <article class="news-item">
+            <time>${escapeHtml(item.date)}</time>
+            <span class="chip">${escapeHtml(item.type)}</span>
+            <p>${escapeHtml(item.text)}</p>
+          </article>
+        `).join("")}
+      `;
+    }
+    if (honorsMount) {
+      honorsMount.innerHTML = `
+        <h3>Honors & Awards</h3>
+        ${(siteData.honors || []).slice(0, 8).map((honor) => {
+          const year = extractYear(honor);
+          return `
+            <article class="honor-item">
+              <strong>${escapeHtml(year || "Award")}</strong>
+              <p>${escapeHtml(honor)}</p>
+            </article>
+          `;
+        }).join("")}
+      `;
+    }
+  }
+
+  function renderResearchImpact() {
+    const statsMount = $("[data-impact-stats]");
+    const chartMount = $("[data-impact-chart]");
+    if (!statsMount || !chartMount) return;
+    const summary = scholarAnalytics.summary || scholarFallback.summary;
+    const annual = (scholarAnalytics.annualCitations || scholarFallback.annualCitations).filter((item) => Number(item.year) > 0);
+    statsMount.innerHTML = [
+      { value: summary.totalCitations || scholarFallback.summary.totalCitations, label: "Total citations" },
+      { value: summary.hIndex || scholarFallback.summary.hIndex, label: "h-index" },
+      { value: summary.i10Index || scholarFallback.summary.i10Index, label: "i10-index" }
+    ].map((item) => `
+      <a class="impact-stat" href="${verifiedLinks.scholar}" target="_blank" rel="noopener noreferrer">
+        <strong data-counter="${item.value}">${formatNumber(item.value)}</strong>
+        <span>${escapeHtml(item.label)}</span>
+        <small>${escapeHtml(summary.sinceLabel || scholarFallback.summary.sinceLabel)}</small>
+      </a>
+    `).join("");
+
+    chartMount.innerHTML = `
+      <div class="impact-chart-card">
+        <div>
+          <h3>Citations by year</h3>
+          <p>Google Scholar analytics snapshot.</p>
+        </div>
+        ${barChart(annual, "citations")}
+      </div>
+      <div class="impact-chart-card">
+        <div>
+          <h3>Publications by year</h3>
+          <p>Computed from the synced CV publication records.</p>
+        </div>
+        ${barChart(publicationsByYear(), "publications")}
+      </div>
+    `;
+  }
+
+  function barChart(rows, valueKey) {
+    const cleanRows = rows.filter((row) => Number(row[valueKey]) >= 0);
+    const max = Math.max(...cleanRows.map((row) => Number(row[valueKey])), 1);
+    return `
+      <div class="mini-bars" role="img" aria-label="${escapeHtml(valueKey)} by year">
+        ${cleanRows.map((row) => {
+          const value = Number(row[valueKey]) || 0;
+          const height = Math.max(7, Math.round((value / max) * 100));
+          return `
+            <div class="mini-bar">
+              <span style="height:${height}%"><em>${formatNumber(value)}</em></span>
+              <small>${escapeHtml(row.year)}</small>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+  }
+
+  function publicationsByYear() {
+    const counts = new Map();
+    (siteData.publications || []).forEach((pub) => {
+      const year = Number(pub.year);
+      if (!year) return;
+      counts.set(year, (counts.get(year) || 0) + 1);
+    });
+    return Array.from(counts.entries())
+      .sort((a, b) => a[0] - b[0])
+      .slice(-8)
+      .map(([year, publications]) => ({ year, publications }));
+  }
+
+  function renderOpenScience() {
+    const mount = $("[data-open-science]");
+    if (!mount) return;
+    mount.innerHTML = openScienceItems.map((item) => `
+      <article class="open-card reveal">
+        <h3>${escapeHtml(item.title)}</h3>
+        <p>${escapeHtml(item.text)}</p>
+        ${item.href ? `<a href="${escapeHtml(item.href)}" target="_blank" rel="noopener noreferrer">Open profile</a>` : `<span>No verified public URL yet</span>`}
+      </article>
+    `).join("");
+  }
+
+  function renderGlobalCollaborations() {
+    const listMount = $("[data-global-partners]");
+    if (listMount) {
+      listMount.innerHTML = `
+        <h3>Partner list</h3>
+        <p><strong>Home node:</strong> ${escapeHtml(homeCollaborator.name)} (${escapeHtml(homeCollaborator.place)})</p>
+        <ul>
+          ${globalCollaborators.map((partner) => `<li><strong>${escapeHtml(partner.name)}</strong><span>${escapeHtml(partner.place)}</span></li>`).join("")}
+        </ul>
+      `;
+    }
+    drawGlobalMap();
+  }
+
+  function drawGlobalMap() {
+    const svgNode = $("#global-map");
+    if (!svgNode) return;
+    const width = 960;
+    const height = 500;
+    const project = (lat, lon) => ({
+      x: ((lon + 180) / 360) * width,
+      y: ((90 - lat) / 180) * height
+    });
+    const home = project(homeCollaborator.lat, homeCollaborator.lon);
+    const landPaths = [
+      "M86 151 L166 104 L279 121 L303 181 L250 229 L168 221 L113 193 Z",
+      "M245 244 L313 266 L322 358 L274 430 L224 391 L211 306 Z",
+      "M404 116 L462 92 L528 111 L540 157 L492 174 L433 162 Z",
+      "M462 181 L553 186 L601 238 L571 306 L485 294 L434 239 Z",
+      "M610 127 L739 104 L841 143 L874 217 L792 262 L660 230 Z",
+      "M711 260 L793 281 L822 370 L754 426 L686 383 Z",
+      "M780 331 L872 348 L895 409 L829 441 L775 403 Z",
+      "M276 92 L326 70 L351 104 L319 130 Z"
+    ];
+    svgNode.setAttribute("viewBox", `0 0 ${width} ${height}`);
+    svgNode.setAttribute("width", width);
+    svgNode.setAttribute("height", height);
+    svgNode.innerHTML = `
+      <title id="global-map-title">Global collaboration map</title>
+      <desc id="global-map-desc">Equirectangular world map showing arcs from The University of Alabama in Tuscaloosa to collaborators in the Netherlands, South Korea, and the United States.</desc>
+      <rect class="map-ocean" width="${width}" height="${height}" rx="8"></rect>
+      <g class="map-graticule">
+        ${[-120, -60, 0, 60, 120].map((lon) => {
+          const x = project(0, lon).x;
+          return `<line x1="${x}" y1="34" x2="${x}" y2="${height - 34}"></line>`;
+        }).join("")}
+        ${[-45, 0, 45].map((lat) => {
+          const y = project(lat, 0).y;
+          return `<line x1="34" y1="${y}" x2="${width - 34}" y2="${y}"></line>`;
+        }).join("")}
+      </g>
+      <g class="map-land">${landPaths.map((path) => `<path d="${path}"></path>`).join("")}</g>
+      <g class="map-arcs">
+        ${globalCollaborators.map((partner, index) => {
+          const target = project(partner.lat, partner.lon);
+          const lift = 56 + (index % 3) * 18;
+          const cx = (home.x + target.x) / 2;
+          const cy = Math.min(home.y, target.y) - lift;
+          return `<path d="M${home.x.toFixed(1)} ${home.y.toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${target.x.toFixed(1)} ${target.y.toFixed(1)}"></path>`;
+        }).join("")}
+      </g>
+      <g class="map-markers">
+        <circle class="home-marker" cx="${home.x}" cy="${home.y}" r="8"></circle>
+        <text x="${home.x + 12}" y="${home.y + 4}">UA</text>
+        ${globalCollaborators.map((partner, index) => {
+          const target = project(partner.lat, partner.lon);
+          const dx = (index % 2) * 9 - 4;
+          const dy = (index % 3) * 7 - 7;
+          return `<circle cx="${(target.x + dx).toFixed(1)}" cy="${(target.y + dy).toFixed(1)}" r="5"><title>${escapeHtml(partner.name)}</title></circle>`;
+        }).join("")}
+      </g>
+      <g class="map-legend" transform="translate(34 430)">
+        <circle class="home-marker" cx="0" cy="0" r="6"></circle><text x="14" y="4">Home node</text>
+        <circle cx="140" cy="0" r="5"></circle><text x="154" y="4">Collaborator</text>
+        <line x1="292" y1="0" x2="342" y2="0"></line><text x="354" y="4">Research arc</text>
+      </g>
+    `;
+  }
+
   function renderProjects() {
-    $("[data-collaborations]").innerHTML = collaborations.map((item) => `
+    $("[data-project-spotlights]").innerHTML = projectSpotlightSpecs.map((spotlight) => {
+      const collaboration = collaborations.find((item) => item.title === spotlight.collaborationTitle) || collaborations[0];
+      return `
+        <article class="project-spotlight reveal">
+          <img src="${escapeHtml(spotlight.image)}" width="1000" height="625" alt="" loading="lazy">
+          <div>
+            <div class="chips"><span class="chip">${escapeHtml(collaboration.status)}</span></div>
+            <h3>${escapeHtml(spotlight.title)}</h3>
+            <p>${escapeHtml(collaboration.text)}</p>
+            <p><strong>Outcome:</strong> ${escapeHtml(spotlight.outcome)}</p>
+            <p><strong>Partners:</strong> ${escapeHtml(collaboration.partners)}</p>
+          </div>
+        </article>
+      `;
+    }).join("");
+
+    const spotlightTitles = new Set(projectSpotlightSpecs.map((spotlight) => spotlight.collaborationTitle));
+    const remainingCollaborations = collaborations.filter((item) => !spotlightTitles.has(item.title));
+    $("[data-collaborations]").innerHTML = remainingCollaborations.map((item) => `
       <article class="collab-card reveal">
         <div class="chips"><span class="chip">${escapeHtml(item.status)}</span></div>
         <h3>${escapeHtml(item.title)}</h3>
@@ -908,6 +1369,7 @@
   // concern; the bundled assets/data/cv-site-data.js snapshot is the offline fallback.
   // Whenever the CV site regenerates its data, this site reflects it on next load.
   const CV_DATA_URL = "https://educatian.github.io/cv/assets/site-data.generated.json";
+  const SCHOLAR_ANALYTICS_URL = "https://educatian.github.io/cv/assets/research-analytics-scholar.json";
   const SYNC_KEYS = [
     "publications",
     "completeJournalArticles",
@@ -916,7 +1378,9 @@
     "grants",
     "grantPortfolio",
     "stats",
-    "talks"
+    "talks",
+    "news",
+    "honors"
   ];
 
   async function syncPaperRecords() {
@@ -939,6 +1403,9 @@
       renderAdvisingImpact();
       renderPublicationFilters();
       renderPublications();
+      renderTalks();
+      renderNewsAndHonors();
+      renderResearchImpact();
       renderGrants();
       drawConstellation();
     } catch (err) {
@@ -946,15 +1413,42 @@
     }
   }
 
+  async function syncScholarAnalytics() {
+    renderResearchImpact();
+    if (!window.fetch || location.protocol === "file:") return;
+    try {
+      const res = await fetch(SCHOLAR_ANALYTICS_URL, { cache: "no-cache" });
+      if (!res.ok) return;
+      const fresh = await res.json();
+      if (!fresh || typeof fresh !== "object") return;
+      scholarAnalytics = {
+        ...scholarFallback,
+        ...fresh,
+        profileUrl: verifiedLinks.scholar,
+        summary: { ...scholarFallback.summary, ...(fresh.summary || {}) },
+        annualCitations: Array.isArray(fresh.annualCitations) ? fresh.annualCitations : scholarFallback.annualCitations
+      };
+      renderResearchImpact();
+    } catch {
+      scholarAnalytics = scholarFallback;
+      renderResearchImpact();
+    }
+  }
+
   function init() {
     renderStats();
     renderResearch();
+    renderResearchImpact();
     renderPeople();
     renderAdvisingImpact();
     renderPublicationFilters();
     renderPublications();
+    renderTalks();
     renderProjects();
+    renderGlobalCollaborations();
     renderGrants();
+    renderOpenScience();
+    renderNewsAndHonors();
     setupTheme();
     setupNavigation();
     setupReveals();
@@ -964,7 +1458,9 @@
     setupBackToTop();
     drawConstellation();
     window.addEventListener("resize", debounce(drawConstellation, 220));
+    window.addEventListener("resize", debounce(drawGlobalMap, 220));
     syncPaperRecords();
+    syncScholarAnalytics();
   }
 
   function clamp(value, min, max) {
@@ -992,9 +1488,9 @@
 
   function debounce(fn, wait) {
     let id;
-    return () => {
+    return (...args) => {
       clearTimeout(id);
-      id = setTimeout(fn, wait);
+      id = setTimeout(() => fn(...args), wait);
     };
   }
 
