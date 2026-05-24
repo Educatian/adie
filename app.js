@@ -37,7 +37,7 @@
 
   const people = [
     {
-      group: "Director",
+      group: "People",
       items: [
         {
           name: "Dr. Jewoong Moon",
@@ -45,12 +45,7 @@
           avatar: "assets/img/moon-headshot.jpg",
           chips: ["Director", "Learning Analytics", "XR", "GenAI"],
           bio: "Studies digital game-based learning, inclusive immersive learning experience design, learning analytics, educational data mining, and adaptive learning systems."
-        }
-      ]
-    },
-    {
-      group: "PhD Students",
-      items: [
+        },
         {
           name: 'Idowu "David" Awoyemi',
           avatar: "assets/img/people/awoyemi.jpg",
@@ -201,17 +196,14 @@
   }
 
   function renderPeople() {
-    $("[data-people]").innerHTML = people.map((group) => `
-      <section class="people-group reveal" aria-label="${escapeHtml(group.group)}">
-        <div class="people-group-heading">
-          <h3>${escapeHtml(group.group)}</h3>
-          <span>${group.items.length} ${group.items.length === 1 ? "member" : "members"}</span>
-        </div>
+    const members = people.flatMap((group) => group.items);
+    $("[data-people]").innerHTML = `
+      <section class="people-group reveal" aria-label="People">
         <div class="people-grid">
-          ${group.items.map((person) => personCard(person)).join("")}
+          ${members.map((person) => personCard(person)).join("")}
         </div>
       </section>
-    `).join("");
+    `;
   }
 
   function renderAdvisingImpact() {
@@ -315,7 +307,9 @@
   }
 
   function currentPhdStudents() {
-    return people.find((group) => group.group === "PhD Students")?.items || [];
+    return people
+      .flatMap((group) => group.items)
+      .filter((person) => !/director/i.test(person.role || ""));
   }
 
   function personCard(person) {
