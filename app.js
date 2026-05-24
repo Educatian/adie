@@ -5,31 +5,31 @@
   const researchAreas = [
     {
       title: "Immersive learning environments",
-      image: "assets/img/motif-immersive.png",
+      image: "assets/img/motif-immersive.webp",
       alt: "Abstract mixed-reality spatial grid and luminous learning portals.",
       text: "Digital games, VR, AR, and mixed reality environments for authentic learning and assessment."
     },
     {
       title: "Learning analytics & educational data mining",
-      image: "assets/img/motif-analytics.png",
+      image: "assets/img/motif-analytics.webp",
       alt: "Abstract data constellations and analytic learning pathways.",
       text: "Behavioral traces, multimodal data, and interpretable models of how learners act and adapt."
     },
     {
       title: "Inclusive & adaptive learning design",
-      image: "assets/img/motif-inclusive.png",
+      image: "assets/img/motif-inclusive.webp",
       alt: "Abstract adaptive forms and inclusive learning pathways.",
       text: "Personalized learning environments for underrepresented learners, including learners with disabilities."
     },
     {
       title: "Generative-AI-empowered learning & agents",
-      image: "assets/img/motif-genai.png",
+      image: "assets/img/motif-genai.webp",
       alt: "Abstract neural-light strands and agentic feedback loops.",
       text: "Generative agents, teacher simulations, AI literacy, and evidence-based governance for AI in learning."
     },
     {
       title: "Engineering / STEM education",
-      image: "assets/img/motif-stem.png",
+      image: "assets/img/motif-stem.webp",
       alt: "Abstract STEM simulation lattice and calibrated light paths.",
       text: "XR simulation, STEM problem solving, engineering education, and computational design research."
     }
@@ -42,6 +42,7 @@
         {
           name: "Dr. Jewoong Moon",
           role: "Director, Assistant Professor of Instructional Technology",
+          avatar: "assets/img/moon-headshot.jpg",
           chips: ["Director", "Learning Analytics", "XR", "GenAI"],
           bio: "Studies digital game-based learning, inclusive immersive learning experience design, learning analytics, educational data mining, and adaptive learning systems."
         }
@@ -136,6 +137,12 @@
 
   const labMemberNames = ["Awoyemi", "Abu", "Uddin", "Ghooreian", "Tran", "Amayou", "Searight", "Ogunniran"];
   const publicationTags = ["All", "XR", "GenAI", "Analytics", "Game-Based", "STEM", "Teacher Ed", "Review"];
+  const avatarTiles = [
+    "assets/img/avatar-tile-1.png",
+    "assets/img/avatar-tile-2.png",
+    "assets/img/avatar-tile-3.png",
+    "assets/img/avatar-tile-4.png"
+  ];
   let activePublicationTag = "All";
 
   const $ = (selector, scope = document) => scope.querySelector(selector);
@@ -173,7 +180,7 @@
   function renderResearch() {
     $("[data-research-grid]").innerHTML = researchAreas.map((area, index) => `
       <article class="research-card reveal">
-        <img src="${area.image}" width="1586" height="992" alt="${escapeHtml(area.alt)}" loading="lazy">
+        <img src="${area.image}" width="1000" height="625" alt="${escapeHtml(area.alt)}" loading="lazy">
         <div>
           <span class="number">${String(index + 1).padStart(2, "0")}</span>
           <h3>${escapeHtml(area.title)}</h3>
@@ -184,21 +191,71 @@
   }
 
   function renderPeople() {
+    let tileCursor = 0;
     $("[data-people]").innerHTML = people.map((group) => `
       <section class="people-group reveal" aria-label="${escapeHtml(group.group)}">
-        <h3>${escapeHtml(group.group)}</h3>
+        <div class="people-group-heading">
+          <h3>${escapeHtml(group.group)}</h3>
+          <span>${group.items.length} ${group.items.length === 1 ? "member" : "members"}</span>
+        </div>
         <div class="people-grid">
-          ${group.items.map((person) => `
-            <article class="person-card">
-              <h4>${escapeHtml(person.name)}</h4>
-              <p><strong>${escapeHtml(person.role)}</strong></p>
-              <div class="chips">${person.chips.map((chip) => `<span class="chip">${escapeHtml(chip)}</span>`).join("")}</div>
-              <p>${escapeHtml(person.bio)}</p>
-            </article>
-          `).join("")}
+          ${group.items.map((person) => {
+            const tileIndex = person.avatar ? 0 : tileCursor++;
+            return personCard(person, tileIndex);
+          }).join("")}
         </div>
       </section>
     `).join("");
+  }
+
+  function personCard(person, tileIndex) {
+    const chips = cleanChips(person.chips);
+    return `
+      <article class="person-card">
+        ${personAvatar(person, tileIndex)}
+        <div class="person-card-body">
+          <h4>${escapeHtml(person.name)}</h4>
+          <p class="person-role">${escapeHtml(person.role)}</p>
+          <div class="chips">${chips.map((chip) => `<span class="chip">${escapeHtml(chip)}</span>`).join("")}</div>
+          <p>${escapeHtml(person.bio)}</p>
+        </div>
+      </article>
+    `;
+  }
+
+  function personAvatar(person, tileIndex) {
+    if (person.avatar) {
+      return `
+        <div class="person-avatar is-photo">
+          <img src="${escapeHtml(person.avatar)}" width="240" height="240" alt="Portrait of ${escapeHtml(person.name)}" loading="lazy">
+        </div>
+      `;
+    }
+    const tile = avatarTiles[tileIndex % avatarTiles.length];
+    return `
+      <div class="person-avatar is-monogram" style="--avatar-image: url('${escapeHtml(tile)}')">
+        <span>${escapeHtml(initialsFor(person.name))}</span>
+      </div>
+    `;
+  }
+
+  function initialsFor(name) {
+    const cleaned = String(name || "")
+      .replace(/\bDr\.\s*/gi, "")
+      .replace(/["']/g, "")
+      .trim();
+    const parts = cleaned.split(/\s+/).filter(Boolean);
+    if (!parts.length) return "AD";
+    const first = parts[0][0] || "";
+    const last = (parts.length > 1 ? parts[parts.length - 1][0] : parts[0][1]) || "";
+    return `${first}${last}`.toUpperCase();
+  }
+
+  function cleanChips(chips) {
+    return (chips || [])
+      .map((chip) => String(chip || "").trim())
+      .filter((chip) => chip && !/[^\x20-\x7E]/.test(chip))
+      .slice(0, 4);
   }
 
   function isLabCollaboration(pub) {
@@ -206,8 +263,12 @@
   }
 
   function renderPublicationFilters() {
+    const allPublications = siteData.publications || [];
     $("[data-publication-filters]").innerHTML = publicationTags.map((tag) => `
-      <button class="filter-button ${tag === activePublicationTag ? "is-active" : ""}" type="button" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</button>
+      <button class="filter-button ${tag === activePublicationTag ? "is-active" : ""}" type="button" data-tag="${escapeHtml(tag)}">
+        <span>${escapeHtml(tag)}</span>
+        <em>${tag === "All" ? allPublications.length : allPublications.filter((pub) => (pub.tags || []).includes(tag)).length}</em>
+      </button>
     `).join("");
     $$("[data-tag]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -227,9 +288,8 @@
   function renderPublications() {
     const publications = filteredPublications();
     const featured = publications.filter(isLabCollaboration).slice(0, 6);
-    const latest = publications.slice(0, 10);
     $("[data-featured-publications]").innerHTML = featured.map((pub) => publicationCard(pub)).join("");
-    $("[data-publication-list]").innerHTML = latest.map((pub) => `
+    $("[data-publication-list]").innerHTML = publications.map((pub) => `
       <article class="publication-row">
         <strong>${escapeHtml(pub.year)}</strong>
         <div>
@@ -243,17 +303,28 @@
   }
 
   function publicationCard(pub) {
-    const link = pub.link ? `<a href="${escapeHtml(pub.link)}">DOI / link</a>` : "";
+    const link = validPublicationUrl(pub.link);
     return `
       <article class="publication-card reveal">
         <span class="year">${escapeHtml(pub.year)}${pub.status ? ` · ${escapeHtml(pub.status)}` : ""}</span>
         <h3>${escapeHtml(pub.title)}</h3>
         <p>${escapeHtml(pub.authors)}</p>
-        <p>${escapeHtml(pub.venue)}</p>
+        <p class="publication-venue">${escapeHtml(pub.venue)}</p>
         <div class="chips">${(pub.tags || []).slice(0, 4).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>
-        ${link}
+        ${link ? `<a class="publication-link" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">DOI / link</a>` : ""}
       </article>
     `;
+  }
+
+  function validPublicationUrl(value) {
+    const trimmed = String(value || "").trim();
+    if (!trimmed) return "";
+    try {
+      const url = new URL(trimmed);
+      return url.protocol === "http:" || url.protocol === "https:" ? trimmed : "";
+    } catch {
+      return "";
+    }
   }
 
   function renderProjects() {
@@ -408,6 +479,18 @@
     });
   }
 
+  function setupBackToTop() {
+    const button = $("[data-back-to-top]");
+    if (!button) return;
+    window.addEventListener("scroll", () => {
+      button.classList.toggle("is-visible", window.scrollY > 720);
+    }, { passive: true });
+    button.addEventListener("click", () => {
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    });
+  }
+
   function drawConstellation() {
     if (!window.d3) {
       $("#constellation-viz").outerHTML = "<p class='form-note'>Network visualization loads when D3 is available.</p>";
@@ -415,35 +498,61 @@
     }
     const svg = d3.select("#constellation-viz");
     const shell = $(".viz-shell");
-    const width = shell.clientWidth;
-    const height = 480;
-    svg.attr("viewBox", `0 0 ${width} ${height}`);
+    const isMobile = window.matchMedia("(max-width: 760px)").matches;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const width = Math.max(shell.clientWidth, isMobile ? 760 : 720);
+    const height = isMobile ? 560 : 620;
+    svg.attr("viewBox", `0 0 ${width} ${height}`).attr("width", width).attr("height", height);
 
     const topicCounts = new Map();
     (siteData.publications || []).forEach((pub) => {
       (pub.tags || []).forEach((tag) => topicCounts.set(tag, (topicCounts.get(tag) || 0) + 1));
     });
 
-    const nodes = [
-      { id: "AdDIE Lab", type: "theme", r: 24 },
-      ...researchAreas.map((area) => ({ id: area.title.split(" & ")[0], type: "theme", r: 15 })),
-      ...people.flatMap((group) => group.items).slice(0, 9).map((person) => ({ id: person.name.split(" ")[0].replaceAll('"', ""), type: "person", r: 10 })),
-      ...Array.from(topicCounts.entries()).sort((a, b) => b[1] - a[1]).slice(0, 8).map(([tag, count]) => ({ id: tag, type: "output", r: 7 + Math.min(count, 18) / 2 }))
+    const themeNodes = [
+      { id: "Immersive learning", label: "Immersive learning", type: "theme", r: 17, tags: ["XR", "Game-Based"] },
+      { id: "Learning analytics", label: "Learning analytics", type: "theme", r: 17, tags: ["Analytics"] },
+      { id: "Inclusive design", label: "Inclusive design", type: "theme", r: 17, tags: ["Review"] },
+      { id: "GenAI learning", label: "GenAI learning", type: "theme", r: 17, tags: ["GenAI", "Teacher Ed"] },
+      { id: "STEM education", label: "STEM education", type: "theme", r: 17, tags: ["STEM"] }
     ];
-    const links = nodes.filter((node) => node.id !== "AdDIE Lab").map((node) => ({ source: "AdDIE Lab", target: node.id }));
-    nodes.filter((node) => node.type === "person").forEach((node, index) => {
-      links.push({ source: node.id, target: researchAreas[index % researchAreas.length].title.split(" & ")[0] });
+    const personNodes = people.flatMap((group) => group.items).map((person) => ({
+      id: person.name,
+      label: shortPersonLabel(person.name),
+      type: "person",
+      r: person.avatar ? 13 : 10,
+      chips: cleanChips(person.chips)
+    }));
+    const outputNodes = Array.from(topicCounts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 9)
+      .map(([tag, count]) => ({ id: `Output: ${tag}`, label: tag, type: "output", r: 7 + Math.min(count, 20) / 2, count }));
+    const nodes = [
+      { id: "AdDIE Lab", label: "AdDIE Lab", type: "hub", r: 26 },
+      ...themeNodes,
+      ...personNodes,
+      ...outputNodes
+    ];
+    const links = themeNodes.map((node) => ({ source: "AdDIE Lab", target: node.id, strength: 0.9 }));
+    const themeByTag = new Map(themeNodes.flatMap((theme) => theme.tags.map((tag) => [tag, theme.id])));
+    personNodes.forEach((person, index) => {
+      const matchedThemes = person.chips.map((chip) => themeByTag.get(chip)).filter(Boolean);
+      const targets = matchedThemes.length ? Array.from(new Set(matchedThemes)) : [themeNodes[index % themeNodes.length].id];
+      targets.forEach((target) => links.push({ source: person.id, target, strength: 0.42 }));
     });
-    nodes.filter((node) => node.type === "output").forEach((node, index) => {
-      links.push({ source: node.id, target: researchAreas[index % researchAreas.length].title.split(" & ")[0] });
+    outputNodes.forEach((output, index) => {
+      links.push({ source: output.id, target: themeByTag.get(output.label) || themeNodes[index % themeNodes.length].id, strength: 0.55 });
+      links.push({ source: "AdDIE Lab", target: output.id, strength: 0.18 });
+    });
+    personNodes.slice(0, 5).forEach((person, index) => {
+      links.push({ source: person.id, target: outputNodes[index % outputNodes.length].id, strength: 0.2 });
     });
 
-    const color = { theme: "#9e1b32", person: "#2b8c87", output: "#b6812d" };
+    const color = { hub: "#111014", theme: "#9e1b32", person: "#2b8c87", output: "#b6812d" };
     svg.selectAll("*").remove();
 
     const link = svg.append("g")
-      .attr("stroke", "currentColor")
-      .attr("stroke-opacity", 0.18)
+      .attr("class", "constellation-links")
       .selectAll("line")
       .data(links)
       .join("line");
@@ -474,27 +583,35 @@
       .attr("fill-opacity", 0.92);
 
     node.append("text")
-      .attr("x", 12)
+      .attr("class", "constellation-label")
+      .attr("x", (d) => d.r + 8)
       .attr("y", 4)
-      .attr("fill", "currentColor")
-      .attr("font-size", 11)
-      .attr("font-weight", 800)
-      .text((d) => d.id);
+      .text((d) => d.label);
 
     const simulation = d3.forceSimulation(nodes)
-      .force("link", d3.forceLink(links).id((d) => d.id).distance((d) => d.source.id === "AdDIE Lab" ? 96 : 72))
-      .force("charge", d3.forceManyBody().strength(-260))
+      .force("link", d3.forceLink(links).id((d) => d.id).distance((d) => d.source.id === "AdDIE Lab" ? 130 : 92).strength((d) => d.strength || 0.3))
+      .force("charge", d3.forceManyBody().strength((d) => d.type === "hub" ? -520 : -260))
       .force("center", d3.forceCenter(width / 2, height / 2))
-      .force("collision", d3.forceCollide().radius((d) => d.r + 22));
+      .force("x", d3.forceX((d) => d.type === "person" ? width * 0.72 : d.type === "output" ? width * 0.28 : width * 0.5).strength(0.035))
+      .force("y", d3.forceY(height / 2).strength(0.045))
+      .force("collision", d3.forceCollide().radius((d) => d.r + (d.type === "person" ? 54 : d.type === "theme" ? 56 : 42)));
 
-    simulation.on("tick", () => {
+    function ticked() {
       link
-        .attr("x1", (d) => d.source.x)
-        .attr("y1", (d) => d.source.y)
-        .attr("x2", (d) => d.target.x)
-        .attr("y2", (d) => d.target.y);
-      node.attr("transform", (d) => `translate(${d.x},${d.y})`);
-    });
+        .attr("x1", (d) => clamp(d.source.x, 30, width - 30))
+        .attr("y1", (d) => clamp(d.source.y, 58, height - 58))
+        .attr("x2", (d) => clamp(d.target.x, 30, width - 30))
+        .attr("y2", (d) => clamp(d.target.y, 58, height - 58));
+      node.attr("transform", (d) => `translate(${clamp(d.x, 34, width - 230)},${clamp(d.y, 58, height - 58)})`);
+    }
+
+    if (reduceMotion) {
+      simulation.stop();
+      for (let i = 0; i < 180; i += 1) simulation.tick();
+      ticked();
+    } else {
+      simulation.on("tick", ticked);
+    }
   }
 
   function init() {
@@ -510,8 +627,23 @@
     setupReveals();
     setupCounters();
     setupContactForm();
+    setupBackToTop();
     drawConstellation();
     window.addEventListener("resize", debounce(drawConstellation, 220));
+  }
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value || 0));
+  }
+
+  function shortPersonLabel(name) {
+    const cleaned = String(name || "")
+      .replace(/^Dr\.\s*/i, "")
+      .replace(/"([^"]+)"/g, "$1")
+      .trim();
+    const parts = cleaned.split(/\s+/).filter(Boolean);
+    if (parts.length <= 2) return cleaned;
+    return `${parts[0]} ${parts[parts.length - 1]}`;
   }
 
   function debounce(fn, wait) {
