@@ -65,6 +65,7 @@
   const globalCollaborators = [
     { name: "Wageningen University & Research", place: "Netherlands", lat: 51.9851, lon: 5.6636 },
     { name: "Leiden University", place: "Netherlands", lat: 52.1579, lon: 4.4852 },
+    { name: "Maastricht University", place: "Maastricht, Netherlands", lat: 50.8514, lon: 5.6910 },
     { name: "Daegu National University of Education", place: "South Korea", lat: 35.8576, lon: 128.5906 },
     { name: "Enuma (EdTech)", place: "USA / South Korea", lat: 37.5665, lon: 126.9780 },
     { name: "Seoul National University", place: "Seoul, South Korea", lat: 37.4599, lon: 126.9519 },
@@ -73,8 +74,8 @@
     { name: "Kuala Lumpur", place: "Malaysia", lat: 3.1390, lon: 101.6869 },
     { name: "Syracuse University", place: "New York, USA", lat: 43.0481, lon: -76.1474 },
     { name: "Georgia State University", place: "Atlanta, Georgia, USA", lat: 33.7490, lon: -84.3880 },
-    { name: "Oklahoma City", place: "Oklahoma, USA", lat: 35.4676, lon: -97.5164 },
-    { name: "Tallahassee", place: "Florida, USA", lat: 30.4383, lon: -84.2807 },
+    { name: "University of Oklahoma", place: "Norman, Oklahoma, USA", lat: 35.2059, lon: -97.4457 },
+    { name: "Florida State University", place: "Tallahassee, Florida, USA", lat: 30.4419, lon: -84.2985 },
     { name: "New York City", place: "New York, USA", lat: 40.7128, lon: -74.0060 },
     { name: "Florida Gulf Coast University", place: "Fort Myers, Florida, USA", lat: 26.4634, lon: -81.7748 },
     { name: "Center for Innovative Research in Autism (CIRA)", place: "UA, USA", lat: 33.2098, lon: -87.5692 },
@@ -1045,12 +1046,12 @@
   function getPartnerMapLabel(partner) {
     const denseClusterLabel = { show: false, text: "", dx: 0, dy: 0, anchor: "start", radius: 4.4 };
     if (/wageningen/i.test(partner.name)) return { show: true, text: "Netherlands", dx: 10, dy: -14, anchor: "start", radius: 4.6 };
-    if (/leiden/i.test(partner.name)) return denseClusterLabel;
+    if (/leiden|maastricht/i.test(partner.name)) return denseClusterLabel;
     if (/daegu/i.test(partner.name)) return { show: true, text: "Daegu", dx: 10, dy: -12, anchor: "start", radius: 4.6 };
     if (/seoul national|korea university|kongju national/i.test(partner.name)) return denseClusterLabel;
     if (/kuala lumpur/i.test(partner.name)) return { show: true, text: "Kuala Lumpur", dx: -10, dy: 18, anchor: "end", radius: 4.8 };
     if (/enuma/i.test(partner.name)) return { show: true, text: "Berkeley", dx: -10, dy: -12, anchor: "end", radius: 4.8 };
-    if (/syracuse|georgia state|oklahoma city|tallahassee|new york city|arizona state|florida gulf coast/i.test(partner.name)) return denseClusterLabel;
+    if (/syracuse|georgia state|university of oklahoma|florida state|new york city|arizona state|florida gulf coast/i.test(partner.name)) return denseClusterLabel;
     return { show: true, text: partner.name, dx: 10, dy: -10, anchor: "start", radius: 4.8 };
   }
 
