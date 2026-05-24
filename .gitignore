@@ -1,0 +1,6 @@
+# Codex build logs (local only)
+_codex-build.log
+_codex-last-message.txt
+# local preview/debug artifacts
+_*.png
+_*.html
