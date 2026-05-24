@@ -580,7 +580,6 @@
   }
 
   function publicationCard(pub) {
-    const link = validPublicationUrl(pub.link);
     return `
       <article class="publication-card reveal">
         <span class="year">${escapeHtml(pub.year)}${pub.status ? ` · ${escapeHtml(pub.status)}` : ""}</span>
@@ -589,7 +588,6 @@
         <p class="publication-venue">${escapeHtml(pub.venue)}</p>
         <div class="chips">${(pub.tags || []).slice(0, 4).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>
         ${publicationCopyActions(pub)}
-        ${link ? `<a class="publication-link" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">DOI / link</a>` : ""}
       </article>
     `;
   }
@@ -608,8 +606,11 @@
   function publicationCopyActions(pub) {
     const key = `pub-${publicationActionStore.size}`;
     publicationActionStore.set(key, pub);
+    const link = validPublicationUrl(pub.link);
+    const linkLabel = /doi\.org/i.test(link) ? "DOI ↗" : "Source ↗";
     return `
-      <div class="publication-actions" aria-label="Citation copy actions">
+      <div class="publication-actions" aria-label="Citation and source links">
+        ${link ? `<a class="publication-link" href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">${linkLabel}</a>` : ""}
         <button class="cite-button" type="button" data-pub-action="${key}" data-format="apa">Cite &#10697;</button>
         <button class="cite-button" type="button" data-pub-action="${key}" data-format="bibtex">BibTeX</button>
       </div>
