@@ -67,9 +67,19 @@
     { name: "Leiden University", place: "Netherlands", lat: 52.1579, lon: 4.4852 },
     { name: "Daegu National University of Education", place: "South Korea", lat: 35.8576, lon: 128.5906 },
     { name: "Enuma (EdTech)", place: "USA / South Korea", lat: 37.5665, lon: 126.9780 },
+    { name: "Seoul National University", place: "Seoul, South Korea", lat: 37.4599, lon: 126.9519 },
+    { name: "Korea University", place: "Seoul, South Korea", lat: 37.5895, lon: 127.0323 },
+    { name: "Kongju National University", place: "Gongju, South Korea", lat: 36.4467, lon: 127.1190 },
+    { name: "Kuala Lumpur", place: "Malaysia", lat: 3.1390, lon: 101.6869 },
+    { name: "Syracuse University", place: "New York, USA", lat: 43.0481, lon: -76.1474 },
+    { name: "Georgia State University", place: "Atlanta, Georgia, USA", lat: 33.7490, lon: -84.3880 },
+    { name: "Oklahoma City", place: "Oklahoma, USA", lat: 35.4676, lon: -97.5164 },
+    { name: "Tallahassee", place: "Florida, USA", lat: 30.4383, lon: -84.2807 },
+    { name: "New York City", place: "New York, USA", lat: 40.7128, lon: -74.0060 },
+    { name: "Florida Gulf Coast University", place: "Fort Myers, Florida, USA", lat: 26.4634, lon: -81.7748 },
     { name: "Center for Innovative Research in Autism (CIRA)", place: "UA, USA", lat: 33.2098, lon: -87.5692 },
     { name: "Center for Youth Development & Intervention (CYDI)", place: "UA, USA", lat: 33.2118, lon: -87.5650 },
-    { name: "UA College of Engineering (Dr. Siyuan Song's Lab)", place: "USA", lat: 33.2140, lon: -87.5450 }
+    { name: "Arizona State University (Dr. Siyuan Song's Lab)", place: "Tempe, Arizona, USA", lat: 33.4242, lon: -111.9281 }
   ];
 
   const homeCollaborator = {
@@ -916,7 +926,7 @@
     svgNode.setAttribute("aria-busy", "false");
     svgNode.innerHTML = `
       <title id="global-map-title">Global collaboration map</title>
-      <desc id="global-map-desc">Natural Earth world map showing crimson great-circle research arcs from The University of Alabama in Tuscaloosa to external collaborators in the Netherlands, South Korea, and California. Campus partners are folded into the home node and listed in the partner list.</desc>
+      <desc id="global-map-desc">Natural Earth world map showing crimson great-circle research arcs from The University of Alabama in Tuscaloosa to external collaborators in Europe, Asia, Malaysia, California, and multiple US cities. Dense clusters use hover tooltips and the partner list instead of always-on labels. Campus partners are folded into the home node and listed in the partner list.</desc>
       <defs>
         <filter id="map-crimson-glow" x="-30%" y="-30%" width="160%" height="160%">
           <feGaussianBlur in="SourceGraphic" stdDeviation="3.2" result="blur"></feGaussianBlur>
@@ -935,7 +945,7 @@
       </g>
       <g class="map-arcs" aria-hidden="true">
         ${mappedPartners.map((partner, index) => {
-          const d = greatCirclePath(projection, homeLonLat, partner.lonLat);
+          const d = greatCirclePath(projection, homeLonLat, partner.lonLat, getShortArcBend(homePoint, partner.point, partner.name));
           return `
             <path class="map-arc-glow" d="${d}" pathLength="1"></path>
             <path class="map-arc-line" d="${d}" pathLength="1" style="--arc-index:${index}"></path>
@@ -953,10 +963,10 @@
           const [x, y] = partner.point;
           const label = partner.label;
           return `
-            <g class="map-partner" transform="translate(${x.toFixed(1)} ${y.toFixed(1)})">
+            <g class="map-partner" transform="translate(${x.toFixed(1)} ${y.toFixed(1)})" aria-label="${escapeHtml(partner.name)} (${escapeHtml(partner.place)})">
               <title>${escapeHtml(partner.name)} (${escapeHtml(partner.place)})</title>
-              <circle r="5.6"></circle>
-              <text class="map-label" x="${label.dx}" y="${label.dy}" text-anchor="${label.anchor}">${escapeHtml(label.text)}</text>
+              <circle r="${label.radius.toFixed(1)}"></circle>
+              ${label.show ? `<text class="map-label" x="${label.dx}" y="${label.dy}" text-anchor="${label.anchor}">${escapeHtml(label.text)}</text>` : ""}
             </g>
           `;
         }).join("")}
@@ -984,15 +994,43 @@
     `;
   }
 
-  function greatCirclePath(projection, startLonLat, targetLonLat) {
+  function greatCirclePath(projection, startLonLat, targetLonLat, bend = 0) {
     const interpolate = d3.geoInterpolate(startLonLat, targetLonLat);
-    const points = d3.range(45).map((step) => projection(interpolate(step / 44))).filter(Boolean);
+    const rawPoints = d3.range(45).map((step) => {
+      const t = step / 44;
+      const point = projection(interpolate(t));
+      return point ? { point, t } : null;
+    }).filter(Boolean);
+    const points = bend ? bendProjectedPath(rawPoints, bend) : rawPoints.map((item) => item.point);
     if (!points.length) return "";
     return points.map((point, index) => {
       const previous = points[index - 1];
       const command = !index || (previous && Math.abs(point[0] - previous[0]) > 320) ? "M" : "L";
       return `${command}${point[0].toFixed(1)} ${point[1].toFixed(1)}`;
     }).join(" ");
+  }
+
+  function bendProjectedPath(items, bend) {
+    const first = items[0]?.point;
+    const last = items[items.length - 1]?.point;
+    if (!first || !last) return items.map((item) => item.point);
+    const dx = last[0] - first[0];
+    const dy = last[1] - first[1];
+    const distance = Math.hypot(dx, dy) || 1;
+    const normalX = -dy / distance;
+    const normalY = dx / distance;
+    return items.map(({ point, t }) => {
+      const offset = Math.sin(Math.PI * t) * bend;
+      return [point[0] + normalX * offset, point[1] + normalY * offset];
+    });
+  }
+
+  function getShortArcBend(startPoint, targetPoint, name) {
+    if (!startPoint || !targetPoint) return 0;
+    const distance = Math.hypot(targetPoint[0] - startPoint[0], targetPoint[1] - startPoint[1]);
+    if (!distance || distance > 130) return 0;
+    const direction = /atlanta|syracuse|oklahoma/i.test(name) ? -1 : 1;
+    return direction * clamp(34 - distance * 0.12, 12, 28);
   }
 
   function isCampusPartner(partner) {
@@ -1005,11 +1043,15 @@
   }
 
   function getPartnerMapLabel(partner) {
-    if (/wageningen/i.test(partner.name)) return { text: "Wageningen", dx: 10, dy: -12, anchor: "start" };
-    if (/leiden/i.test(partner.name)) return { text: "Leiden", dx: 10, dy: 22, anchor: "start" };
-    if (/daegu/i.test(partner.name)) return { text: "Daegu", dx: 10, dy: -10, anchor: "start" };
-    if (/enuma/i.test(partner.name)) return { text: "Enuma", dx: -10, dy: -11, anchor: "end" };
-    return { text: partner.name, dx: 10, dy: -10, anchor: "start" };
+    const denseClusterLabel = { show: false, text: "", dx: 0, dy: 0, anchor: "start", radius: 4.4 };
+    if (/wageningen/i.test(partner.name)) return { show: true, text: "Netherlands", dx: 10, dy: -14, anchor: "start", radius: 4.6 };
+    if (/leiden/i.test(partner.name)) return denseClusterLabel;
+    if (/daegu/i.test(partner.name)) return { show: true, text: "Daegu", dx: 10, dy: -12, anchor: "start", radius: 4.6 };
+    if (/seoul national|korea university|kongju national/i.test(partner.name)) return denseClusterLabel;
+    if (/kuala lumpur/i.test(partner.name)) return { show: true, text: "Kuala Lumpur", dx: -10, dy: 18, anchor: "end", radius: 4.8 };
+    if (/enuma/i.test(partner.name)) return { show: true, text: "Berkeley", dx: -10, dy: -12, anchor: "end", radius: 4.8 };
+    if (/syracuse|georgia state|oklahoma city|tallahassee|new york city|arizona state|florida gulf coast/i.test(partner.name)) return denseClusterLabel;
+    return { show: true, text: partner.name, dx: 10, dy: -10, anchor: "start", radius: 4.8 };
   }
 
   function renderProjects() {
