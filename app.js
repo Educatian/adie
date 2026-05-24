@@ -149,13 +149,9 @@
     underReview: 29,
     currentAdvisees: 7
   };
-  const avatarTiles = [
-    "assets/img/avatar-tile-1.png",
-    "assets/img/avatar-tile-2.png",
-    "assets/img/avatar-tile-3.png",
-    "assets/img/avatar-tile-4.png"
-  ];
+  const PUBLICATION_COLLAPSED_LIMIT = 12;
   let activePublicationTag = "All";
+  let publicationsExpanded = false;
 
   const $ = (selector, scope = document) => scope.querySelector(selector);
   const $$ = (selector, scope = document) => Array.from(scope.querySelectorAll(selector));
@@ -203,7 +199,6 @@
   }
 
   function renderPeople() {
-    let tileCursor = 0;
     $("[data-people]").innerHTML = people.map((group) => `
       <section class="people-group reveal" aria-label="${escapeHtml(group.group)}">
         <div class="people-group-heading">
@@ -211,10 +206,7 @@
           <span>${group.items.length} ${group.items.length === 1 ? "member" : "members"}</span>
         </div>
         <div class="people-grid">
-          ${group.items.map((person) => {
-            const tileIndex = person.avatar ? 0 : tileCursor++;
-            return personCard(person, tileIndex);
-          }).join("")}
+          ${group.items.map((person) => personCard(person)).join("")}
         </div>
       </section>
     `).join("");
@@ -340,11 +332,11 @@
     return people.find((group) => group.group === "PhD Students")?.items || [];
   }
 
-  function personCard(person, tileIndex) {
+  function personCard(person) {
     const chips = cleanChips(person.chips);
     return `
       <article class="person-card">
-        ${personAvatar(person, tileIndex)}
+        ${personAvatar(person)}
         <div class="person-card-body">
           <h4>${escapeHtml(person.name)}</h4>
           <p class="person-role">${escapeHtml(person.role)}</p>
@@ -355,7 +347,7 @@
     `;
   }
 
-  function personAvatar(person, tileIndex) {
+  function personAvatar(person) {
     if (person.avatar) {
       return `
         <div class="person-avatar is-photo">
@@ -363,9 +355,8 @@
         </div>
       `;
     }
-    const tile = avatarTiles[tileIndex % avatarTiles.length];
     return `
-      <div class="person-avatar is-monogram" style="--avatar-image: url('${escapeHtml(tile)}')">
+      <div class="person-avatar is-monogram" aria-label="${escapeHtml(person.name)}">
         <span>${escapeHtml(initialsFor(person.name))}</span>
       </div>
     `;
@@ -405,6 +396,7 @@
     $$("[data-tag]").forEach((button) => {
       button.addEventListener("click", () => {
         activePublicationTag = button.dataset.tag;
+        publicationsExpanded = false;
         renderPublicationFilters();
         renderPublications();
       });
@@ -420,18 +412,46 @@
   function renderPublications() {
     const publications = filteredPublications();
     const featured = publications.filter(isLabCollaboration).slice(0, 6);
+    const visiblePublications = publicationsExpanded ? publications : publications.slice(0, PUBLICATION_COLLAPSED_LIMIT);
+    const hasOverflow = publications.length > PUBLICATION_COLLAPSED_LIMIT;
+    const listMount = $("[data-publication-list]");
     $("[data-featured-publications]").innerHTML = featured.map((pub) => publicationCard(pub)).join("");
-    $("[data-publication-list]").innerHTML = publications.map((pub) => `
-      <article class="publication-row">
-        <strong>${escapeHtml(pub.year)}</strong>
-        <div>
-          <h3>${escapeHtml(pub.title)}</h3>
-          <p>${escapeHtml(pub.authors)}</p>
-          <p>${escapeHtml(pub.venue)}${pub.status ? ` · ${escapeHtml(pub.status)}` : ""}</p>
-        </div>
-        <div class="chips">${(pub.tags || []).slice(0, 3).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>
-      </article>
-    `).join("");
+    listMount.innerHTML = `
+      <div class="publication-list-meta">
+        <p>${escapeHtml(publicationListSummary(visiblePublications.length, publications.length))}</p>
+        ${hasOverflow ? `
+          <button class="publication-toggle" type="button" aria-expanded="${publicationsExpanded}" data-publication-toggle>
+            ${publicationsExpanded ? "Show fewer" : `Show all (${publications.length})`}
+          </button>
+        ` : ""}
+      </div>
+      <div class="publication-list-rows">
+        ${visiblePublications.map((pub) => `
+          <article class="publication-row">
+            <strong>${escapeHtml(pub.year)}</strong>
+            <div>
+              <h3>${escapeHtml(pub.title)}</h3>
+              <p>${escapeHtml(pub.authors)}</p>
+              <p>${escapeHtml(pub.venue)}${pub.status ? ` · ${escapeHtml(pub.status)}` : ""}</p>
+            </div>
+            <div class="chips">${(pub.tags || []).slice(0, 3).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>
+          </article>
+        `).join("")}
+      </div>
+    `;
+    const toggle = $("[data-publication-toggle]", listMount);
+    if (toggle) {
+      toggle.addEventListener("click", () => {
+        publicationsExpanded = !publicationsExpanded;
+        renderPublications();
+      });
+    }
+  }
+
+  function publicationListSummary(visibleCount, totalCount) {
+    if (!totalCount) return "No publications match this filter.";
+    if (visibleCount === totalCount) return `Showing all ${totalCount} publication${totalCount === 1 ? "" : "s"}.`;
+    return `Showing ${visibleCount} of ${totalCount} publications.`;
   }
 
   function publicationCard(pub) {
