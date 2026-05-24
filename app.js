@@ -903,6 +903,49 @@
     }
   }
 
+  // Auto-sync paper records (publications, working papers, grants, stats) from the
+  // personal CV site's live data file. Same origin (educatian.github.io), so no CORS
+  // concern; the bundled assets/data/cv-site-data.js snapshot is the offline fallback.
+  // Whenever the CV site regenerates its data, this site reflects it on next load.
+  const CV_DATA_URL = "https://educatian.github.io/cv/assets/site-data.generated.json";
+  const SYNC_KEYS = [
+    "publications",
+    "completeJournalArticles",
+    "workingPapers",
+    "workingPaperSummary",
+    "grants",
+    "grantPortfolio",
+    "stats",
+    "talks"
+  ];
+
+  async function syncPaperRecords() {
+    if (!window.fetch || location.protocol === "file:") return;
+    try {
+      const res = await fetch(CV_DATA_URL, { cache: "no-cache" });
+      if (!res.ok) return;
+      const fresh = await res.json();
+      if (!fresh || typeof fresh !== "object") return;
+      let changed = false;
+      SYNC_KEYS.forEach((key) => {
+        if (fresh[key] != null) {
+          siteData[key] = fresh[key];
+          changed = true;
+        }
+      });
+      if (!changed) return;
+      // Re-render only the record-driven sections; lab-specific content stays put.
+      renderStats();
+      renderAdvisingImpact();
+      renderPublicationFilters();
+      renderPublications();
+      renderGrants();
+      drawConstellation();
+    } catch (err) {
+      // Offline, blocked, or CV data unavailable: keep the bundled snapshot silently.
+    }
+  }
+
   function init() {
     renderStats();
     renderResearch();
@@ -921,6 +964,7 @@
     setupBackToTop();
     drawConstellation();
     window.addEventListener("resize", debounce(drawConstellation, 220));
+    syncPaperRecords();
   }
 
   function clamp(value, min, max) {
