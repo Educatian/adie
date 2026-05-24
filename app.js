@@ -79,6 +79,11 @@
     lon: -87.5692
   };
 
+  const worldAtlasUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+  let worldCountries;
+  let worldAtlasPromise;
+  let globalMapRenderId = 0;
+
   const openScienceItems = [
     { title: "Google Scholar", text: "Citation profile and publication impact metrics.", href: verifiedLinks.scholar },
     { title: "ResearchGate", text: "Research profile and publication discovery.", href: verifiedLinks.researchGate },
@@ -841,65 +846,170 @@
     const svgNode = $("#global-map");
     if (!svgNode) return;
     const width = 960;
-    const height = 500;
-    const project = (lat, lon) => ({
-      x: ((lon + 180) / 360) * width,
-      y: ((90 - lat) / 180) * height
-    });
-    const home = project(homeCollaborator.lat, homeCollaborator.lon);
-    const landPaths = [
-      "M86 151 L166 104 L279 121 L303 181 L250 229 L168 221 L113 193 Z",
-      "M245 244 L313 266 L322 358 L274 430 L224 391 L211 306 Z",
-      "M404 116 L462 92 L528 111 L540 157 L492 174 L433 162 Z",
-      "M462 181 L553 186 L601 238 L571 306 L485 294 L434 239 Z",
-      "M610 127 L739 104 L841 143 L874 217 L792 262 L660 230 Z",
-      "M711 260 L793 281 L822 370 L754 426 L686 383 Z",
-      "M780 331 L872 348 L895 409 L829 441 L775 403 Z",
-      "M276 92 L326 70 L351 104 L319 130 Z"
-    ];
+    const height = window.matchMedia("(max-width: 760px)").matches ? 560 : 520;
+    const renderId = ++globalMapRenderId;
+
+    prepareGlobalMapSvg(svgNode, width, height);
+    if (!window.d3 || !window.topojson) {
+      renderGlobalMapFallback(svgNode, width, height, "World map data is temporarily unavailable. The partner list remains available.");
+      return;
+    }
+
+    if (worldCountries) {
+      renderGlobalMapSvg(svgNode, width, height, worldCountries);
+      return;
+    }
+
+    renderGlobalMapFallback(svgNode, width, height, "Loading world map data...");
+    loadWorldCountries()
+      .then((countries) => {
+        if (renderId === globalMapRenderId) renderGlobalMapSvg(svgNode, width, height, countries);
+      })
+      .catch(() => {
+        if (renderId === globalMapRenderId) {
+          renderGlobalMapFallback(svgNode, width, height, "World topology could not be loaded. The partner list remains available.");
+        }
+      });
+  }
+
+  function loadWorldCountries() {
+    if (worldCountries) return Promise.resolve(worldCountries);
+    if (!worldAtlasPromise) {
+      worldAtlasPromise = d3.json(worldAtlasUrl).then((topology) => {
+        if (!topology || !topology.objects || !topology.objects.countries || !window.topojson) {
+          throw new Error("Missing world-atlas countries topology");
+        }
+        worldCountries = window.topojson.feature(topology, topology.objects.countries);
+        return worldCountries;
+      }).catch((error) => {
+        worldAtlasPromise = null;
+        throw error;
+      });
+    }
+    return worldAtlasPromise;
+  }
+
+  function prepareGlobalMapSvg(svgNode, width, height) {
     svgNode.setAttribute("viewBox", `0 0 ${width} ${height}`);
     svgNode.setAttribute("width", width);
     svgNode.setAttribute("height", height);
+    svgNode.setAttribute("aria-busy", worldCountries ? "false" : "true");
+  }
+
+  function renderGlobalMapSvg(svgNode, width, height, countries) {
+    const projection = d3.geoNaturalEarth1().fitExtent([[22, 22], [width - 22, height - 52]], { type: "Sphere" });
+    const path = d3.geoPath(projection);
+    const homeLonLat = [homeCollaborator.lon, homeCollaborator.lat];
+    const homePoint = projection(homeLonLat);
+    const campusPartners = globalCollaborators.filter(isCampusPartner);
+    const externalPartners = globalCollaborators.filter((partner) => !isCampusPartner(partner));
+    const mappedPartners = externalPartners.map((partner) => {
+      const lonLat = getMapLonLat(partner);
+      const point = projection(lonLat);
+      return { ...partner, lonLat, point, label: getPartnerMapLabel(partner) };
+    }).filter((partner) => partner.point);
+    const homeTitle = [
+      `${homeCollaborator.name}, ${homeCollaborator.place}`,
+      ...campusPartners.map((partner) => `${partner.name}, ${partner.place}`)
+    ].join(" | ");
+
+    svgNode.setAttribute("aria-busy", "false");
     svgNode.innerHTML = `
       <title id="global-map-title">Global collaboration map</title>
-      <desc id="global-map-desc">Equirectangular world map showing arcs from The University of Alabama in Tuscaloosa to collaborators in the Netherlands, South Korea, and the United States.</desc>
+      <desc id="global-map-desc">Natural Earth world map showing crimson great-circle research arcs from The University of Alabama in Tuscaloosa to external collaborators in the Netherlands, South Korea, and California. Campus partners are folded into the home node and listed in the partner list.</desc>
+      <defs>
+        <filter id="map-crimson-glow" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="3.2" result="blur"></feGaussianBlur>
+          <feColorMatrix in="blur" type="matrix" values="1 0 0 0 0.62 0 0 0 0 0.10 0 0 0 0 0.20 0 0 0 0.68 0" result="glow"></feColorMatrix>
+          <feMerge>
+            <feMergeNode in="glow"></feMergeNode>
+            <feMergeNode in="SourceGraphic"></feMergeNode>
+          </feMerge>
+        </filter>
+      </defs>
       <rect class="map-ocean" width="${width}" height="${height}" rx="8"></rect>
-      <g class="map-graticule">
-        ${[-120, -60, 0, 60, 120].map((lon) => {
-          const x = project(0, lon).x;
-          return `<line x1="${x}" y1="34" x2="${x}" y2="${height - 34}"></line>`;
-        }).join("")}
-        ${[-45, 0, 45].map((lat) => {
-          const y = project(lat, 0).y;
-          return `<line x1="34" y1="${y}" x2="${width - 34}" y2="${y}"></line>`;
-        }).join("")}
+      <path class="map-sphere" d="${path({ type: "Sphere" }) || ""}"></path>
+      <path class="map-graticule" d="${path(d3.geoGraticule10()) || ""}"></path>
+      <g class="map-land">
+        ${countries.features.map((feature) => `<path d="${path(feature) || ""}"></path>`).join("")}
       </g>
-      <g class="map-land">${landPaths.map((path) => `<path d="${path}"></path>`).join("")}</g>
-      <g class="map-arcs">
-        ${globalCollaborators.map((partner, index) => {
-          const target = project(partner.lat, partner.lon);
-          const lift = 56 + (index % 3) * 18;
-          const cx = (home.x + target.x) / 2;
-          const cy = Math.min(home.y, target.y) - lift;
-          return `<path d="M${home.x.toFixed(1)} ${home.y.toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${target.x.toFixed(1)} ${target.y.toFixed(1)}"></path>`;
+      <g class="map-arcs" aria-hidden="true">
+        ${mappedPartners.map((partner, index) => {
+          const d = greatCirclePath(projection, homeLonLat, partner.lonLat);
+          return `
+            <path class="map-arc-glow" d="${d}" pathLength="1"></path>
+            <path class="map-arc-line" d="${d}" pathLength="1" style="--arc-index:${index}"></path>
+          `;
         }).join("")}
       </g>
       <g class="map-markers">
-        <circle class="home-marker" cx="${home.x}" cy="${home.y}" r="8"></circle>
-        <text x="${home.x + 12}" y="${home.y + 4}">UA</text>
-        ${globalCollaborators.map((partner, index) => {
-          const target = project(partner.lat, partner.lon);
-          const dx = (index % 2) * 9 - 4;
-          const dy = (index % 3) * 7 - 7;
-          return `<circle cx="${(target.x + dx).toFixed(1)}" cy="${(target.y + dy).toFixed(1)}" r="5"><title>${escapeHtml(partner.name)}</title></circle>`;
+        <g class="map-home" transform="translate(${homePoint[0].toFixed(1)} ${homePoint[1].toFixed(1)})">
+          <title>${escapeHtml(homeTitle)}</title>
+          <circle class="home-halo" r="19"></circle>
+          <circle class="home-marker" r="8.5"></circle>
+          <text class="map-label map-home-label" x="13" y="-12">UA Tuscaloosa</text>
+        </g>
+        ${mappedPartners.map((partner) => {
+          const [x, y] = partner.point;
+          const label = partner.label;
+          return `
+            <g class="map-partner" transform="translate(${x.toFixed(1)} ${y.toFixed(1)})">
+              <title>${escapeHtml(partner.name)} (${escapeHtml(partner.place)})</title>
+              <circle r="5.6"></circle>
+              <text class="map-label" x="${label.dx}" y="${label.dy}" text-anchor="${label.anchor}">${escapeHtml(label.text)}</text>
+            </g>
+          `;
         }).join("")}
       </g>
-      <g class="map-legend" transform="translate(34 430)">
+      <g class="map-legend" transform="translate(34 ${height - 34})">
         <circle class="home-marker" cx="0" cy="0" r="6"></circle><text x="14" y="4">Home node</text>
-        <circle cx="140" cy="0" r="5"></circle><text x="154" y="4">Collaborator</text>
-        <line x1="292" y1="0" x2="342" y2="0"></line><text x="354" y="4">Research arc</text>
+        <circle cx="142" cy="0" r="5"></circle><text x="156" y="4">External partner</text>
+        <line x1="318" y1="0" x2="368" y2="0"></line><text x="380" y="4">Research arc</text>
       </g>
     `;
+  }
+
+  function renderGlobalMapFallback(svgNode, width, height, message) {
+    svgNode.setAttribute("aria-busy", "false");
+    svgNode.innerHTML = `
+      <title id="global-map-title">Global collaboration map</title>
+      <desc id="global-map-desc">${escapeHtml(message)} The full partner list remains visible next to this map.</desc>
+      <rect class="map-ocean" width="${width}" height="${height}" rx="8"></rect>
+      <ellipse class="map-fallback-sphere" cx="${width / 2}" cy="${height / 2 - 16}" rx="${width * 0.34}" ry="${height * 0.26}"></ellipse>
+      <path class="map-fallback-arc" d="M${width * 0.36} ${height * 0.56} Q${width * 0.5} ${height * 0.26} ${width * 0.68} ${height * 0.42}"></path>
+      <circle class="home-marker" cx="${width * 0.36}" cy="${height * 0.56}" r="8"></circle>
+      <circle class="map-fallback-point" cx="${width * 0.68}" cy="${height * 0.42}" r="5"></circle>
+      <text class="map-fallback-title" x="${width / 2}" y="${height * 0.78}" text-anchor="middle">Global collaboration map</text>
+      <text class="map-fallback-note" x="${width / 2}" y="${height * 0.84}" text-anchor="middle">${escapeHtml(message)}</text>
+    `;
+  }
+
+  function greatCirclePath(projection, startLonLat, targetLonLat) {
+    const interpolate = d3.geoInterpolate(startLonLat, targetLonLat);
+    const points = d3.range(45).map((step) => projection(interpolate(step / 44))).filter(Boolean);
+    if (!points.length) return "";
+    return points.map((point, index) => {
+      const previous = points[index - 1];
+      const command = !index || (previous && Math.abs(point[0] - previous[0]) > 320) ? "M" : "L";
+      return `${command}${point[0].toFixed(1)} ${point[1].toFixed(1)}`;
+    }).join(" ");
+  }
+
+  function isCampusPartner(partner) {
+    return Math.abs(partner.lat - homeCollaborator.lat) < 0.08 && Math.abs(partner.lon - homeCollaborator.lon) < 0.08;
+  }
+
+  function getMapLonLat(partner) {
+    if (/enuma/i.test(partner.name)) return [-122.27, 37.87];
+    return [partner.lon, partner.lat];
+  }
+
+  function getPartnerMapLabel(partner) {
+    if (/wageningen/i.test(partner.name)) return { text: "Wageningen", dx: 10, dy: -12, anchor: "start" };
+    if (/leiden/i.test(partner.name)) return { text: "Leiden", dx: 10, dy: 22, anchor: "start" };
+    if (/daegu/i.test(partner.name)) return { text: "Daegu", dx: 10, dy: -10, anchor: "start" };
+    if (/enuma/i.test(partner.name)) return { text: "Enuma", dx: -10, dy: -11, anchor: "end" };
+    return { text: partner.name, dx: 10, dy: -10, anchor: "start" };
   }
 
   function renderProjects() {

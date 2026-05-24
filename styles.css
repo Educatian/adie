@@ -1610,15 +1610,16 @@ main > section + section::before {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
   gap: 18px;
-  align-items: stretch;
+  align-items: start;
 }
 
 .global-map-shell {
-  overflow-x: auto;
+  overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background:
-    radial-gradient(circle at 25% 25%, rgba(158, 27, 50, 0.16), transparent 20rem),
+    radial-gradient(circle at 32% 38%, rgba(158, 27, 50, 0.14), transparent 19rem),
+    radial-gradient(circle at 74% 28%, rgba(43, 140, 135, 0.11), transparent 18rem),
     var(--surface);
   box-shadow: var(--shadow);
 }
@@ -1626,59 +1627,171 @@ main > section + section::before {
 #global-map {
   display: block;
   width: 100%;
-  min-width: 760px;
   height: auto;
+  aspect-ratio: 960 / 520;
 }
 
 .map-ocean {
-  fill: color-mix(in srgb, var(--surface-strong) 86%, transparent);
+  fill: color-mix(in srgb, var(--surface-strong) 90%, var(--paper));
 }
 
-.map-graticule line {
-  stroke: var(--line);
-  stroke-width: 1;
+.map-sphere {
+  fill: color-mix(in srgb, var(--surface-strong) 78%, transparent);
+  stroke: color-mix(in srgb, var(--ink) 13%, transparent);
+  stroke-width: 1.2;
+}
+
+.map-graticule {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ink) 13%, transparent);
+  stroke-width: 0.7;
 }
 
 .map-land path {
-  fill: color-mix(in srgb, var(--ink) 10%, transparent);
-  stroke: color-mix(in srgb, var(--ink) 16%, transparent);
-  stroke-width: 1;
+  fill: color-mix(in srgb, var(--paper) 78%, #c9c1b2);
+  stroke: color-mix(in srgb, var(--ink) 21%, transparent);
+  stroke-width: 0.55;
+  vector-effect: non-scaling-stroke;
 }
 
-.map-arcs path {
+.map-arc-line,
+.map-arc-glow,
+.map-fallback-arc,
+.map-legend line {
   fill: none;
-  stroke: var(--crimson);
-  stroke-width: 2.2;
   stroke-linecap: round;
-  opacity: 0.72;
-  filter: drop-shadow(0 0 8px rgba(158, 27, 50, 0.38));
-  stroke-dasharray: 8 10;
-  animation: map-arc-flow 8s linear infinite;
+  vector-effect: non-scaling-stroke;
 }
 
-.map-markers circle,
+.map-arc-glow {
+  stroke: var(--crimson);
+  stroke-width: 7;
+  opacity: 0.17;
+  filter: url("#map-crimson-glow");
+}
+
+.map-arc-line {
+  stroke: color-mix(in srgb, var(--crimson) 86%, white);
+  stroke-width: 2.25;
+  opacity: 0.88;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  filter: drop-shadow(0 0 7px rgba(158, 27, 50, 0.34));
+  animation: map-arc-draw 1.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: calc(var(--arc-index, 0) * 160ms);
+}
+
+.map-partner circle,
 .map-legend circle {
   fill: var(--gold);
   stroke: var(--surface-strong);
   stroke-width: 2;
+  vector-effect: non-scaling-stroke;
 }
 
-.map-markers .home-marker,
+.home-marker,
 .map-legend .home-marker {
   fill: var(--crimson);
+  stroke: var(--surface-strong);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
 }
 
-.map-markers text,
-.map-legend text {
+.home-halo {
+  fill: rgba(158, 27, 50, 0.16);
+  stroke: rgba(158, 27, 50, 0.38);
+  stroke-width: 1.2;
+  animation: map-home-pulse 2.8s ease-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.map-label,
+.map-legend text,
+.map-fallback-title,
+.map-fallback-note {
   fill: var(--ink);
   font-family: var(--font-mono);
+  paint-order: stroke;
+  stroke: color-mix(in srgb, var(--surface-strong) 88%, transparent);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.map-label,
+.map-legend text {
   font-size: 12px;
   font-weight: 850;
+}
+
+.map-home-label {
+  fill: var(--crimson);
 }
 
 .map-legend line {
   stroke: var(--crimson);
   stroke-width: 2;
+}
+
+.map-fallback-sphere {
+  fill: color-mix(in srgb, var(--paper) 52%, transparent);
+  stroke: color-mix(in srgb, var(--ink) 16%, transparent);
+  stroke-width: 1;
+}
+
+.map-fallback-arc {
+  stroke: var(--crimson);
+  stroke-width: 2.2;
+  opacity: 0.7;
+}
+
+.map-fallback-point {
+  fill: var(--gold);
+  stroke: var(--surface-strong);
+  stroke-width: 2;
+}
+
+.map-fallback-title {
+  font-family: var(--font-ui);
+  font-size: 16px;
+  font-weight: 850;
+}
+
+.map-fallback-note {
+  fill: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+[data-theme="dark"] .map-ocean {
+  fill: color-mix(in srgb, var(--surface-strong) 86%, #050507);
+}
+
+[data-theme="dark"] .map-sphere {
+  fill: color-mix(in srgb, var(--surface-strong) 80%, #050507);
+  stroke: color-mix(in srgb, var(--ink) 15%, transparent);
+}
+
+[data-theme="dark"] .map-graticule {
+  stroke: color-mix(in srgb, var(--ink) 14%, transparent);
+}
+
+[data-theme="dark"] .map-land path {
+  fill: #2a2f3a;
+  stroke: color-mix(in srgb, var(--ink) 20%, #2a2f3a);
+}
+
+[data-theme="dark"] .map-arc-line {
+  stroke: color-mix(in srgb, var(--crimson-2) 86%, white);
+}
+
+[data-theme="dark"] .map-home-label {
+  fill: #ff8a9b;
+}
+
+[data-theme="dark"] .map-fallback-sphere {
+  fill: color-mix(in srgb, #2a2f3a 42%, transparent);
+  stroke: color-mix(in srgb, var(--ink) 16%, transparent);
 }
 
 .global-partners {
@@ -1731,9 +1844,26 @@ main > section + section::before {
   text-transform: uppercase;
 }
 
-@keyframes map-arc-flow {
+@keyframes map-arc-draw {
   to {
-    stroke-dashoffset: -72;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes map-home-pulse {
+  0% {
+    opacity: 0.78;
+    transform: scale(0.82);
+  }
+
+  70% {
+    opacity: 0.08;
+    transform: scale(1.55);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.7);
   }
 }
 
@@ -2264,6 +2394,15 @@ main > section + section::before {
     grid-template-columns: 1fr;
   }
 
+  .map-label,
+  .map-legend {
+    display: none;
+  }
+
+  #global-map {
+    aspect-ratio: 960 / 560;
+  }
+
   .site-footer {
     align-items: flex-start;
     flex-direction: column;
@@ -2289,8 +2428,17 @@ main > section + section::before {
     transform: none;
   }
 
-  .map-arcs path {
+  .map-arc-line,
+  .home-halo {
     animation: none;
-    stroke-dasharray: none;
+  }
+
+  .map-arc-line {
+    stroke-dashoffset: 0;
+  }
+
+  .home-halo {
+    opacity: 0.28;
+    transform: none;
   }
 }
