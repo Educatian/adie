@@ -217,8 +217,7 @@
   function renderAdvisingImpact() {
     const mountStats = $("[data-advising-stats]");
     const mountChart = $("[data-advising-chart]");
-    const mountEmerging = $("[data-advising-emerging]");
-    if (!mountStats || !mountChart || !mountEmerging) return;
+    if (!mountStats || !mountChart) return;
 
     const metrics = advisingMetrics();
     mountStats.innerHTML = [
@@ -247,21 +246,6 @@
       </div>
       <div class="advising-bars">
         ${metrics.outputStudents.map((student) => advisingBar(student, maxTotal)).join("")}
-      </div>
-    `;
-
-    mountEmerging.innerHTML = `
-      <div>
-        <h3>Emerging contributors</h3>
-        <p>Newest advisees are entering the lab's mentorship pipeline through project scoping, methods apprenticeship, and early design research roles.</p>
-      </div>
-      <div class="emerging-list">
-        ${metrics.emergingStudents.map((student) => `
-          <span class="emerging-chip">
-            <img src="${escapeHtml(student.avatar)}" width="68" height="68" alt="" loading="lazy" aria-hidden="true">
-            ${escapeHtml(student.name)}
-          </span>
-        `).join("")}
       </div>
     `;
   }
