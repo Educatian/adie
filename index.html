@@ -88,6 +88,7 @@
         <a href="#mission">Mission</a>
         <a href="#research">Research</a>
         <a href="#people">People</a>
+        <a href="#advising">Advising</a>
         <a href="#publications">Publications</a>
         <a href="#projects">Projects</a>
         <a href="#join">Join</a>
@@ -100,7 +101,8 @@
     <main id="main">
       <section id="home" class="hero section-observe">
         <div class="hero-bg" aria-hidden="true">
-          <img src="assets/img/background-mesh.webp" width="1536" height="1024" alt="">
+          <img class="hero-bg-fallback" src="assets/img/hero-key-visual.webp" width="1774" height="887" alt="">
+          <canvas class="hero-network" data-hero-network></canvas>
         </div>
         <div class="hero-inner">
           <div class="hero-copy reveal">
@@ -111,9 +113,6 @@
               <a class="button secondary" href="#join">Join the lab</a>
             </div>
           </div>
-          <figure class="hero-visual reveal delay-1">
-            <img src="assets/img/hero-key-visual.webp" width="1774" height="887" alt="Abstract convergence of immersive learning grids, analytics constellations, adaptive forms, and generative AI light.">
-          </figure>
         </div>
         <div class="hero-stats reveal delay-2" data-stats-band></div>
       </section>
@@ -169,6 +168,19 @@
           <h2>A research group built around mentorship and collaboration.</h2>
         </div>
         <div class="people-groups" data-people></div>
+      </section>
+
+      <section id="advising" class="advising section-observe">
+        <div class="section-heading reveal">
+          <div class="section-kicker">Advising Impact</div>
+          <h2>Mentorship translated into co-authored scholarship.</h2>
+          <p>Current advisees are moving from early-stage apprenticeship into submitted manuscripts, publications, and analytics-rich design research with Dr. Moon.</p>
+        </div>
+        <div class="advising-dashboard reveal delay-1">
+          <div class="advising-stats" data-advising-stats></div>
+          <div class="advising-chart" data-advising-chart></div>
+          <div class="advising-emerging" data-advising-emerging></div>
+        </div>
       </section>
 
       <section id="publications" class="publications section-observe">
@@ -241,6 +253,7 @@
       <nav class="footer-links" aria-label="Footer navigation">
         <a href="#research">Research</a>
         <a href="#people">People</a>
+        <a href="#advising">Advising</a>
         <a href="#publications">Publications</a>
         <a href="#join">Join</a>
         <a href="mailto:jmoon19@ua.edu">jmoon19@ua.edu</a>

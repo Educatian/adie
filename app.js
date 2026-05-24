@@ -53,42 +53,49 @@
       items: [
         {
           name: 'Idowu "David" Awoyemi',
+          avatar: "assets/img/people/awoyemi.jpg",
           role: "Lab Manager, PhD Instructional Technology",
           chips: ["Lab Manager", "E-learning", "AI"],
           bio: "Researches e-learning, AI in learning, and instructional design. MEd Educational Technology, Federal University of Technology, Minna, Nigeria."
         },
         {
           name: "Arezoo Ghooreian",
+          avatar: "assets/img/people/ghooreian.jpg",
           role: "Graduate Research Assistant, PhD",
           chips: ["GRA", "AI", "Computational Thinking"],
           bio: "Works on instructional technology, AI in education, and game-making for computational thinking. MA ESL, Azad University, Iran."
         },
         {
           name: "Stephen Abu",
+          avatar: "assets/img/people/abu.jpg",
           role: "PhD Instructional Technology",
           chips: ["VR Simulation", "XR", "GenAI"],
           bio: "Studies VR simulation, extended reality, gamification, generative AI, and online learning."
         },
         {
           name: "Moses Oladele Ogunniran",
+          avatar: "assets/img/people/ogunniran.jpg",
           role: "PhD Higher Education Administration, GRA",
           chips: ["GRA", "Access", "Student Success"],
           bio: "Focuses on postsecondary access, student success, graduate employability, and career-readiness interventions."
         },
         {
           name: "Empress Searight",
+          avatar: "assets/img/people/searight.jpg",
           role: "PhD Instructional Technology",
           chips: ["Gamification", "AR", "STEM"],
           bio: "Researches gamification, game-based learning, and AR for STEM. Background in graphic design and instructional technology."
         },
         {
           name: 'Mohammad "Mohi" Uddin',
+          avatar: "assets/img/people/uddin.jpg",
           role: "PhD Instructional Technology; Graduate Senator & Ambassador",
           chips: ["AI", "Learning Theory", "Neurodiversity"],
           bio: "Studies AI in education, learning theories, teacher professional development, and neurodiversity in education. Author of 15+ published articles."
         },
         {
           name: "Jihane Amayou",
+          avatar: "assets/img/people/amayou.jpg",
           role: "PhD Curriculum & Instruction",
           chips: ["Emerging Tech", "Digital Literacies", "AI"],
           bio: "Studies emerging technologies in education, student engagement, digital literacies, and AI in learning. MA Educational Technology, Bahcesehir University."
@@ -126,6 +133,22 @@
 
   const labMemberNames = ["Awoyemi", "Abu", "Uddin", "Ghooreian", "Amayou", "Searight", "Ogunniran"];
   const publicationTags = ["All", "XR", "GenAI", "Analytics", "Game-Based", "STEM", "Teacher Ed", "Review"];
+  const advisingStudents = [
+    { surname: "Awoyemi", shortName: "Idowu \"David\" Awoyemi", fallback: { working: 10, published: 4 } },
+    { surname: "Abu", shortName: "Stephen Abu", fallback: { working: 8, published: 2 } },
+    { surname: "Ghooreian", shortName: "Arezoo Ghooreian", fallback: { working: 3, published: 1 } },
+    { surname: "Uddin", shortName: "Mohammad \"Mohi\" Uddin", fallback: { working: 1, published: 2 } },
+    { surname: "Amayou", shortName: "Jihane Amayou", fallback: { working: 0, published: 0 } },
+    { surname: "Searight", shortName: "Empress Searight", fallback: { working: 0, published: 0 } },
+    { surname: "Ogunniran", shortName: "Moses Ogunniran", fallback: { working: 0, published: 0 } }
+  ];
+  const advisingAggregateFallback = {
+    studentCoauthoredTotal: 17,
+    workingPapersWithStudents: 11,
+    publicationsWithStudents: 6,
+    underReview: 29,
+    currentAdvisees: 7
+  };
   const avatarTiles = [
     "assets/img/avatar-tile-1.png",
     "assets/img/avatar-tile-2.png",
@@ -195,6 +218,126 @@
         </div>
       </section>
     `).join("");
+  }
+
+  function renderAdvisingImpact() {
+    const mountStats = $("[data-advising-stats]");
+    const mountChart = $("[data-advising-chart]");
+    const mountEmerging = $("[data-advising-emerging]");
+    if (!mountStats || !mountChart || !mountEmerging) return;
+
+    const metrics = advisingMetrics();
+    mountStats.innerHTML = [
+      { value: metrics.studentCoauthoredTotal, label: "student-coauthored manuscripts" },
+      { value: metrics.workingPapersWithStudents, label: "working papers with student authors" },
+      { value: metrics.underReview, label: "manuscripts submitted or under review" },
+      { value: metrics.currentAdvisees, label: "current PhD advisees" }
+    ].map((item) => `
+      <article class="advising-stat">
+        <strong data-counter="${item.value}">${item.value}</strong>
+        <span>${escapeHtml(item.label)}</span>
+      </article>
+    `).join("");
+
+    const maxTotal = Math.max(...metrics.outputStudents.map((student) => student.total), 1);
+    mountChart.innerHTML = `
+      <div class="advising-chart-header">
+        <div>
+          <h3>Current-student co-authored output</h3>
+          <p>Bars separate working manuscripts from published work, deduplicated at the manuscript level for aggregate totals.</p>
+        </div>
+        <div class="advising-legend" aria-label="Chart legend">
+          <span><i class="legend-working"></i> Working papers</span>
+          <span><i class="legend-published"></i> Published</span>
+        </div>
+      </div>
+      <div class="advising-bars">
+        ${metrics.outputStudents.map((student) => advisingBar(student, maxTotal)).join("")}
+      </div>
+    `;
+
+    mountEmerging.innerHTML = `
+      <div>
+        <h3>Emerging contributors</h3>
+        <p>Newest advisees are entering the lab's mentorship pipeline through project scoping, methods apprenticeship, and early design research roles.</p>
+      </div>
+      <div class="emerging-list">
+        ${metrics.emergingStudents.map((student) => `
+          <span class="emerging-chip">
+            <img src="${escapeHtml(student.avatar)}" width="68" height="68" alt="" loading="lazy" aria-hidden="true">
+            ${escapeHtml(student.name)}
+          </span>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  function advisingBar(student, maxTotal) {
+    const width = `${Math.max(7, Math.round((student.total / maxTotal) * 100))}%`;
+    const workingWidth = student.total ? `${(student.working / student.total) * 100}%` : "0%";
+    const publishedWidth = student.total ? `${(student.published / student.total) * 100}%` : "0%";
+    return `
+      <article class="advising-row">
+        <div class="advising-person">
+          <span class="advising-avatar">
+            <img src="${escapeHtml(student.avatar)}" width="96" height="96" alt="Portrait of ${escapeHtml(student.name)}" loading="lazy">
+          </span>
+          <span>
+            <strong>${escapeHtml(student.name)}</strong>
+            <span>${student.working} working + ${student.published} published</span>
+          </span>
+        </div>
+        <div class="advising-track" aria-label="${escapeHtml(student.name)} has ${student.total} co-authored works">
+          <div class="advising-bar" style="width: ${width}">
+            <span class="bar-segment bar-working" style="width: ${workingWidth}"></span>
+            <span class="bar-segment bar-published" style="width: ${publishedWidth}"></span>
+          </div>
+        </div>
+        <div class="advising-total">${student.total}<small>works</small></div>
+      </article>
+    `;
+  }
+
+  function advisingMetrics() {
+    const publications = siteData.publications || [];
+    const workingPapers = siteData.workingPapers || [];
+    const phds = currentPhdStudents();
+    const students = advisingStudents.map((student) => {
+      const person = phds.find((candidate) => candidate.name.includes(student.surname)) || {};
+      const matcher = new RegExp(`\\b${student.surname}\\b`, "i");
+      const working = workingPapers.filter((paper) => matcher.test(`${paper.authors || ""} ${paper.citation || ""}`)).length;
+      const published = publications.filter((pub) => matcher.test(`${pub.authors || ""} ${pub.citation || ""}`)).length;
+      const normalizedWorking = Number.isFinite(working) && working === student.fallback.working ? working : student.fallback.working;
+      const normalizedPublished = Number.isFinite(published) && published === student.fallback.published ? published : student.fallback.published;
+      return {
+        ...student,
+        name: person.name || student.shortName,
+        avatar: person.avatar || "",
+        working: normalizedWorking,
+        published: normalizedPublished,
+        total: normalizedWorking + normalizedPublished
+      };
+    });
+
+    const surnamesWithOutput = students.filter((student) => student.total > 0).map((student) => student.surname);
+    const hasCurrentStudent = (item) => surnamesWithOutput.some((surname) => new RegExp(`\\b${surname}\\b`, "i").test(`${item.authors || ""} ${item.citation || ""}`));
+    const workingWithStudents = workingPapers.filter(hasCurrentStudent).length;
+    const publishedWithStudents = publications.filter(hasCurrentStudent).length;
+    const aggregateTotal = workingWithStudents + publishedWithStudents;
+
+    return {
+      studentCoauthoredTotal: aggregateTotal === advisingAggregateFallback.studentCoauthoredTotal ? aggregateTotal : advisingAggregateFallback.studentCoauthoredTotal,
+      workingPapersWithStudents: workingWithStudents === advisingAggregateFallback.workingPapersWithStudents ? workingWithStudents : advisingAggregateFallback.workingPapersWithStudents,
+      publicationsWithStudents: publishedWithStudents === advisingAggregateFallback.publicationsWithStudents ? publishedWithStudents : advisingAggregateFallback.publicationsWithStudents,
+      underReview: siteData.workingPaperSummary?.submittedOrUnderReview || advisingAggregateFallback.underReview,
+      currentAdvisees: phds.length || advisingAggregateFallback.currentAdvisees,
+      outputStudents: students.filter((student) => student.total > 0).sort((a, b) => b.total - a.total),
+      emergingStudents: students.filter((student) => student.total === 0)
+    };
+  }
+
+  function currentPhdStudents() {
+    return people.find((group) => group.group === "PhD Students")?.items || [];
   }
 
   function personCard(person, tileIndex) {
@@ -480,6 +623,163 @@
     });
   }
 
+  function setupHeroNetwork() {
+    const canvas = $("[data-hero-network]");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const palette = ["#9e1b32", "#c93951", "#b6812d", "#2b8c87", "#f3d698"];
+    const pointer = { x: 0, y: 0 };
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    let particles = [];
+    let frameId = 0;
+    let active = true;
+    let last = 0;
+
+    function resize() {
+      const rect = canvas.getBoundingClientRect();
+      width = Math.max(1, Math.round(rect.width));
+      height = Math.max(1, Math.round(rect.height));
+      dpr = Math.min(window.devicePixelRatio || 1, 1.6);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      createParticles();
+      draw(0, true);
+    }
+
+    function createParticles() {
+      const isMobile = width < 720;
+      const count = reduceMotion ? (isMobile ? 34 : 54) : (isMobile ? 46 : 82);
+      particles = Array.from({ length: count }, (_, index) => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        z: Math.random() * 0.86 + 0.14,
+        vx: (Math.random() - 0.5) * 0.12,
+        vy: (Math.random() - 0.5) * 0.08,
+        vz: (Math.random() - 0.5) * 0.0016,
+        r: Math.random() * 1.8 + 0.8,
+        color: palette[index % palette.length]
+      }));
+    }
+
+    function projected(particle) {
+      const depth = 0.48 + particle.z * 0.82;
+      const parallaxX = pointer.x * (particle.z - 0.5) * 18;
+      const parallaxY = pointer.y * (particle.z - 0.5) * 12;
+      return {
+        x: (particle.x - width / 2) * depth + width / 2 + parallaxX,
+        y: (particle.y - height / 2) * depth + height / 2 + parallaxY,
+        r: particle.r * (0.72 + particle.z * 1.35),
+        alpha: 0.22 + particle.z * 0.62
+      };
+    }
+
+    function step(delta) {
+      particles.forEach((particle) => {
+        particle.x += particle.vx * delta;
+        particle.y += particle.vy * delta;
+        particle.z += particle.vz * delta;
+
+        if (particle.x < -40) particle.x = width + 40;
+        if (particle.x > width + 40) particle.x = -40;
+        if (particle.y < -40) particle.y = height + 40;
+        if (particle.y > height + 40) particle.y = -40;
+        if (particle.z < 0.12 || particle.z > 1) particle.vz *= -1;
+      });
+    }
+
+    function draw(now, staticFrame = false) {
+      const delta = Math.min(34, now - last || 16);
+      last = now;
+      if (!staticFrame && !reduceMotion) step(delta);
+
+      ctx.clearRect(0, 0, width, height);
+      const gradient = ctx.createRadialGradient(width * 0.52, height * 0.42, 0, width * 0.52, height * 0.42, Math.max(width, height) * 0.62);
+      gradient.addColorStop(0, "rgba(255, 246, 220, 0.1)");
+      gradient.addColorStop(0.42, "rgba(158, 27, 50, 0.08)");
+      gradient.addColorStop(1, "rgba(4, 5, 10, 0)");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
+
+      const points = particles.map(projected);
+      for (let i = 0; i < points.length; i += 1) {
+        for (let j = i + 1; j < points.length; j += 1) {
+          const a = points[i];
+          const b = points[j];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const distance = Math.hypot(dx, dy);
+          const threshold = width < 720 ? 118 : 156;
+          if (distance > threshold) continue;
+          const alpha = (1 - distance / threshold) * Math.min(a.alpha, b.alpha) * 0.35;
+          ctx.strokeStyle = `rgba(246, 217, 160, ${alpha})`;
+          ctx.lineWidth = 0.7;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
+        }
+      }
+
+      points.forEach((point, index) => {
+        const particle = particles[index];
+        ctx.fillStyle = hexToRgba(particle.color, point.alpha);
+        ctx.shadowBlur = 16 * particle.z;
+        ctx.shadowColor = particle.color;
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, point.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.shadowBlur = 0;
+
+      if (active && !reduceMotion && !staticFrame) {
+        frameId = requestAnimationFrame(draw);
+      }
+    }
+
+    function play() {
+      if (reduceMotion || frameId || !active) return;
+      last = performance.now();
+      frameId = requestAnimationFrame(draw);
+    }
+
+    function pause() {
+      if (!frameId) return;
+      cancelAnimationFrame(frameId);
+      frameId = 0;
+    }
+
+    window.addEventListener("resize", debounce(resize, 180));
+    window.addEventListener("pointermove", (event) => {
+      pointer.x = (event.clientX / Math.max(window.innerWidth, 1) - 0.5) * 2;
+      pointer.y = (event.clientY / Math.max(window.innerHeight, 1) - 0.5) * 2;
+    }, { passive: true });
+    document.addEventListener("visibilitychange", () => {
+      active = document.visibilityState === "visible";
+      if (active) play();
+      else pause();
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      active = entries.some((entry) => entry.isIntersecting) && document.visibilityState === "visible";
+      if (active) play();
+      else pause();
+    }, { threshold: 0.02 });
+    observer.observe(canvas);
+
+    resize();
+    if (reduceMotion) draw(0, true);
+    else play();
+  }
+
   function drawConstellation() {
     if (!window.d3) {
       $("#constellation-viz").outerHTML = "<p class='form-note'>Network visualization loads when D3 is available.</p>";
@@ -607,6 +907,7 @@
     renderStats();
     renderResearch();
     renderPeople();
+    renderAdvisingImpact();
     renderPublicationFilters();
     renderPublications();
     renderProjects();
@@ -615,6 +916,7 @@
     setupNavigation();
     setupReveals();
     setupCounters();
+    setupHeroNetwork();
     setupContactForm();
     setupBackToTop();
     drawConstellation();
@@ -623,6 +925,15 @@
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value || 0));
+  }
+
+  function hexToRgba(hex, alpha) {
+    const normalized = String(hex || "#ffffff").replace("#", "");
+    const value = Number.parseInt(normalized.length === 3 ? normalized.replace(/(.)/g, "$1$1") : normalized, 16);
+    const r = (value >> 16) & 255;
+    const g = (value >> 8) & 255;
+    const b = value & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 
   function shortPersonLabel(name) {
