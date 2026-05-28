@@ -1084,7 +1084,7 @@
       </article>
     `).join("");
 
-    const projects = (projectData.projects || []).filter((project) => project.live).slice(0, 6);
+    const projects = (projectData.projects || []).filter((project) => project.live).slice(0, 18);
     $("[data-projects]").innerHTML = projects.map((project) => {
       const thumb = project.thumb
         ? `<a class="project-thumb" href="${escapeHtml(project.live)}" aria-label="Open ${escapeHtml(project.title)}"><img src="${escapeHtml(project.thumb)}" width="640" height="400" alt="Screenshot of ${escapeHtml(project.title)}" loading="lazy"></a>`
