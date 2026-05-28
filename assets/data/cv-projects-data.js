@@ -65,7 +65,8 @@ window.__cvProjects = {
       "summary": "Firebase-backed AI ethics chatbot for graduate-level instruction. English deployment of the Ethobot research line (with 3.1 and 3.2 follow-ups), Express server with Firestore-stored conversations and Analytics instrumentation.",
       "tags": ["AI ethics", "chatbot", "Firebase"],
       "repo": "https://github.com/Educatian/ETHOBOT_ENG",
-      "live": "https://educatian.github.io/ETHOBOT_ENG/"
+      "live": "https://educatian.github.io/ETHOBOT_ENG/",
+      "thumb": "assets/img/projects/ethobot-eng.png"
     },
     {
       "name": "TINA1.01",
@@ -95,7 +96,8 @@ window.__cvProjects = {
       "summary": "Cross-field discourse map of Learning Sciences vs Educational Technology journal abstracts (2015–2025). MPNet embeddings, BERTopic, LLM-tagged threads, bootstrap inference, sensitivity sweeps.",
       "tags": ["BERTopic", "MPNet", "bibliometrics"],
       "repo": "https://github.com/Educatian/discourse-lens",
-      "live": "https://educatian.github.io/discourse-lens/"
+      "live": "https://educatian.github.io/discourse-lens/",
+      "thumb": "assets/img/projects/discourse-lens.png"
     },
     {
       "name": "learning-theories-timeline",
@@ -105,7 +107,8 @@ window.__cvProjects = {
       "summary": "Interactive D3 timeline of learning theories, instructional design, AIED, learning analytics, EDM, QE, VR, and agentic AI. Built for graduate seminar onboarding.",
       "tags": ["D3", "history of learning", "interactive viz"],
       "repo": "https://github.com/Educatian/learning-theories-timeline",
-      "live": "https://educatian.github.io/learning-theories-timeline/"
+      "live": "https://educatian.github.io/learning-theories-timeline/",
+      "thumb": "assets/img/projects/learning-theories-timeline.png"
     },
     {
       "name": "counseling-graph-cscl",
@@ -115,7 +118,8 @@ window.__cvProjects = {
       "summary": "Knowledge-graph CSCL tool (Korean) for counseling and clinical psychology training. Renders concept networks from coursework artifacts and supports collaborative annotation.",
       "tags": ["CSCL", "knowledge graph", "counseling ed"],
       "repo": "https://github.com/Educatian/counseling-graph-cscl",
-      "live": "https://educatian.github.io/counseling-graph-cscl/"
+      "live": "https://educatian.github.io/counseling-graph-cscl/",
+      "thumb": "assets/img/projects/counseling-graph-cscl.png"
     },
     {
       "name": "videoanalysis",
@@ -135,7 +139,7 @@ window.__cvProjects = {
       "summary": "Small LLM fine-tuning recipe specialized for AI ethics in educational design. Includes evaluation prompts and refusal-style probes calibrated for graduate coursework.",
       "tags": ["LLM fine-tuning", "AI ethics"],
       "repo": "https://github.com/Educatian/ethicsedullm",
-      "live": "https://educatian.github.io/ethicsedullm/"
+      "live": ""
     },
     {
       "name": "cybersentinel",
@@ -145,7 +149,8 @@ window.__cvProjects = {
       "summary": "Reachy Mini WiFi treated as a cybersecurity teaching surface. Module builder's guide for graduate-student instructional designers, with task scaffolds and reflection prompts.",
       "tags": ["Reachy Mini", "cybersecurity teaching", "ID guide"],
       "repo": "https://github.com/Educatian/cybersentinel",
-      "live": "https://educatian.github.io/cybersentinel/"
+      "live": "https://educatian.github.io/cybersentinel/",
+      "thumb": "assets/img/projects/cybersentinel.png"
     },
     {
       "name": "research-assistant-ai-workflow-en",
@@ -155,7 +160,8 @@ window.__cvProjects = {
       "summary": "Obsidian × Claude Code 7-day setup guide for PhDs and researchers. Daily lessons, code snippets, and reproducible folder layouts for an AI-augmented research stack.",
       "tags": ["Obsidian", "Claude Code", "research workflow"],
       "repo": "https://github.com/Educatian/research-assistant-ai-workflow-en",
-      "live": "https://educatian.github.io/research-assistant-ai-workflow-en/"
+      "live": "https://educatian.github.io/research-assistant-ai-workflow-en/",
+      "thumb": "assets/img/projects/research-assistant-ai-workflow-en.png"
     },
     {
       "name": "educatian.github.io",
@@ -165,7 +171,8 @@ window.__cvProjects = {
       "summary": "Hub of self-contained guides covering education data × analysis matrix, RQ fit, LAK vs EDM, telemetry design, agentic XR workflow, ISD to LDT, and more. Each guide is a single static HTML page.",
       "tags": ["open guides", "hub", "research methods"],
       "repo": "https://github.com/Educatian/educatian.github.io",
-      "live": "https://educatian.github.io/"
+      "live": "https://educatian.github.io/",
+      "thumb": "assets/img/projects/educatian-hub.png"
     }
   ]
 };

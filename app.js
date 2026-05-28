@@ -1085,14 +1085,22 @@
     `).join("");
 
     const projects = (projectData.projects || []).filter((project) => project.live).slice(0, 6);
-    $("[data-projects]").innerHTML = projects.map((project) => `
+    $("[data-projects]").innerHTML = projects.map((project) => {
+      const thumb = project.thumb
+        ? `<a class="project-thumb" href="${escapeHtml(project.live)}" aria-label="Open ${escapeHtml(project.title)}"><img src="${escapeHtml(project.thumb)}" width="640" height="400" alt="Screenshot of ${escapeHtml(project.title)}" loading="lazy"></a>`
+        : "";
+      return `
       <article class="project-card reveal">
-        <div class="chips">${(project.tags || []).slice(0, 3).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>
-        <h3>${escapeHtml(project.title)}</h3>
-        <p>${escapeHtml(project.summary)}</p>
-        <a href="${escapeHtml(project.live)}">View project</a>
+        ${thumb}
+        <div class="project-card-body">
+          <div class="chips">${(project.tags || []).slice(0, 3).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>
+          <h3>${escapeHtml(project.title)}</h3>
+          <p>${escapeHtml(project.summary)}</p>
+          <a href="${escapeHtml(project.live)}">View project</a>
+        </div>
       </article>
-    `).join("");
+    `;
+    }).join("");
   }
 
   function renderGrants() {
