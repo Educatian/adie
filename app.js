@@ -185,6 +185,13 @@
           role: "PhD Curriculum & Instruction",
           chips: ["Emerging Tech", "Digital Literacies", "AI"],
           bio: "Studies emerging technologies in education, student engagement, digital literacies, and AI in learning. MA Educational Technology, Bahcesehir University."
+        },
+        {
+          name: "Samuel Opeyemi Olowolafe",
+          avatar: "assets/img/people/olowolafe.jpg",
+          role: "PhD Instructional Technology",
+          chips: ["AI", "Online Learning", "Game-Based", "Math Education"],
+          bio: "Works on education and intelligent transportation systems, with interests in AI in education, online learning, game-based learning, and mathematics education. Over a decade of secondary-school mathematics teaching. MEd Educational Technology, National Open University of Nigeria."
         }
       ]
     }
@@ -217,7 +224,7 @@
     }
   ];
 
-  const labMemberNames = ["Awoyemi", "Abu", "Uddin", "Ghooreian", "Amayou", "Searight", "Ogunniran"];
+  const labMemberNames = ["Awoyemi", "Abu", "Uddin", "Ghooreian", "Amayou", "Searight", "Ogunniran", "Olowolafe"];
   const publicationTags = ["All", "XR", "GenAI", "Analytics", "Game-Based", "STEM", "Teacher Ed", "Review"];
   const advisingStudents = [
     { surname: "Awoyemi", shortName: "Idowu \"David\" Awoyemi", fallback: { working: 10, published: 4 } },
@@ -226,14 +233,15 @@
     { surname: "Uddin", shortName: "Mohammad \"Mohi\" Uddin", fallback: { working: 1, published: 2 } },
     { surname: "Amayou", shortName: "Jihane Amayou", fallback: { working: 0, published: 0 } },
     { surname: "Searight", shortName: "Empress Searight", fallback: { working: 0, published: 0 } },
-    { surname: "Ogunniran", shortName: "Moses Ogunniran", fallback: { working: 0, published: 0 } }
+    { surname: "Ogunniran", shortName: "Moses Ogunniran", fallback: { working: 0, published: 0 } },
+    { surname: "Olowolafe", shortName: "Samuel Opeyemi Olowolafe", fallback: { working: 0, published: 0 } }
   ];
   const advisingAggregateFallback = {
     studentCoauthoredTotal: 17,
     workingPapersWithStudents: 11,
     publicationsWithStudents: 6,
     underReview: 29,
-    currentAdvisees: 7
+    currentAdvisees: 8
   };
   const PUBLICATION_COLLAPSED_LIMIT = 12;
   let activePublicationTag = "All";
