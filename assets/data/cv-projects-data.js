@@ -92,6 +92,17 @@ window.__cvProjects = {
       "thumb": "assets/img/projects/virtual-makerspace.png"
     },
     {
+      "name": "chalk-and-chance",
+      "title": "Chalk & Chance — Teacher Simulation",
+      "category": "immersive-analytics",
+      "language": "Godot 4",
+      "summary": "Browser-playable pixel classroom simulation for deliberate teaching practice. LLM-driven students that won't just accept an answer, proximity & withitness mechanics, lesson-under-pressure timing, seating-by-task, and a scored debrief with badges built around seven core teaching moves (Elicit, Extend, Revoice, Tell/Model, Praise, Redirect, Wait).",
+      "tags": ["teacher simulation", "Godot 4", "LLM students", "deliberate practice"],
+      "repo": "",
+      "live": "https://chalk-and-chance.pages.dev/",
+      "thumb": "assets/img/projects/chalk-and-chance.png"
+    },
+    {
       "name": "discourse-lens",
       "title": "Discourse Lens",
       "category": "immersive-analytics",
