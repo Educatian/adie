@@ -81,6 +81,17 @@ window.__cvProjects = {
       "thumb": "assets/img/projects/tina.png"
     },
     {
+      "name": "sail",
+      "title": "SAIL - Self-Regulated AI Learning Mentor",
+      "category": "agents",
+      "language": "TypeScript",
+      "summary": "Self-regulated learning mentor for college and graduate students. Students plan a focused study session, work with Marin through Socratic prompts and graded hints, reflect on calibration and strategy use, and optionally contribute privacy-preserving spatial/context telemetry for research.",
+      "tags": ["SRL", "AI mentor", "learning analytics", "telemetry"],
+      "repo": "",
+      "live": "https://sail-dia.pages.dev",
+      "thumb": "assets/img/projects/sail.png"
+    },
+    {
       "name": "virtual-makerspace",
       "title": "Virtual Makerspace",
       "category": "immersive-analytics",
