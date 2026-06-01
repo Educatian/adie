@@ -87,7 +87,7 @@ window.__cvProjects = {
       "language": "TypeScript",
       "summary": "Self-regulated learning mentor for college and graduate students. Students plan a focused study session, work with Marin through Socratic prompts and graded hints, reflect on calibration and strategy use, and optionally contribute privacy-preserving spatial/context telemetry for research.",
       "tags": ["SRL", "AI mentor", "learning analytics", "telemetry"],
-      "repo": "",
+      "repo": "https://github.com/Educatian/sail",
       "live": "https://sail-dia.pages.dev",
       "thumb": "assets/img/projects/sail.png",
       "screenshots": [
