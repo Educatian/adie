@@ -1097,6 +1097,14 @@
       const thumb = project.thumb
         ? `<a class="project-thumb" href="${escapeHtml(project.live)}" aria-label="Open ${escapeHtml(project.title)}"><img src="${escapeHtml(project.thumb)}" width="640" height="400" alt="Screenshot of ${escapeHtml(project.title)}" loading="lazy"></a>`
         : "";
+      const screenshots = (project.screenshots || []).slice(0, 6);
+      const screenshotStrip = screenshots.length
+        ? `<div class="project-screenshot-strip" aria-label="Key screens from ${escapeHtml(project.title)}">${screenshots.map((shot) => `
+            <a class="project-shot" href="${escapeHtml(shot.src)}" aria-label="Open ${escapeHtml(project.title)} ${escapeHtml(shot.label || "screen")} screenshot">
+              <img src="${escapeHtml(shot.src)}" width="180" height="320" alt="${escapeHtml(project.title)} ${escapeHtml(shot.label || "screen")} screen" loading="lazy">
+            </a>
+          `).join("")}</div>`
+        : "";
       return `
       <article class="project-card reveal">
         ${thumb}
@@ -1104,6 +1112,7 @@
           <div class="chips">${(project.tags || []).slice(0, 3).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>
           <h3>${escapeHtml(project.title)}</h3>
           <p>${escapeHtml(project.summary)}</p>
+          ${screenshotStrip}
           <a href="${escapeHtml(project.live)}">View project</a>
         </div>
       </article>

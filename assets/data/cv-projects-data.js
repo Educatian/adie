@@ -89,7 +89,15 @@ window.__cvProjects = {
       "tags": ["SRL", "AI mentor", "learning analytics", "telemetry"],
       "repo": "",
       "live": "https://sail-dia.pages.dev",
-      "thumb": "assets/img/projects/sail.png"
+      "thumb": "assets/img/projects/sail.png",
+      "screenshots": [
+        { "label": "Home", "src": "assets/img/projects/sail-home.png" },
+        { "label": "Goal studio", "src": "assets/img/projects/sail-goal-studio.png" },
+        { "label": "Active mentor", "src": "assets/img/projects/sail-mentor.png" },
+        { "label": "Reflection", "src": "assets/img/projects/sail-reflection.png" },
+        { "label": "Dashboard", "src": "assets/img/projects/sail-dashboard.png" },
+        { "label": "Location context", "src": "assets/img/projects/sail-map-location.png" }
+      ]
     },
     {
       "name": "virtual-makerspace",
