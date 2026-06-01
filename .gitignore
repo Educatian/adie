@@ -1,5 +1,6 @@
 # Codex build/refine logs + last-message + any local temp artifacts
 _*
+node_modules/
 # build briefs (kept local, not served publicly)
 BRIEF.md
 REFINE.md

@@ -1,0 +1,25 @@
+{
+  "name": "adie",
+  "version": "1.0.0",
+  "description": "Static research-group website for the Adaptive Design of Immersive E-Learning Lab at The University of Alabama.",
+  "private": true,
+  "main": "app.js",
+  "scripts": {
+    "playwright:version": "playwright --version"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Educatian/adie.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Educatian/adie/issues"
+  },
+  "homepage": "https://educatian.github.io/adie/",
+  "devDependencies": {
+    "playwright": "^1.60.0"
+  }
+}
