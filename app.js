@@ -483,7 +483,7 @@
     $("[data-publication-filters]").innerHTML = `
       <div class="publication-filter-row" aria-label="Publication topic filters">
         ${publicationTags.map((tag) => `
-          <button class="filter-button ${tag === activePublicationTag ? "is-active" : ""}" type="button" data-tag="${escapeHtml(tag)}">
+          <button class="filter-button ${tag === activePublicationTag ? "is-active" : ""}" type="button" data-tag="${escapeHtml(tag)}" aria-pressed="${tag === activePublicationTag}">
             <span>${escapeHtml(tag)}</span>
             <em>${tag === "All" ? allPublications.length : allPublications.filter((pub) => (pub.tags || []).includes(tag)).length}</em>
           </button>
@@ -1550,6 +1550,8 @@
   const CV_DATA_URL = "https://educatian.github.io/cv/assets/site-data.generated.json";
   const SCHOLAR_ANALYTICS_URL = "https://educatian.github.io/cv/assets/research-analytics-scholar.json";
   const SYNC_KEYS = [
+    "generatedAt",
+    "sourceCv",
     "publications",
     "completeJournalArticles",
     "workingPapers",
@@ -1561,6 +1563,24 @@
     "news",
     "honors"
   ];
+
+  function renderCvSyncStatus(source = "bundled snapshot") {
+    const mount = $("[data-cv-sync-status]");
+    if (!mount) return;
+    const generatedAt = new Date(siteData.generatedAt || "");
+    if (Number.isNaN(generatedAt.getTime())) {
+      mount.textContent = `Using the ${source}.`;
+      return;
+    }
+    const readable = new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    }).format(generatedAt);
+    mount.innerHTML = `Synced from the CV site · <time datetime="${escapeHtml(generatedAt.toISOString())}">${escapeHtml(readable)}</time> · ${escapeHtml(source)}`;
+  }
 
   async function syncPaperRecords() {
     if (!window.fetch || location.protocol === "file:") return;
@@ -1586,6 +1606,7 @@
       renderNewsAndHonors();
       renderResearchImpact();
       renderGrants();
+      renderCvSyncStatus("live CV record");
       drawConstellation();
     } catch (err) {
       // Offline, blocked, or CV data unavailable: keep the bundled snapshot silently.
@@ -1628,6 +1649,7 @@
     renderGrants();
     renderOpenScience();
     renderNewsAndHonors();
+    renderCvSyncStatus();
     setupTheme();
     setupNavigation();
     setupReveals();
