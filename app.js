@@ -1095,32 +1095,101 @@
       </article>
     `).join("");
 
-    const projects = (projectData.projects || []).filter((project) => project.live).slice(0, 18);
-    $("[data-projects]").innerHTML = projects.map((project) => {
-      const thumb = project.thumb
-        ? `<a class="project-thumb" href="${escapeHtml(project.live)}" aria-label="Open ${escapeHtml(project.title)}"><img src="${escapeHtml(project.thumb)}" width="640" height="400" alt="Screenshot of ${escapeHtml(project.title)}" loading="lazy"></a>`
-        : "";
-      const screenshots = (project.screenshots || []).slice(0, 6);
-      const screenshotStrip = screenshots.length
-        ? `<div class="project-screenshot-strip" aria-label="Key screens from ${escapeHtml(project.title)}">${screenshots.map((shot) => `
-            <a class="project-shot" href="${escapeHtml(shot.src)}" aria-label="Open ${escapeHtml(project.title)} ${escapeHtml(shot.label || "screen")} screenshot">
-              <img src="${escapeHtml(shot.src)}" width="180" height="320" alt="${escapeHtml(project.title)} ${escapeHtml(shot.label || "screen")} screen" loading="lazy">
-            </a>
-          `).join("")}</div>`
-        : "";
-      return `
-      <article class="project-card reveal">
-        ${thumb}
-        <div class="project-card-body">
-          <div class="chips">${(project.tags || []).slice(0, 3).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>
-          <h3>${escapeHtml(project.title)}</h3>
-          <p>${escapeHtml(project.summary)}</p>
-          ${screenshotStrip}
-          <a href="${escapeHtml(project.live)}">View project</a>
-        </div>
-      </article>
-    `;
+    const priority = [
+      "TeachPlay",
+      "vr-safety-training",
+      "korean-classroom-ai-teacher-training-sim",
+      "counselcue",
+      "TINA1.01",
+      "chalk-and-chance",
+      "sail",
+      "ethobot3.2",
+      "virtual-makerspace",
+      "datasandbox-toolkit"
+    ];
+    const projects = [...(projectData.projects || [])].sort((a, b) => {
+      const aPriority = priority.indexOf(a.name);
+      const bPriority = priority.indexOf(b.name);
+      if (aPriority !== -1 || bPriority !== -1) {
+        if (aPriority === -1) return 1;
+        if (bPriority === -1) return -1;
+        return aPriority - bPriority;
+      }
+      return String(a.title || a.name).localeCompare(String(b.title || b.name));
+    });
+    const filterSpecs = [
+      { id: "all", label: "All projects" },
+      { id: "ai", label: "AI & adaptive" },
+      { id: "xr", label: "XR & simulation" },
+      { id: "games", label: "Games" },
+      { id: "analytics", label: "Analytics & research" },
+      { id: "open", label: "Open tools" }
+    ];
+
+    function projectFilterKeys(project) {
+      const text = `${project.title || ""} ${project.summary || ""} ${(project.tags || []).join(" ")} ${project.language || ""}`.toLowerCase();
+      const keys = ["all"];
+      if (/\bai\b|agent|adaptive|llm|chatbot|mentor|tutor|gemini|socratic|coregulat/.test(text)) keys.push("ai");
+      if (/\bvr\b|\bxr\b|openxr|webxr|unity|immersive|simulation|embodied|gaze|facs/.test(text)) keys.push("xr");
+      if (/game|godot|rpg|arcade|gamelet|playtest|strategy simulation/.test(text)) keys.push("games");
+      if (/analytics|data|research|nlp|visuali|network|timeline|bibliometric|dashboard|telemetry|methodolog/.test(text)) keys.push("analytics");
+      if (/ethics|policy|guide|workflow|infrastructure|community|credential|open source|scorm|curat/.test(text)) keys.push("open");
+      return [...new Set(keys)];
+    }
+
+    function renderProjectArchive(activeFilter = "all") {
+      const filtered = projects.filter((project) => projectFilterKeys(project).includes(activeFilter));
+      $("[data-project-count]").textContent = `Showing ${filtered.length} of ${projects.length} public projects`;
+      $("[data-projects]").innerHTML = filtered.map((project) => {
+        const destination = project.live || project.repo || "";
+        const thumb = project.thumb
+          ? `<a class="project-thumb" href="${escapeHtml(destination)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(project.title)}"><img src="${escapeHtml(project.thumb)}" width="640" height="400" alt="Project image from ${escapeHtml(project.title)}" loading="lazy"></a>`
+          : "";
+        const screenshots = (project.screenshots || []).slice(0, 6);
+        const screenshotStrip = screenshots.length
+          ? `<div class="project-screenshot-strip" aria-label="Key screens from ${escapeHtml(project.title)}">${screenshots.map((shot) => `
+              <a class="project-shot" href="${escapeHtml(shot.src)}" aria-label="Open ${escapeHtml(project.title)} ${escapeHtml(shot.label || "screen")} screenshot">
+                <img src="${escapeHtml(shot.src)}" width="180" height="320" alt="${escapeHtml(project.title)} ${escapeHtml(shot.label || "screen")} screen" loading="lazy">
+              </a>
+            `).join("")}</div>`
+          : "";
+        const live = project.live
+          ? `<a class="project-card-action project-card-action-primary" href="${escapeHtml(project.live)}" target="_blank" rel="noopener noreferrer">Live project</a>`
+          : "";
+        const repo = project.repo
+          ? `<a class="project-card-action" href="${escapeHtml(project.repo)}" target="_blank" rel="noopener noreferrer">Source</a>`
+          : "";
+        return `
+          <article class="project-card reveal${project.thumb ? "" : " project-card-no-thumb"}">
+            ${thumb}
+            <div class="project-card-body">
+              <div class="project-card-status">${project.live ? "Live" : "Research prototype"}</div>
+              <div class="chips">${(project.tags || []).slice(0, 3).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>
+              <h3>${escapeHtml(project.title)}</h3>
+              <p>${escapeHtml(project.summary)}</p>
+              ${screenshotStrip}
+              <div class="project-card-actions">${live}${repo}</div>
+            </div>
+          </article>`;
+      }).join("");
+    }
+
+    const filtersRoot = $("[data-project-filters]");
+    filtersRoot.innerHTML = filterSpecs.map((filter) => {
+      const count = projects.filter((project) => projectFilterKeys(project).includes(filter.id)).length;
+      return `<button type="button" class="project-filter${filter.id === "all" ? " is-active" : ""}" data-project-filter="${filter.id}" aria-pressed="${filter.id === "all"}">${escapeHtml(filter.label)} <span>${count}</span></button>`;
     }).join("");
+    filtersRoot.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-project-filter]");
+      if (!button) return;
+      filtersRoot.querySelectorAll("[data-project-filter]").forEach((item) => {
+        const active = item === button;
+        item.classList.toggle("is-active", active);
+        item.setAttribute("aria-pressed", String(active));
+      });
+      renderProjectArchive(button.dataset.projectFilter);
+    });
+    renderProjectArchive();
   }
 
   function renderGrants() {

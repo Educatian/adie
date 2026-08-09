@@ -59,15 +59,15 @@ window.__cvProjects = {
       "live": ""
     },
     {
-      "name": "ETHOBOT_ENG",
-      "title": "Ethobot — AI Ethics Education Chatbot",
+      "name": "ethobot3.2",
+      "title": "Ethobot 3.2 — AI Ethics Education Assistant",
       "category": "agents",
       "language": "JavaScript",
-      "summary": "Firebase-backed AI ethics chatbot for graduate-level instruction. English deployment of the Ethobot research line (with 3.1 and 3.2 follow-ups), Express server with Firestore-stored conversations and Analytics instrumentation.",
-      "tags": ["AI ethics", "chatbot", "Firebase"],
-      "repo": "https://github.com/Educatian/ETHOBOT_ENG",
-      "live": "https://educatian.github.io/ETHOBOT_ENG/",
-      "thumb": "assets/img/projects/ethobot-eng.png"
+      "summary": "Bilingual AI ethics learning environment with Socratic reasoning coaching, role-based ethical dilemmas, learner reflection, and teacher-facing analytics.",
+      "tags": ["AI ethics", "Socratic dialogue", "bilingual"],
+      "repo": "https://github.com/Educatian/ethobot3.2",
+      "live": "https://ethobot32.vercel.app",
+      "thumb": "assets/img/projects/ethobot32.webp"
     },
     {
       "name": "TINA1.01",
@@ -272,6 +272,188 @@ window.__cvProjects = {
       "repo": "https://github.com/Educatian/datasandbox3.1",
       "live": "https://datasandbox-toolkit.pages.dev",
       "thumb": "assets/img/projects/datasandbox-toolkit.png"
+    },
+    {
+      "name": "TeachPlay",
+      "title": "TeachPlay — AI-Enhanced Educational Game Design",
+      "category": "agents",
+      "language": "HTML",
+      "summary": "A twelve-session University of Alabama microcredential handbook and learner platform that connects educational-game objectives, prototypes, playtesting, evidence review, and verifiable credentials.",
+      "tags": ["game design", "microcredential", "evidence portfolio"],
+      "repo": "https://github.com/Educatian/TeachPlay",
+      "live": "https://teachplay.dev/",
+      "thumb": "assets/img/projects/teachplay.webp"
+    },
+    {
+      "name": "counselcue",
+      "title": "CounselCue — VR Counselor Training",
+      "category": "immersive-analytics",
+      "language": "C# / Unity",
+      "summary": "Korean one-to-one counselor-training simulation for practicing how counseling micro-skills, gaze, posture, facial movement, and response timing work together in relational delivery.",
+      "tags": ["VR simulation", "counselor education", "embodied interaction"],
+      "repo": "https://github.com/Educatian/counselcue",
+      "live": "https://educatian.github.io/counselcue/",
+      "thumb": "assets/img/projects/counselcue.webp"
+    },
+    {
+      "name": "korean-classroom-ai-teacher-training-sim",
+      "title": "Korean Classroom VR Teacher Response Simulator",
+      "category": "immersive-analytics",
+      "language": "C# / Unity",
+      "summary": "Teacher-education prototype for rehearsing responses to elementary students showing emotional and behavioral distress in a realistic Korean classroom, with affect dynamics and evidence-centered debriefing.",
+      "tags": ["VR teacher simulation", "SEL", "evidence-centered design"],
+      "repo": "https://github.com/Educatian/korean-classroom-ai-teacher-training-sim",
+      "live": "",
+      "thumb": "assets/img/projects/korean-vr-teacher-sim.webp"
+    },
+    {
+      "name": "vr-safety-training",
+      "title": "VR Safety Training Explorer",
+      "category": "immersive-analytics",
+      "language": "C# / Unity",
+      "summary": "OpenXR safety-training campus with five workplace zones, hands-on hazard controls, deterministic assessment, telemetry, and grounded Rocketbox NPC coaching.",
+      "tags": ["OpenXR", "safety training", "NPC coaching"],
+      "repo": "https://github.com/Educatian/vr-safety-training",
+      "live": "",
+      "thumb": "assets/img/projects/vr-safety-training.webp"
+    },
+    {
+      "name": "GeckoGripLabUnity",
+      "title": "GeckoGrip Lab",
+      "category": "immersive-analytics",
+      "language": "C# / Unity",
+      "summary": "Interactive Unity learning lab for exploring bio-inspired directional dry adhesion through gecko-foot structures, pad cartridges, surface coupons, and shear testing.",
+      "tags": ["bio-inspired design", "Unity lab", "engineering education"],
+      "repo": "https://github.com/Educatian/GeckoGripLabUnity",
+      "live": "",
+      "thumb": "assets/img/projects/geckogrip.webp"
+    },
+    {
+      "name": "PineMorphLabUnity",
+      "title": "PineMorph Lab",
+      "category": "immersive-analytics",
+      "language": "C# / Unity",
+      "summary": "Interactive engineering lab that models pine-cone-inspired bilayer actuation and lets learners vary design inputs, run a test, and inspect the resulting deformation.",
+      "tags": ["biomimicry", "Unity lab", "mechanical engineering"],
+      "repo": "https://github.com/Educatian/PineMorphLabUnity",
+      "live": "",
+      "thumb": "assets/img/projects/pinemorph.webp"
+    },
+    {
+      "name": "ConcussionVRPrototypeUnity",
+      "title": "Concussion VR Prototype",
+      "category": "immersive-analytics",
+      "language": "C# / Unity",
+      "summary": "Immersive rehabilitation research prototype combining a calm virtual environment with gaze-stabilization, memory, and reaction activities for iterative expert review.",
+      "tags": ["VR health", "gaze interaction", "rehabilitation prototype"],
+      "repo": "https://github.com/Educatian/ConcussionVRPrototypeUnity",
+      "live": "",
+      "thumb": "assets/img/projects/concussion-vr.webp"
+    },
+    {
+      "name": "nrf-sel-stage",
+      "title": "NRF SEL Simulation Stage",
+      "category": "immersive-analytics",
+      "language": "JavaScript / Godot",
+      "summary": "WebXR social-emotional-learning simulation stage for co-investigator testing, including facial Action Unit inspection and controlled scenario rehearsal.",
+      "tags": ["WebXR", "SEL", "facial action units"],
+      "repo": "https://github.com/Educatian/nrf-sel-stage",
+      "live": "https://educatian.github.io/nrf-sel-stage/"
+    },
+    {
+      "name": "korea-compnlp-handson",
+      "title": "Computational NLP Hands-on",
+      "category": "immersive-analytics",
+      "language": "Jupyter Notebook",
+      "summary": "Korean-language computational NLP workshop materials and Colab exercises for education researchers, covering a reproducible path from text preparation to analysis.",
+      "tags": ["computational NLP", "Colab", "research methods"],
+      "repo": "https://github.com/Educatian/korea-compnlp-handson",
+      "live": "",
+      "thumb": "assets/img/projects/korea-compnlp.webp"
+    },
+    {
+      "name": "cipherfell",
+      "title": "Cipherfell",
+      "category": "ethics-infra",
+      "language": "HTML / JavaScript",
+      "summary": "Medieval-village mystery RPG that teaches cybersecurity mental models—authentication, encryption, least privilege, and OSINT—without placing computers on screen.",
+      "tags": ["cybersecurity", "game-based learning", "stealth assessment"],
+      "repo": "https://github.com/Educatian/cipherfell",
+      "live": "https://cipherfell.pages.dev",
+      "thumb": "assets/img/projects/cipherfell.webp"
+    },
+    {
+      "name": "algopolis",
+      "title": "Algopolis",
+      "category": "ethics-infra",
+      "language": "HTML / JavaScript",
+      "summary": "Three-dimensional strategy simulation in which learners design the algorithm governing a city while reasoning about computational thinking and AI ethics trade-offs.",
+      "tags": ["AI ethics", "computational thinking", "strategy simulation"],
+      "repo": "https://github.com/Educatian/algopolis",
+      "live": "https://ancient-pebble-944.higgsfield.gg/",
+      "thumb": "assets/img/projects/algopolis.webp"
+    },
+    {
+      "name": "kels-curator-bot",
+      "title": "KELS Curator Bot",
+      "category": "ethics-infra",
+      "language": "JavaScript",
+      "summary": "Discord research-community curator that supports private reading queues, public digests, onboarding threads, safety rails, and repeatable knowledge-sharing workflows.",
+      "tags": ["research community", "Discord automation", "knowledge curation"],
+      "repo": "https://github.com/Educatian/kels-curator-bot",
+      "live": "https://educatian.github.io/kels-curator-bot/",
+      "thumb": "assets/img/projects/kels-curator.webp"
+    },
+    {
+      "name": "spaceinvaders",
+      "title": "Space Invaders Learning Gamelets",
+      "category": "immersive-analytics",
+      "language": "GDScript / Godot",
+      "summary": "Browser-playable Godot gamelets that connect arcade mechanics with orbital-motion and physics-learning activities used as worked examples in TeachPlay.",
+      "tags": ["educational gamelets", "Godot", "physics learning"],
+      "repo": "https://github.com/Educatian/spaceinvaders",
+      "live": "https://educatian.github.io/spaceinvaders/",
+      "thumb": "assets/img/projects/spaceinvaders.webp"
+    },
+    {
+      "name": "codex_collaboratione-learn",
+      "title": "Codex Collaboration for E-Learning",
+      "category": "ethics-infra",
+      "language": "HTML",
+      "summary": "Open tutorial for building interactive e-learning with Codex, covering iterative instructional design, web deployment, and SCORM packaging.",
+      "tags": ["Codex", "SCORM", "instructional design workflow"],
+      "repo": "https://github.com/Educatian/codex_collaboratione-learn",
+      "live": ""
+    },
+    {
+      "name": "CRAFT-",
+      "title": "CRAFT — Runtime and Authoring Framework for Training",
+      "category": "ethics-infra",
+      "language": "Python",
+      "summary": "Experimental runtime and authoring framework for creating structured AI-supported training experiences and reusable instructional workflows.",
+      "tags": ["authoring framework", "training", "AI workflow"],
+      "repo": "https://github.com/Educatian/CRAFT-",
+      "live": ""
+    },
+    {
+      "name": "civilform",
+      "title": "CivilForm",
+      "category": "agents",
+      "language": "JavaScript",
+      "summary": "AI evaluation and feedback prototype for civil-engineering students' Autodesk Revit projects, using vision-assisted review to support formative design critique.",
+      "tags": ["engineering education", "design feedback", "Gemini Vision"],
+      "repo": "https://github.com/Educatian/civilform",
+      "live": ""
+    },
+    {
+      "name": "CoReg_Companion",
+      "title": "CoReg Companion",
+      "category": "agents",
+      "language": "TypeScript",
+      "summary": "Co-regulated learning companion prototype with coaching dialogue, learning goals, adaptive scaffolding, and structured reflection for student learning sessions.",
+      "tags": ["co-regulated learning", "AI companion", "adaptive scaffolding"],
+      "repo": "https://github.com/Educatian/CoReg_Companion",
+      "live": ""
     }
   ]
 };
