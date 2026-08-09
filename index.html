@@ -154,6 +154,15 @@
         <div class="research-grid" data-research-grid></div>
       </section>
 
+      <section id="projects" class="featured-projects section-observe" aria-labelledby="featured-projects-title">
+        <div class="section-heading reveal">
+          <div class="section-kicker">Selected Projects</div>
+          <h2 id="featured-projects-title">Research tools in active development.</h2>
+          <p>Featured work rotates automatically. Use the controls to browse at your own pace or open a focused case-study view.</p>
+        </div>
+        <div data-featured-projects data-image-base="assets/img/projects/" aria-label="Rotating selected projects"></div>
+      </section>
+
       <section class="constellation section-observe" aria-labelledby="constellation-title">
         <div class="constellation-copy reveal">
           <div class="section-kicker">Research Constellation</div>
@@ -223,12 +232,11 @@
         <div class="talk-list" data-talks></div>
       </section>
 
-      <section id="projects" class="projects section-observe">
+      <section id="project-archive" class="projects section-observe">
         <div class="section-heading reveal">
-          <div class="section-kicker">Projects &amp; Collaborations</div>
-          <h2>Design research with field partners, prototypes, and funded work.</h2>
+          <div class="section-kicker">Project Archive &amp; Collaborations</div>
+          <h2>More design research with field partners, prototypes, and funded work.</h2>
         </div>
-        <div class="project-spotlights" data-project-spotlights></div>
         <div class="collab-grid" data-collaborations></div>
         <div class="project-rail" data-projects></div>
       </section>
@@ -327,6 +335,8 @@
 
     <script defer src="assets/data/cv-site-data.js"></script>
     <script defer src="assets/data/cv-projects-data.js"></script>
+    <script defer src="assets/data/featured-projects.js"></script>
+    <script defer src="assets/js/featured-rotation.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
     <script defer src="app.js"></script>

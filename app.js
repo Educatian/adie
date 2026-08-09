@@ -1065,21 +1065,24 @@
   }
 
   function renderProjects() {
-    $("[data-project-spotlights]").innerHTML = projectSpotlightSpecs.map((spotlight) => {
-      const collaboration = collaborations.find((item) => item.title === spotlight.collaborationTitle) || collaborations[0];
-      return `
-        <article class="project-spotlight reveal">
-          <img src="${escapeHtml(spotlight.image)}" width="1000" height="625" alt="" loading="lazy">
-          <div>
-            <div class="chips"><span class="chip">${escapeHtml(collaboration.status)}</span></div>
-            <h3>${escapeHtml(spotlight.title)}</h3>
-            <p>${escapeHtml(collaboration.text)}</p>
-            <p><strong>Outcome:</strong> ${escapeHtml(spotlight.outcome)}</p>
-            <p><strong>Partners:</strong> ${escapeHtml(collaboration.partners)}</p>
-          </div>
-        </article>
-      `;
-    }).join("");
+    const spotlightRoot = $("[data-project-spotlights]");
+    if (spotlightRoot) {
+      spotlightRoot.innerHTML = projectSpotlightSpecs.map((spotlight) => {
+        const collaboration = collaborations.find((item) => item.title === spotlight.collaborationTitle) || collaborations[0];
+        return `
+          <article class="project-spotlight reveal">
+            <img src="${escapeHtml(spotlight.image)}" width="1000" height="625" alt="" loading="lazy">
+            <div>
+              <div class="chips"><span class="chip">${escapeHtml(collaboration.status)}</span></div>
+              <h3>${escapeHtml(spotlight.title)}</h3>
+              <p>${escapeHtml(collaboration.text)}</p>
+              <p><strong>Outcome:</strong> ${escapeHtml(spotlight.outcome)}</p>
+              <p><strong>Partners:</strong> ${escapeHtml(collaboration.partners)}</p>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
 
     const spotlightTitles = new Set(projectSpotlightSpecs.map((spotlight) => spotlight.collaborationTitle));
     const remainingCollaborations = collaborations.filter((item) => !spotlightTitles.has(item.title));
