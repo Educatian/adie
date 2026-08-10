@@ -18,7 +18,7 @@ Static research-group website for the Adaptive Design of Immersive E-Learning La
 - `assets/data/cv-site-data.js` wraps the snapshot for direct `file://` viewing and offline fallback.
 - `assets/data/cv-projects-data.js` provides project/prototype data.
 - `assets/img/people/` contains real student photo avatars; `assets/img/moon-headshot.jpg` is the director photo.
-- `assets/img/hero-key-visual.webp` is the hero fallback image; generated motif/background assets support the research and join sections.
+- `assets/img/addie-symbol.svg` and the matching lockups are the Figma-exported Immersive Frame identity assets; `assets/img/og-image-immersive-frame.png` is the 1200×630 social preview.
 
 ## CV Auto-Sync
 
