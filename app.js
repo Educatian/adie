@@ -244,6 +244,37 @@
     currentAdvisees: 8
   };
   const PUBLICATION_COLLAPSED_LIMIT = 12;
+  const journalCoverProfiles = [
+    { terms: ["computers and education: x reality", "computers & education: x reality"], image: "assets/img/journal-covers/cexr.webp" },
+    { terms: ["interactive learning environment"], image: "assets/img/journal-covers/ile.webp" },
+    { terms: ["educational psychology review"], image: "assets/img/journal-covers/educational-psychology-review.webp" },
+    { terms: ["education sciences"], image: "assets/img/journal-covers/educationsciences.png" },
+    { terms: ["education and information technologies"], label: "Education and Information Technologies" },
+    { terms: ["educational research review"], image: "assets/img/journal-covers/educational-research-review.jpg" },
+    { terms: ["teaching and teacher education"], image: "assets/img/journal-covers/tate.jpg" },
+    { terms: ["computer applications in engineering education"], image: "assets/img/journal-covers/caee.jpeg" },
+    { terms: ["innovations in education and teaching international", "innovation in education and teaching international"], image: "assets/img/journal-covers/IETI.jpg" },
+    { terms: ["simulation & gaming"], image: "assets/img/journal-covers/simulationgaming.png" },
+    { terms: ["smart learning environments"], image: "assets/img/journal-covers/SLE.jpeg" },
+    { terms: ["online learning journal", "online learning"], image: "assets/img/journal-covers/olj.webp" },
+    { terms: ["journal of safety research"], image: "assets/img/journal-covers/JSR.jpeg" },
+    { terms: ["journal of applied instructional design"], image: "assets/img/journal-covers/jaid.webp" },
+    { terms: ["educational technology & society", "journal of educational technology & society"], image: "assets/img/journal-covers/ets.jpg" },
+    { terms: ["ethics and behavior", "ethics & behavior"], image: "assets/img/journal-covers/ethics-and-behavior.jpg" },
+    { terms: ["cogent education"], image: "assets/img/journal-covers/cogenteducation.jpg" },
+    { terms: ["ai & ethics"], image: "assets/img/journal-covers/ai-and-ethics.webp" },
+    { terms: ["ai & society"], image: "assets/img/journal-covers/ai-and-society.webp" },
+    { terms: ["behaviormetrika"], image: "assets/img/journal-covers/behaviormetrika.webp" },
+    { terms: ["zdm"], image: "assets/img/journal-covers/zdm.jpg" },
+    { terms: ["computers & education"], image: "assets/img/journal-covers/computers-education.jpg" },
+    { terms: ["journal of autism and developmental disorders"], label: "Journal of Autism and Developmental Disorders" },
+    { terms: ["technology, knowledge, and learning"], label: "Technology, Knowledge, and Learning" },
+    { terms: ["international journal of educational technology in higher education"], label: "Educational Technology in Higher Education" },
+    { terms: ["british journal of educational technology"], label: "British Journal of Educational Technology" },
+    { terms: ["journal of learning analytics"], label: "Journal of Learning Analytics" },
+    { terms: ["techtrends"], label: "TechTrends" },
+    { terms: ["research in learning technology"], label: "Research in Learning Technology" }
+  ];
   let activePublicationTag = "All";
   let activePublicationSearch = "";
   let activePublicationAuthor = "All";
@@ -265,6 +296,39 @@
 
   function escapeRegExp(value) {
     return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+
+  function normalizeJournalName(value) {
+    return String(value || "")
+      .toLowerCase()
+      .replace(/â€“|â€”/g, "-")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  function journalCoverProfile(pub) {
+    const venue = normalizeJournalName(pub.venue);
+    return journalCoverProfiles.find((profile) => profile.terms.some((term) => venue.includes(term))) || null;
+  }
+
+  function journalThumbnail(pub, size = "card") {
+    const profile = journalCoverProfile(pub);
+    const venue = String(pub.venue || "Scholarly Journal").replace(/,\s*\d.*$/, "").trim();
+    const label = profile?.label || venue;
+    if (profile?.image) {
+      return `
+        <div class="publication-thumbnail publication-thumbnail-${size}">
+          <img src="${escapeHtml(profile.image)}" alt="${escapeHtml(`${label} journal cover`)}" loading="lazy" decoding="async">
+        </div>
+      `;
+    }
+    return `
+      <div class="publication-thumbnail publication-thumbnail-${size} publication-thumbnail-fallback" aria-label="${escapeHtml(`${label} journal thumbnail`)}">
+        <span>Journal</span>
+        <strong>${escapeHtml(label)}</strong>
+        <i aria-hidden="true"></i>
+      </div>
+    `;
   }
 
   function formatNumber(value) {
@@ -559,8 +623,9 @@
       <div class="publication-list-rows">
         ${visiblePublications.map((pub) => `
           <article class="publication-row">
-            <strong>${escapeHtml(pub.year)}</strong>
+            ${journalThumbnail(pub, "row")}
             <div>
+              <strong class="publication-row-year">${escapeHtml(pub.year)}</strong>
               <h3>${escapeHtml(pub.title)}</h3>
               <p>${escapeHtml(pub.authors)}</p>
               ${publicationCopyActions(pub)}
@@ -590,12 +655,15 @@
   function publicationCard(pub) {
     return `
       <article class="publication-card reveal">
-        <span class="year">${escapeHtml(pub.year)}${pub.status ? ` · ${escapeHtml(pub.status)}` : ""}</span>
-        <h3>${escapeHtml(pub.title)}</h3>
-        <p>${escapeHtml(pub.authors)}</p>
-        <p class="publication-venue">${escapeHtml(pub.venue)}</p>
-        <div class="chips">${(pub.tags || []).slice(0, 4).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>
-        ${publicationCopyActions(pub)}
+        ${journalThumbnail(pub, "card")}
+        <div class="publication-card-body">
+          <span class="year">${escapeHtml(pub.year)}${pub.status ? ` · ${escapeHtml(pub.status)}` : ""}</span>
+          <h3>${escapeHtml(pub.title)}</h3>
+          <p>${escapeHtml(pub.authors)}</p>
+          <p class="publication-venue">${escapeHtml(pub.venue)}</p>
+          <div class="chips">${(pub.tags || []).slice(0, 4).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>
+          ${publicationCopyActions(pub)}
+        </div>
       </article>
     `;
   }
