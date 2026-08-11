@@ -1266,14 +1266,17 @@
       { value: `$${formatNumber(portfolio.fundedTotal || 0)}`, label: "Funded total" },
       { value: String(portfolio.fundedCount || 0), label: "Funded awards" },
       { value: `$${formatNumber(portfolio.pendingTotal || 0)}`, label: "Pending total" },
-      { value: String(portfolio.pendingCount || 0), label: "Pending proposals" }
+      { value: String(portfolio.pendingCount || 0), label: "Pending proposals" },
+      { value: String(portfolio.withdrawnCount || 0), label: "Withdrawn proposals" }
     ].map((item) => statCell(item.value, item.label)).join("");
 
     const funded = siteData.grants?.funded || [];
     const pending = siteData.grants?.pending || [];
+    const withdrawn = siteData.grants?.withdrawn || [];
     $("[data-grants]").innerHTML = `
       ${grantColumn("Funded", funded.slice(0, 6))}
       ${grantColumn("Pending", pending.slice(0, 5))}
+      ${grantColumn("Withdrawn", withdrawn.slice(0, 5))}
     `;
   }
 
