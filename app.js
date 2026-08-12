@@ -1260,23 +1260,54 @@
     renderProjectArchive();
   }
 
+  const grantFunderMarks = {
+    imls: { name: "Institute of Museum and Library Services", src: "assets/funder-logos/imls.png", shape: "is-wide" },
+    nrf: { name: "National Research Foundation of Korea", src: "assets/funder-logos/nrf-korea.jpg", shape: "is-wide" },
+    ua: { name: "The University of Alabama", src: "assets/funder-logos/ua.svg", shape: "is-symbol" },
+    ache: { name: "Alabama Commission on Higher Education", src: "assets/funder-logos/ache.png", shape: "is-symbol" },
+    sec: { name: "Southeastern Conference", src: "assets/funder-logos/sec.png", shape: "is-symbol" },
+    aera: { name: "American Educational Research Association", src: "assets/funder-logos/aera.png", shape: "is-wide" },
+    aims: { name: "Advancing Innovative Math Solutions Collaboratory", src: "assets/funder-logos/aims.png", shape: "is-wide" },
+    nsf: { name: "National Science Foundation", src: "assets/funder-logos/nsf.png", shape: "is-symbol" },
+    nih: { name: "National Institutes of Health", src: "assets/funder-logos/nih.png", shape: "is-symbol" }
+  };
+
+  function getGrantFunderMark(grant) {
+    const searchable = `${grant.title || ""} ${grant.meta || ""}`.toLowerCase();
+    if (searchable.includes("museum and library services") || searchable.includes("imls")) return grantFunderMarks.imls;
+    if (searchable.includes("national research foundation of korea") || searchable.includes("(nrf)")) return grantFunderMarks.nrf;
+    if (searchable.includes("aera-nsf")) return grantFunderMarks.aera;
+    if (searchable.includes("innovative math solutions") || searchable.includes("aims collaboratory")) return grantFunderMarks.aims;
+    if (searchable.includes("national institutes of health") || searchable.includes("(nih)")) return grantFunderMarks.nih;
+    if (searchable.includes("national science foundation") || searchable.includes("nsf ritel") || searchable.includes("camel-cn")) return grantFunderMarks.nsf;
+    if (searchable.includes("alabama commission on higher education")) return grantFunderMarks.ache;
+    if (searchable.includes("sec faculty travel")) return grantFunderMarks.sec;
+    return grantFunderMarks.ua;
+  }
+
+  function grantFunderLogo(grant) {
+    const funder = getGrantFunderMark(grant);
+    return `
+      <span class="grant-funder-mark ${funder.shape}" title="${escapeHtml(funder.name)}">
+        <img src="${escapeHtml(funder.src)}" alt="${escapeHtml(`${funder.name} logo`)}" loading="lazy" decoding="async">
+      </span>
+    `;
+  }
+
   function renderGrants() {
     const portfolio = siteData.grantPortfolio || {};
     $("[data-grant-summary]").innerHTML = [
       { value: `$${formatNumber(portfolio.fundedTotal || 0)}`, label: "Funded total" },
       { value: String(portfolio.fundedCount || 0), label: "Funded awards" },
       { value: `$${formatNumber(portfolio.pendingTotal || 0)}`, label: "Pending total" },
-      { value: String(portfolio.pendingCount || 0), label: "Pending proposals" },
-      { value: String(portfolio.withdrawnCount || 0), label: "Withdrawn proposals" }
+      { value: String(portfolio.pendingCount || 0), label: "Pending proposals" }
     ].map((item) => statCell(item.value, item.label)).join("");
 
     const funded = siteData.grants?.funded || [];
     const pending = siteData.grants?.pending || [];
-    const withdrawn = siteData.grants?.withdrawn || [];
     $("[data-grants]").innerHTML = `
       ${grantColumn("Funded", funded.slice(0, 6))}
       ${grantColumn("Pending", pending.slice(0, 5))}
-      ${grantColumn("Withdrawn", withdrawn.slice(0, 5))}
     `;
   }
 
@@ -1286,9 +1317,15 @@
         <h3>${escapeHtml(title)}</h3>
         ${grants.map((grant) => `
           <article class="grant-card">
-            <h3>${escapeHtml(grant.title)}</h3>
-            <p>${escapeHtml(grant.meta)}</p>
-            <span class="amount">${escapeHtml(grant.amount)}</span>
+            <div class="grant-card-main">
+              ${grantFunderLogo(grant)}
+              <div class="grant-card-copy">
+                <span class="grant-funder-name">${escapeHtml(getGrantFunderMark(grant).name)}</span>
+                <h3>${escapeHtml(grant.title)}</h3>
+                <p>${escapeHtml(grant.meta)}</p>
+                <span class="amount">${escapeHtml(grant.amount)}</span>
+              </div>
+            </div>
           </article>
         `).join("")}
       </div>
