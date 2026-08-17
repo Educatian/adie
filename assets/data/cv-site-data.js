@@ -1,5 +1,5 @@
 ﻿window.__cvSiteData = {
-  "generatedAt": "2026-08-11T18:08:08.384333+00:00",
+  "generatedAt": "2026-08-17T01:52:46.598926+00:00",
   "sourceCv": "C:\\Users\\jewoo\\Desktop\\_System\\_projects\\cv\\CV_202605_MOON.docx",
   "profile": {
     "name": "Dr. Jewoong Moon",
@@ -166,7 +166,7 @@
     {
       "date": "2026",
       "type": "Publication",
-      "text": "Minor revision manuscript for Cogent Education: Challenges, solutions, and PD needs for integrating AI: Insights from a two-week AI literacy module with preservice teachers."
+      "text": "Accepted article in Cogent Education: Challenges, solutions, and PD needs for integrating AI: Insights from a two-week AI literacy module with preservice teachers."
     },
     {
       "date": "2026",
@@ -236,7 +236,7 @@
       "tags": [
         "$497,460",
         "Lead PI",
-        "National Science Foundation (NSF), Proposal 26-0572, submission deadline April 3, 2026, submitted to sponsor March 10, 2026, SUBMITTED TO SPONSOR"
+        "National Science Foundation (NSF), Proposal 26-0572, submission deadline April 3, 2026, submitted to sponsor March 10, 2026"
       ]
     }
   ],
@@ -266,7 +266,7 @@
         "Teacher Ed"
       ],
       "note": "",
-      "status": "Minor revision"
+      "status": "Accepted"
     },
     {
       "year": "2026",
@@ -1093,7 +1093,7 @@
     {
       "year": "2026",
       "category": "International",
-      "citation": "Aldemir, T., Bicer, Al., Kilinc, S., Moon, J., & Kwok, M. (Minor revision, 2026). Challenges, solutions, and PD needs for integrating AI: Insights from a two-week AI literacy module with preservice teachers. Cogent Education [ESCI-indexed, IF = 2.0, IF5 = 2.1]",
+      "citation": "Aldemir, T., Bicer, Al., Kilinc, S., Moon, J., & Kwok, M. (Accepted, 2026). Challenges, solutions, and PD needs for integrating AI: Insights from a two-week AI literacy module with preservice teachers. Cogent Education [ESCI-indexed, IF = 2.0, IF5 = 2.1]",
       "link": ""
     },
     {
@@ -2004,7 +2004,7 @@
       },
       {
         "title": "CyberAI Innovation: Teaching AI as Target and Defender through a Full-Stack Immersive AI Ecosystem",
-        "meta": "Lead PI | National Science Foundation (NSF), Proposal 26-0572, submission deadline April 3, 2026, submitted to sponsor March 10, 2026, SUBMITTED TO SPONSOR | October 2026 - September 2029",
+        "meta": "Lead PI | National Science Foundation (NSF), Proposal 26-0572, submission deadline April 3, 2026, submitted to sponsor March 10, 2026 | October 2026 - September 2029",
         "amount": "$497,460",
         "amountValue": 497460.0
       },
@@ -2021,14 +2021,7 @@
         "amountValue": 399946.0
       }
     ],
-    "withdrawn": [
-      {
-        "title": "SaTS 2.0: EDU: Metaverse or Metaworst: Metaverse Security Education by Using Heutagogical and Challenge-based Pedagogy",
-        "meta": "Lead PI | National Science Foundation (NSF), Proposal 25-1293, submitted September 29, 2025, withdrawn February 9, 2026 | April 2026 - March 2029",
-        "amount": "$598,139",
-        "amountValue": 598139.0
-      }
-    ]
+    "withdrawn": []
   },
   "grantPortfolio": {
     "fundedTotal": 607683,
@@ -2037,9 +2030,9 @@
     "pendingCount": 4,
     "sourceReportedFundedTotal": 607683,
     "sourceReportedPendingTotal": 932406,
-    "withdrawnTotal": 598139,
-    "withdrawnCount": 1,
-    "sourceReportedWithdrawnTotal": 598139,
+    "withdrawnTotal": 0,
+    "withdrawnCount": 0,
+    "sourceReportedWithdrawnTotal": 0,
     "fundedDiscrepancy": 0,
     "pendingDiscrepancy": 0,
     "withdrawnDiscrepancy": 0
