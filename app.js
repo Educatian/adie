@@ -1769,6 +1769,15 @@
       if (!res.ok) return;
       const fresh = await res.json();
       if (!fresh || typeof fresh !== "object") return;
+      const bundledTimestamp = Date.parse(siteData.generatedAt || "");
+      const liveTimestamp = Date.parse(fresh.generatedAt || "");
+      if (
+        Number.isFinite(bundledTimestamp) &&
+        Number.isFinite(liveTimestamp) &&
+        liveTimestamp < bundledTimestamp
+      ) {
+        return;
+      }
       let changed = false;
       SYNC_KEYS.forEach((key) => {
         if (fresh[key] != null) {
