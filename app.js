@@ -244,6 +244,7 @@
     currentAdvisees: 8
   };
   const PUBLICATION_COLLAPSED_LIMIT = 12;
+  const BOOK_CHAPTER_COLLAPSED_LIMIT = 4;
   const journalCoverProfiles = [
     { terms: ["computers and education: x reality", "computers & education: x reality"], image: "assets/img/journal-covers/cexr.webp" },
     { terms: ["interactive learning environment"], image: "assets/img/journal-covers/ile.webp" },
@@ -279,6 +280,7 @@
   let activePublicationSearch = "";
   let activePublicationAuthor = "All";
   let publicationsExpanded = false;
+  let bookChaptersExpanded = false;
   let scholarAnalytics = scholarFallback;
   const publicationActionStore = new Map();
 
@@ -313,7 +315,8 @@
 
   function journalThumbnail(pub, size = "card") {
     const profile = journalCoverProfile(pub);
-    const venue = String(pub.venue || "Scholarly Journal").replace(/,\s*\d.*$/, "").trim();
+    const isBookChapter = pub.type === "Book Chapter";
+    const venue = String(pub.bookTitle || pub.venue || (isBookChapter ? "Scholarly Book" : "Scholarly Journal")).replace(/,\s*\d.*$/, "").trim();
     const label = profile?.label || venue;
     if (profile?.image) {
       return `
@@ -323,8 +326,8 @@
       `;
     }
     return `
-      <div class="publication-thumbnail publication-thumbnail-${size} publication-thumbnail-fallback" aria-label="${escapeHtml(`${label} journal thumbnail`)}">
-        <span>Journal</span>
+      <div class="publication-thumbnail publication-thumbnail-${size} publication-thumbnail-fallback" aria-label="${escapeHtml(`${label} ${isBookChapter ? "book chapter" : "journal"} thumbnail`)}">
+        <span>${isBookChapter ? "Chapter" : "Journal"}</span>
         <strong>${escapeHtml(label)}</strong>
         <i aria-hidden="true"></i>
       </div>
@@ -643,7 +646,53 @@
         renderPublications();
       });
     }
+    renderBookChapters();
     setupPublicationCopyButtons();
+  }
+
+  function renderBookChapters() {
+    const mount = $("[data-book-chapter-list]");
+    if (!mount) return;
+    const chapters = siteData.bookChapters || [];
+    if (!chapters.length) {
+      mount.innerHTML = "";
+      return;
+    }
+    const visible = bookChaptersExpanded
+      ? chapters
+      : chapters.slice(0, BOOK_CHAPTER_COLLAPSED_LIMIT);
+    const hasOverflow = chapters.length > BOOK_CHAPTER_COLLAPSED_LIMIT;
+
+    mount.innerHTML = `
+      <div class="publication-list-meta">
+        <div>
+          <span class="section-kicker">Scholarly chapters</span>
+          <h3>Book chapters</h3>
+          <p>Showing ${visible.length} of ${chapters.length} chapters from the current CV.</p>
+        </div>
+        ${hasOverflow ? `<button class="publication-toggle" type="button" aria-expanded="${bookChaptersExpanded}" data-book-chapter-toggle>${bookChaptersExpanded ? "Show fewer" : `Show all (${chapters.length})`}</button>` : ""}
+      </div>
+      <div class="publication-list-rows">
+        ${visible.map((chapter) => `
+          <article class="publication-row">
+            ${journalThumbnail(chapter, "row")}
+            <div>
+              <strong class="publication-row-year">${escapeHtml(chapter.year || "")}</strong>
+              <h3>${escapeHtml(chapter.title || "Book chapter")}</h3>
+              <p>${escapeHtml(chapter.authors || "")}</p>
+              ${publicationCopyActions(chapter)}
+              <p>${escapeHtml(chapter.venue || "")}${chapter.status ? ` · ${escapeHtml(chapter.status)}` : ""}</p>
+            </div>
+            <div class="chips"><span class="chip">Book Chapter</span>${(chapter.tags || []).slice(0, 2).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>
+          </article>
+        `).join("")}
+      </div>
+    `;
+    $("[data-book-chapter-toggle]", mount)?.addEventListener("click", () => {
+      bookChaptersExpanded = !bookChaptersExpanded;
+      renderBookChapters();
+      setupPublicationCopyButtons(mount);
+    });
   }
 
   function publicationListSummary(visibleCount, totalCount) {
@@ -693,8 +742,8 @@
     `;
   }
 
-  function setupPublicationCopyButtons() {
-    $$("[data-pub-action]").forEach((button) => {
+  function setupPublicationCopyButtons(scope = document) {
+    $$("[data-pub-action]", scope).forEach((button) => {
       button.addEventListener("click", async () => {
         const pub = publicationActionStore.get(button.dataset.pubAction);
         if (!pub) return;
@@ -717,7 +766,7 @@
     const year = String(pub.year || "n.d.").trim();
     const title = sentenceWithPeriod(pub.title || "Untitled work");
     const venue = sentenceWithPeriod(pub.venue || "");
-    const status = pub.status ? ` ${sentenceWithPeriod(pub.status)}` : "";
+    const status = pub.status && pub.status !== "Published" ? ` ${sentenceWithPeriod(pub.status)}` : "";
     return `${authors} (${year}). ${title} ${venue}${status}`.replace(/\s+/g, " ").trim();
   }
 
@@ -726,11 +775,13 @@
     const firstAuthor = String(pub.authors || "Moon").split(",")[0].replace(/[^a-z0-9]/gi, "") || "Moon";
     const firstTitleWord = String(pub.title || "work").split(/\s+/)[0].replace(/[^a-z0-9]/gi, "") || "work";
     const key = `${firstAuthor}${year}${firstTitleWord}`;
+    const isBookChapter = pub.type === "Book Chapter";
     return [
-      `@article{${key},`,
+      `@${isBookChapter ? "incollection" : "article"}{${key},`,
       `  author = {${escapeBibTex(pub.authors || "")}},`,
       `  title = {${escapeBibTex(pub.title || "")}},`,
-      `  journal = {${escapeBibTex(pub.venue || "")}},`,
+      `  ${isBookChapter ? "booktitle" : "journal"} = {${escapeBibTex(pub.bookTitle || pub.venue || "")}},`,
+      ...(isBookChapter && pub.publisher ? [`  publisher = {${escapeBibTex(pub.publisher)}},`] : []),
       `  year = {${escapeBibTex(pub.year || "")}},`,
       `  note = {${escapeBibTex(pub.status || pub.note || "")}}`,
       "}"
@@ -1734,6 +1785,7 @@
     "sourceCv",
     "publications",
     "completeJournalArticles",
+    "bookChapters",
     "workingPapers",
     "workingPaperSummary",
     "grants",
