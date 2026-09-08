@@ -1215,6 +1215,7 @@
     `).join("");
 
     const priority = [
+      "ethobot-vr", "campus-digital-twin", "Swarm_ID", "reboot-seoul-2050", "forma",
       "TeachPlay",
       "vr-safety-training",
       "korean-classroom-ai-teacher-training-sim",
@@ -1262,7 +1263,7 @@
       $("[data-projects]").innerHTML = filtered.map((project) => {
         const destination = project.live || project.repo || "";
         const thumb = project.thumb
-          ? `<a class="project-thumb" href="${escapeHtml(destination)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(project.title)}"><img src="${escapeHtml(project.thumb)}" width="640" height="400" alt="Project image from ${escapeHtml(project.title)}" loading="lazy"></a>`
+          ? `<a class="project-thumb" href="${escapeHtml(destination)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(project.title)}"><img src="${escapeHtml(project.thumb)}" width="640" height="400" alt="${escapeHtml(project.imageAlt || ("Project image from " + project.title))}" loading="lazy"></a>`
           : "";
         const screenshots = (project.screenshots || []).slice(0, 6);
         const screenshotStrip = screenshots.length
@@ -1282,7 +1283,7 @@
           <article class="project-card reveal${project.thumb ? "" : " project-card-no-thumb"}">
             ${thumb}
             <div class="project-card-body">
-              <div class="project-card-status">${project.live ? "Live" : "Research prototype"}</div>
+              <div class="project-card-status">${escapeHtml(project.status || (project.live ? "Live" : "Research prototype"))}</div>
               <div class="chips">${(project.tags || []).slice(0, 3).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>
               <h3>${escapeHtml(project.title)}</h3>
               <p>${escapeHtml(project.summary)}</p>
