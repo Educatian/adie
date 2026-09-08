@@ -1281,7 +1281,7 @@
           : "";
         return `
           <article class="project-card reveal${project.thumb ? "" : " project-card-no-thumb"}">
-            ${thumb}
+            <figure class="archive-project-preview">${thumb}${project.thumbnailCaption ? `<figcaption>${escapeHtml(project.thumbnailCaption)}</figcaption>` : ""}</figure>
             <div class="project-card-body">
               <div class="project-card-status">${escapeHtml(project.status || (project.live ? "Live" : "Research prototype"))}</div>
               <div class="chips">${(project.tags || []).slice(0, 3).map((tag) => `<span class="chip">${escapeHtml(tag)}</span>`).join("")}</div>

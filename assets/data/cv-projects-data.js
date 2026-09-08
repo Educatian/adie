@@ -135,7 +135,10 @@ window.__cvProjects = {
         "agent"
       ],
       "repo": "https://github.com/Educatian/ThinkMethod",
-      "live": ""
+      "live": "",
+      "thumb": "assets/img/projects/thinkmethod-thumbnail-20260908.png",
+      "imageAlt": "ThinkMethod research design advisor with methodology choices and a research wizard.",
+      "thumbnailCaption": "Research design advisor · prototype interface"
     },
     {
       "name": "bamatext",
@@ -149,7 +152,10 @@ window.__cvProjects = {
         "Socratic AI tutor"
       ],
       "repo": "https://github.com/Educatian/bamatext",
-      "live": ""
+      "live": "",
+      "thumb": "assets/img/projects/bamatext-thumbnail-20260908.png",
+      "imageAlt": "BamaText adaptive physics textbook landing screen and learning features.",
+      "thumbnailCaption": "Adaptive textbook · prototype interface"
     },
     {
       "name": "BamaTide",
@@ -164,7 +170,10 @@ window.__cvProjects = {
         "Gemini tutor"
       ],
       "repo": "https://github.com/Educatian/BamaTide",
-      "live": ""
+      "live": "",
+      "thumb": "assets/img/projects/bamatide-thumbnail-20260908.png",
+      "imageAlt": "BamaTide educational game design microcredential pilot landing screen.",
+      "thumbnailCaption": "Microcredential pilot · demo interface"
     },
     {
       "name": "ethobot3.2",
@@ -326,7 +335,10 @@ window.__cvProjects = {
         "MMLA"
       ],
       "repo": "https://github.com/Educatian/videoanalysis",
-      "live": ""
+      "live": "",
+      "thumb": "assets/img/projects/videoanalysis-thumbnail-20260908.png",
+      "imageAlt": "Public README overview of the Classroom Engagement Analysis System research toolkit.",
+      "thumbnailCaption": "Project documentation · research toolkit"
     },
     {
       "name": "ethicsedullm",
@@ -339,7 +351,10 @@ window.__cvProjects = {
         "AI ethics"
       ],
       "repo": "https://github.com/Educatian/ethicsedullm",
-      "live": ""
+      "live": "",
+      "thumb": "assets/img/projects/ethicsedullm-thumbnail-20260908.png",
+      "imageAlt": "Public README outlining the AI Ethics Education LLM development project.",
+      "thumbnailCaption": "Project documentation · model development"
     },
     {
       "name": "cybersentinel",
@@ -578,7 +593,10 @@ window.__cvProjects = {
         "facial action units"
       ],
       "repo": "https://github.com/Educatian/nrf-sel-stage",
-      "live": "https://educatian.github.io/nrf-sel-stage/"
+      "live": "https://educatian.github.io/nrf-sel-stage/",
+      "thumb": "assets/img/projects/nrf-sel-stage-thumbnail-20260908.png",
+      "imageAlt": "NRF SEL Stage running in Godot, showing the affect avatar and facial action controls.",
+      "thumbnailCaption": "Local prototype · avatar test scene"
     },
     {
       "name": "korea-compnlp-handson",
@@ -667,7 +685,10 @@ window.__cvProjects = {
         "instructional design workflow"
       ],
       "repo": "https://github.com/Educatian/codex_collaboratione-learn",
-      "live": ""
+      "live": "",
+      "thumb": "assets/img/projects/codex-elearn-thumbnail-20260908.png",
+      "imageAlt": "Cover of the Codex Collaboration Tutorial for interactive e-learning authoring.",
+      "thumbnailCaption": "Interactive e-learning · workflow guide"
     },
     {
       "name": "CRAFT-",
@@ -681,7 +702,10 @@ window.__cvProjects = {
         "AI workflow"
       ],
       "repo": "https://github.com/Educatian/CRAFT-",
-      "live": ""
+      "live": "",
+      "thumb": "assets/img/projects/craft-thumbnail-20260908.png",
+      "imageAlt": "CRAFT SCORM quiz starter running in browser-only mode, showing its first question.",
+      "thumbnailCaption": "SCORM framework · working quiz example"
     },
     {
       "name": "civilform",
@@ -695,7 +719,10 @@ window.__cvProjects = {
         "Gemini Vision"
       ],
       "repo": "https://github.com/Educatian/civilform",
-      "live": ""
+      "live": "",
+      "thumb": "assets/img/projects/civilform-thumbnail-20260908.png",
+      "imageAlt": "CivilForm prototype showing Revit evaluation choices and the design upload workflow.",
+      "thumbnailCaption": "Revit assessment · prototype interface"
     },
     {
       "name": "CoReg_Companion",
@@ -709,7 +736,10 @@ window.__cvProjects = {
         "adaptive scaffolding"
       ],
       "repo": "https://github.com/Educatian/CoReg_Companion",
-      "live": ""
+      "live": "",
+      "thumb": "assets/img/projects/coreg-companion-thumbnail-20260908.png",
+      "imageAlt": "CoREG Companion demo dashboard showing the learning coach and navigation for courses, goals, and feedback.",
+      "thumbnailCaption": "Learning companion · demo interface"
     }
   ]
 };
