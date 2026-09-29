@@ -167,7 +167,7 @@
           bio: "Works on education and intelligent transportation systems, with interests in AI in education, online learning, game-based learning, and mathematics education. Over a decade of secondary-school mathematics teaching. MEd Educational Technology, National Open University of Nigeria."
         },
         {
-          name: "Vijesh",
+          name: "Vijesh Sharma",
           role: "PhD Instructional Technology",
           chips: ["PhD Student"],
           bio: ""
@@ -240,16 +240,14 @@
   const labMemberNames = ["Awoyemi", "Abu", "Uddin", "Ghooreian", "Amayou", "Searight", "Ogunniran", "Olowolafe"];
   const publicationTags = ["All", "XR", "GenAI", "Analytics", "Game-Based", "STEM", "Teacher Ed", "Review"];
   const advisingStudents = [
-    { surname: "Awoyemi", shortName: "Idowu \"David\" Awoyemi", fallback: { working: 10, published: 4 } },
-    { surname: "Abu", shortName: "Stephen Abu", fallback: { working: 8, published: 2 } },
-    { surname: "Uddin", shortName: "Mohammad \"Mohi\" Uddin", fallback: { working: 1, published: 2 } },
-    { surname: "Olowolafe", shortName: "Samuel Opeyemi Olowolafe", fallback: { working: 0, published: 0 } },
-    { surname: "Vijesh", shortName: "Vijesh", fallback: { working: 0, published: 0 } }
+    // Display order runs clockwise around the network, keeping frequent collaborators adjacent.
+    { surname: "Abu", label: "Stephen Abu", pattern: /\bAbu,\s*S\b/ },
+    { surname: "Awoyemi", label: "David Awoyemi", pattern: /\bAwoyemi\b/ },
+    { surname: "Olowolafe", label: "Samuel Olowolafe", pattern: /\bOlowolafe\b/ },
+    { surname: "Sharma", label: "Vijesh Sharma", pattern: /\bSharma,\s*V\b/ },
+    { surname: "Uddin", label: "Mohi Uddin", pattern: /\bUddin,\s*M\b/ }
   ];
   const advisingAggregateFallback = {
-    studentCoauthoredTotal: 17,
-    workingPapersWithStudents: 11,
-    publicationsWithStudents: 6,
     underReview: 29,
     currentAdvisees: 5
   };
@@ -405,8 +403,8 @@
 
     const metrics = advisingMetrics();
     mountStats.innerHTML = [
-      { value: metrics.studentCoauthoredTotal, label: "student-coauthored manuscripts" },
-      { value: metrics.workingPapersWithStudents, label: "working papers with student authors" },
+      { value: metrics.works.length, label: "student-coauthored works" },
+      { value: metrics.sharedWorks, label: "works linking two or more students" },
       { value: metrics.underReview, label: "manuscripts submitted or under review" },
       { value: metrics.currentAdvisees, label: "current PhD advisees" }
     ].map((item) => `
@@ -416,86 +414,310 @@
       </article>
     `).join("");
 
-    const maxTotal = Math.max(...metrics.outputStudents.map((student) => student.total), 1);
     mountChart.innerHTML = `
       <div class="advising-chart-header">
         <div>
-          <h3>Current-student co-authored output</h3>
-          <p>Bars separate working manuscripts from published work, deduplicated at the manuscript level for aggregate totals.</p>
+          <h3>Student publication network</h3>
+          <p>Each dot is a co-authored work from Dr. Moon's CV, linked to every current student on its author list. Hover or tap a dot to see the work; hover a student to trace their papers.</p>
         </div>
-        <div class="advising-legend" aria-label="Chart legend">
-          <span><i class="legend-working"></i> Working papers</span>
-          <span><i class="legend-published"></i> Published</span>
+        <div class="advising-legend" aria-label="Network legend">
+          <span><i class="legend-solo"></i> One student</span>
+          <span><i class="legend-shared"></i> Shared by 2+ students</span>
         </div>
       </div>
-      <div class="advising-bars">
-        ${metrics.outputStudents.map((student) => advisingBar(student, maxTotal)).join("")}
-      </div>
+      <div class="pubnet-shell" data-pubnet></div>
     `;
+    advisingNetworkState.metrics = metrics;
+    drawPublicationNetwork();
   }
 
-  function advisingBar(student, maxTotal) {
-    const width = `${Math.max(7, Math.round((student.total / maxTotal) * 100))}%`;
-    const workingWidth = student.total ? `${(student.working / student.total) * 100}%` : "0%";
-    const publishedWidth = student.total ? `${(student.published / student.total) * 100}%` : "0%";
-    return `
-      <article class="advising-row">
-        <div class="advising-person">
-          <span class="advising-avatar">
-            <img src="${escapeHtml(student.avatar)}" width="96" height="96" alt="Portrait of ${escapeHtml(student.name)}" loading="lazy">
-          </span>
-          <span>
-            <strong>${escapeHtml(student.name)}</strong>
-            <span>${student.working} working + ${student.published} published</span>
-          </span>
-        </div>
-        <div class="advising-track" aria-label="${escapeHtml(student.name)} has ${student.total} co-authored works">
-          <div class="advising-bar" style="width: ${width}">
-            <span class="bar-segment bar-working" style="width: ${workingWidth}"></span>
-            <span class="bar-segment bar-published" style="width: ${publishedWidth}"></span>
-          </div>
-        </div>
-        <div class="advising-total">${student.total}<small>works</small></div>
-      </article>
-    `;
+  const advisingNetworkState = { metrics: null, width: 0, bound: false };
+
+  function normalizedWorkKey(title) {
+    return String(title || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().slice(0, 80);
   }
 
   function advisingMetrics() {
-    const publications = siteData.publications || [];
-    const workingPapers = siteData.workingPapers || [];
+    const records = [
+      ...(siteData.publications || []).map((item) => ({ ...item, kind: "Published" })),
+      ...(siteData.bookChapters || []).map((item) => ({ ...item, kind: item.status || "Book chapter" })),
+      ...(siteData.workingPapers || []).map((item) => ({ ...item, kind: item.status || "In progress" }))
+    ];
+    const works = new Map();
+    records.forEach((record) => {
+      const haystack = `${record.authors || ""} ${record.citation || ""}`;
+      const students = advisingStudents.filter((student) => student.pattern.test(haystack)).map((student) => student.surname);
+      if (!students.length || !record.title) return;
+      const key = normalizedWorkKey(record.title);
+      const existing = works.get(key);
+      if (existing) {
+        existing.students = Array.from(new Set([...existing.students, ...students]));
+        return;
+      }
+      works.set(key, {
+        id: `work-${works.size}`,
+        title: record.title,
+        venue: record.venue || "",
+        meta: /^\d{4}$/.test(String(record.year || "")) && record.kind === "Published" ? String(record.year) : record.kind,
+        students
+      });
+    });
+    const workList = Array.from(works.values());
     const phds = currentPhdStudents();
     const students = advisingStudents.map((student) => {
       const person = phds.find((candidate) => candidate.name.includes(student.surname)) || {};
-      const matcher = new RegExp(`\\b${student.surname}\\b`, "i");
-      const working = workingPapers.filter((paper) => matcher.test(`${paper.authors || ""} ${paper.citation || ""}`)).length;
-      const published = publications.filter((pub) => matcher.test(`${pub.authors || ""} ${pub.citation || ""}`)).length;
-      const normalizedWorking = Number.isFinite(working) && working === student.fallback.working ? working : student.fallback.working;
-      const normalizedPublished = Number.isFinite(published) && published === student.fallback.published ? published : student.fallback.published;
       return {
         ...student,
-        name: person.name || student.shortName,
+        name: person.name || student.label,
         avatar: person.avatar || "",
-        working: normalizedWorking,
-        published: normalizedPublished,
-        total: normalizedWorking + normalizedPublished
+        total: workList.filter((work) => work.students.includes(student.surname)).length
       };
     });
-
-    const surnamesWithOutput = students.filter((student) => student.total > 0).map((student) => student.surname);
-    const hasCurrentStudent = (item) => surnamesWithOutput.some((surname) => new RegExp(`\\b${surname}\\b`, "i").test(`${item.authors || ""} ${item.citation || ""}`));
-    const workingWithStudents = workingPapers.filter(hasCurrentStudent).length;
-    const publishedWithStudents = publications.filter(hasCurrentStudent).length;
-    const aggregateTotal = workingWithStudents + publishedWithStudents;
-
     return {
-      studentCoauthoredTotal: aggregateTotal === advisingAggregateFallback.studentCoauthoredTotal ? aggregateTotal : advisingAggregateFallback.studentCoauthoredTotal,
-      workingPapersWithStudents: workingWithStudents === advisingAggregateFallback.workingPapersWithStudents ? workingWithStudents : advisingAggregateFallback.workingPapersWithStudents,
-      publicationsWithStudents: publishedWithStudents === advisingAggregateFallback.publicationsWithStudents ? publishedWithStudents : advisingAggregateFallback.publicationsWithStudents,
+      works: workList,
+      students,
+      sharedWorks: workList.filter((work) => work.students.length > 1).length,
       underReview: siteData.workingPaperSummary?.submittedOrUnderReview || advisingAggregateFallback.underReview,
-      currentAdvisees: phds.length || advisingAggregateFallback.currentAdvisees,
-      outputStudents: students.filter((student) => student.total > 0).sort((a, b) => b.total - a.total),
-      emergingStudents: students.filter((student) => student.total === 0)
+      currentAdvisees: phds.length || advisingAggregateFallback.currentAdvisees
     };
+  }
+
+  function publicationNetworkLayout(metrics, width, height, compact) {
+    const cx = width / 2;
+    const cy = height / 2;
+    const rx = width * (compact ? 0.36 : 0.3);
+    const ry = height * (compact ? 0.33 : 0.3);
+    const avatarR = compact ? 22 : 28;
+    const dotR = compact ? 6 : 7.5;
+    const students = metrics.students.map((student, index) => {
+      const angle = -Math.PI / 2 + (index / metrics.students.length) * Math.PI * 2;
+      const x = cx + Math.cos(angle) * rx;
+      const y = cy + Math.sin(angle) * ry;
+      const dx = x - cx;
+      const dy = y - cy;
+      const len = Math.hypot(dx, dy) || 1;
+      return { ...student, x, y, ux: dx / len, uy: dy / len, r: avatarR };
+    });
+    const byName = new Map(students.map((student) => [student.surname, student]));
+
+    const soloCount = new Map();
+    const nodes = metrics.works.map((work) => {
+      const linked = work.students.map((name) => byName.get(name)).filter(Boolean);
+      let tx;
+      let ty;
+      if (linked.length === 1) {
+        const owner = linked[0];
+        const count = metrics.works.filter((item) => item.students.length === 1 && item.students[0] === owner.surname).length;
+        const index = soloCount.get(owner.surname) || 0;
+        soloCount.set(owner.surname, index + 1);
+        const spread = Math.min(Math.PI * 1.1, 0.42 * Math.max(count - 1, 0));
+        let base = Math.atan2(owner.uy, owner.ux);
+        // Names sit under each portrait, so fans never point straight down.
+        if (Math.sin(base) > 0.3) base = owner.ux >= 0 ? 0.3 : Math.PI - 0.3;
+        const angle = count > 1 ? base - spread / 2 + (spread * index) / (count - 1) : base;
+        const dist = avatarR + (compact ? 34 : 44);
+        tx = owner.x + Math.cos(angle) * dist;
+        ty = owner.y + Math.sin(angle) * dist;
+      } else {
+        tx = linked.reduce((sum, s) => sum + s.x, 0) / linked.length;
+        ty = linked.reduce((sum, s) => sum + s.y, 0) / linked.length;
+        tx = tx + (cx - tx) * 0.38;
+        ty = ty + (cy - ty) * 0.38;
+      }
+      return { ...work, linked, tx, ty, x: tx, y: ty, r: linked.length > 1 ? dotR + 2 : dotR };
+    });
+
+    // Deterministic relaxation: keep dots near their targets without overlapping each other or avatars.
+    const pad = 12;
+    const labelObstacles = students.flatMap((student) => [-1, -0.5, 0, 0.5, 1].map((offset) => ({
+      x: student.x + offset * (compact ? 34 : 44),
+      y: student.y + student.r + (compact ? 18 : 22),
+      r: compact ? 13 : 16
+    })));
+    for (let step = 0; step < 220; step += 1) {
+      nodes.forEach((node) => {
+        node.x += (node.tx - node.x) * 0.06;
+        node.y += (node.ty - node.y) * 0.06;
+      });
+      for (let i = 0; i < nodes.length; i += 1) {
+        const a = nodes[i];
+        for (let j = i + 1; j < nodes.length; j += 1) {
+          const b = nodes[j];
+          const dx = b.x - a.x || 0.01 * (j - i);
+          const dy = b.y - a.y || 0.01;
+          const dist = Math.hypot(dx, dy);
+          const min = a.r + b.r + 5;
+          if (dist < min) {
+            const push = (min - dist) / 2;
+            a.x -= (dx / dist) * push;
+            a.y -= (dy / dist) * push;
+            b.x += (dx / dist) * push;
+            b.y += (dy / dist) * push;
+          }
+        }
+        students.forEach((student) => {
+          const dx = a.x - student.x || 0.01;
+          const dy = a.y - student.y || 0.01;
+          const dist = Math.hypot(dx, dy);
+          const min = student.r + a.r + 10;
+          if (dist < min) {
+            a.x += (dx / dist) * (min - dist);
+            a.y += (dy / dist) * (min - dist);
+          }
+        });
+        labelObstacles.forEach((box) => {
+          const dx = a.x - box.x || 0.01;
+          const dy = a.y - box.y || 0.01;
+          const dist = Math.hypot(dx, dy);
+          const min = box.r + a.r + 2;
+          if (dist < min) {
+            a.x += (dx / dist) * (min - dist);
+            a.y += (dy / dist) * (min - dist);
+          }
+        });
+        a.x = Math.min(width - pad - a.r, Math.max(pad + a.r, a.x));
+        a.y = Math.min(height - pad - a.r, Math.max(pad + a.r, a.y));
+      }
+    }
+    return { students, nodes, avatarR };
+  }
+
+  function drawPublicationNetwork() {
+    const mount = $("[data-pubnet]");
+    const metrics = advisingNetworkState.metrics;
+    if (!mount || !metrics) return;
+    const width = Math.max(300, Math.round(mount.clientWidth || 960));
+    const compact = width < 640;
+    const height = compact ? Math.round(width * 1.12) : Math.round(Math.min(520, Math.max(420, width * 0.46)));
+    advisingNetworkState.width = width;
+    const { students, nodes, avatarR } = publicationNetworkLayout(metrics, width, height, compact);
+    const cx = width / 2;
+    const cy = height / 2;
+
+    const edges = nodes.flatMap((node) => node.linked.map((student) => {
+      const mx = (student.x + node.x) / 2;
+      const my = (student.y + node.y) / 2;
+      const qx = mx + (cx - mx) * 0.08;
+      const qy = my + (cy - my) * 0.08;
+      return `<path class="pubnet-edge" data-student="${escapeHtml(student.surname)}" data-work="${node.id}" d="M${student.x.toFixed(1)},${student.y.toFixed(1)} Q${qx.toFixed(1)},${qy.toFixed(1)} ${node.x.toFixed(1)},${node.y.toFixed(1)}"></path>`;
+    })).join("");
+
+    const dots = nodes.map((node) => `
+      <circle class="pubnet-work ${node.linked.length > 1 ? "is-shared" : "is-solo"}" tabindex="0" role="button"
+        data-work="${node.id}" data-students="${escapeHtml(node.linked.map((s) => s.surname).join(" "))}"
+        cx="${node.x.toFixed(1)}" cy="${node.y.toFixed(1)}" r="${node.r}"
+        aria-label="${escapeHtml(`${node.title}. ${node.venue}. ${node.meta}. Student co-authors: ${node.linked.map((s) => s.label).join(", ")}`)}"></circle>
+    `).join("");
+
+    const labelSize = compact ? 11.5 : 13;
+    const personMarks = students.map((student, index) => {
+      const clipId = `pubnet-clip-${index}`;
+      const halfLabel = student.label.length * labelSize * 0.37;
+      const lx = Math.min(width - halfLabel - 4, Math.max(halfLabel + 4, student.x));
+      const ly = student.y + student.r + labelSize + 6;
+      const anchor = "middle";
+      const sub = student.total ? `${student.total} ${student.total === 1 ? "work" : "works"}` : "New member";
+      const image = student.avatar
+        ? `<image href="${escapeHtml(student.avatar)}" x="${(student.x - student.r).toFixed(1)}" y="${(student.y - student.r).toFixed(1)}" width="${student.r * 2}" height="${student.r * 2}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice"></image>`
+        : `<text class="pubnet-initials" x="${student.x.toFixed(1)}" y="${(student.y + 5).toFixed(1)}" text-anchor="middle">${escapeHtml(initialsFor(student.name))}</text>`;
+      return `
+        <g class="pubnet-person${student.total ? "" : " is-new"}" data-student="${escapeHtml(student.surname)}" tabindex="0"
+          aria-label="${escapeHtml(`${student.label}: ${sub}`)}">
+          <clipPath id="${clipId}"><circle cx="${student.x.toFixed(1)}" cy="${student.y.toFixed(1)}" r="${student.r}"></circle></clipPath>
+          <circle class="pubnet-avatar-bg" cx="${student.x.toFixed(1)}" cy="${student.y.toFixed(1)}" r="${student.r}"></circle>
+          ${image}
+          <circle class="pubnet-ring" cx="${student.x.toFixed(1)}" cy="${student.y.toFixed(1)}" r="${student.r + 3}"></circle>
+          <text class="pubnet-name" x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="${anchor}" font-size="${labelSize}">${escapeHtml(student.label)}</text>
+          <text class="pubnet-sub" x="${lx.toFixed(1)}" y="${(ly + labelSize + 2).toFixed(1)}" text-anchor="${anchor}">${escapeHtml(sub)}</text>
+        </g>
+      `;
+    }).join("");
+
+    mount.innerHTML = `
+      <svg class="pubnet-svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="group" aria-labelledby="pubnet-title">
+        <title id="pubnet-title">Student publication network: ${metrics.works.length} co-authored works linked to ${students.length} current students</title>
+        <g class="pubnet-edges">${edges}</g>
+        <g class="pubnet-works">${dots}</g>
+        <g class="pubnet-people">${personMarks}</g>
+      </svg>
+      <div class="pubnet-tooltip" role="status" aria-live="polite" hidden></div>
+    `;
+    bindPublicationNetwork(mount, nodes, avatarR);
+
+    if (!advisingNetworkState.bound) {
+      advisingNetworkState.bound = true;
+      let timer;
+      window.addEventListener("resize", () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          const current = $("[data-pubnet]");
+          if (current && Math.abs(current.clientWidth - advisingNetworkState.width) > 24) drawPublicationNetwork();
+        }, 180);
+      });
+    }
+  }
+
+  function bindPublicationNetwork(mount, nodes, avatarR) {
+    const svg = mount.querySelector("svg");
+    const tooltip = mount.querySelector(".pubnet-tooltip");
+    const byId = new Map(nodes.map((node) => [node.id, node]));
+
+    const clear = () => {
+      svg.classList.remove("is-focusing");
+      svg.querySelectorAll(".is-lit").forEach((el) => el.classList.remove("is-lit"));
+      tooltip.hidden = true;
+    };
+    const lightStudent = (surname) => {
+      clear();
+      svg.classList.add("is-focusing");
+      svg.querySelectorAll(`[data-student="${surname}"]`).forEach((el) => el.classList.add("is-lit"));
+      svg.querySelectorAll(".pubnet-work").forEach((el) => {
+        if (el.dataset.students.split(" ").includes(surname)) el.classList.add("is-lit");
+      });
+    };
+    const lightWork = (el) => {
+      const node = byId.get(el.dataset.work);
+      if (!node) return;
+      clear();
+      svg.classList.add("is-focusing");
+      el.classList.add("is-lit");
+      svg.querySelectorAll(`.pubnet-edge[data-work="${node.id}"]`).forEach((edge) => edge.classList.add("is-lit"));
+      node.linked.forEach((student) => {
+        svg.querySelectorAll(`.pubnet-person[data-student="${student.surname}"]`).forEach((p) => p.classList.add("is-lit"));
+      });
+      tooltip.innerHTML = `
+        <strong>${escapeHtml(node.title)}</strong>
+        <span>${escapeHtml([node.venue, node.meta].filter(Boolean).join(" · "))}</span>
+        <em>${escapeHtml(node.linked.map((s) => s.label).join(" · "))}</em>
+      `;
+      tooltip.hidden = false;
+      const scale = svg.getBoundingClientRect().width / svg.viewBox.baseVal.width || 1;
+      const left = node.x * scale;
+      const top = node.y * scale;
+      const shellWidth = mount.clientWidth;
+      const tipWidth = Math.min(320, shellWidth - 16);
+      tooltip.style.width = `${tipWidth}px`;
+      tooltip.style.left = `${Math.min(Math.max(8, left - tipWidth / 2), shellWidth - tipWidth - 8)}px`;
+      const below = top + node.r * scale + 12;
+      tooltip.style.top = `${below}px`;
+      if (below + tooltip.offsetHeight > mount.clientHeight) {
+        tooltip.style.top = `${Math.max(4, top - node.r * scale - 12 - tooltip.offsetHeight)}px`;
+      }
+    };
+
+    svg.querySelectorAll(".pubnet-work").forEach((el) => {
+      el.addEventListener("mouseenter", () => lightWork(el));
+      el.addEventListener("focus", () => lightWork(el));
+      el.addEventListener("click", () => lightWork(el));
+      el.addEventListener("mouseleave", clear);
+      el.addEventListener("blur", clear);
+    });
+    svg.querySelectorAll(".pubnet-person").forEach((el) => {
+      el.addEventListener("mouseenter", () => lightStudent(el.dataset.student));
+      el.addEventListener("focus", () => lightStudent(el.dataset.student));
+      el.addEventListener("mouseleave", clear);
+      el.addEventListener("blur", clear);
+    });
   }
 
   function currentPhdStudents() {

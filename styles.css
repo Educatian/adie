@@ -1283,6 +1283,170 @@ main > section + section::before {
   background: linear-gradient(90deg, var(--gold), #e1b66a);
 }
 
+.legend-solo {
+  background: var(--crimson);
+}
+
+.legend-shared {
+  background: var(--gold);
+}
+
+.pubnet-shell {
+  position: relative;
+  width: 100%;
+}
+
+.pubnet-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.pubnet-edge {
+  fill: none;
+  stroke: color-mix(in srgb, var(--ink) 22%, transparent);
+  stroke-width: 1.2;
+  transition: stroke 160ms ease, stroke-width 160ms ease, opacity 160ms ease;
+}
+
+.pubnet-work {
+  stroke: var(--surface-strong);
+  stroke-width: 2;
+  cursor: pointer;
+  transition: opacity 160ms ease, transform 160ms ease;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.pubnet-work.is-solo {
+  fill: var(--crimson);
+}
+
+.pubnet-work.is-shared {
+  fill: var(--gold);
+}
+
+.pubnet-work:focus {
+  outline: none;
+}
+
+.pubnet-work:focus-visible,
+.pubnet-work.is-lit {
+  transform: scale(1.35);
+  stroke: var(--ink);
+}
+
+.pubnet-avatar-bg {
+  fill: var(--crimson);
+}
+
+.pubnet-ring {
+  fill: none;
+  stroke: var(--crimson);
+  stroke-width: 2.5;
+}
+
+.pubnet-person.is-new .pubnet-ring {
+  stroke: var(--muted);
+  stroke-dasharray: 4 4;
+}
+
+.pubnet-person.is-new .pubnet-avatar-bg {
+  fill: #6c6670;
+}
+
+.pubnet-person {
+  cursor: default;
+  outline: none;
+  transition: opacity 160ms ease;
+}
+
+.pubnet-initials {
+  fill: #fff;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.pubnet-name,
+.pubnet-sub {
+  paint-order: stroke;
+  stroke: var(--surface-strong);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+
+.pubnet-name {
+  fill: var(--ink);
+  font-family: var(--font-ui);
+  font-weight: 850;
+}
+
+.pubnet-sub {
+  fill: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.pubnet-svg.is-focusing .pubnet-edge:not(.is-lit),
+.pubnet-svg.is-focusing .pubnet-work:not(.is-lit),
+.pubnet-svg.is-focusing .pubnet-person:not(.is-lit) {
+  opacity: 0.22;
+}
+
+.pubnet-edge.is-lit {
+  stroke: var(--crimson);
+  stroke-width: 2.2;
+}
+
+.pubnet-tooltip {
+  position: absolute;
+  z-index: 3;
+  display: grid;
+  gap: 4px;
+  padding: 11px 13px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-strong);
+  box-shadow: var(--shadow);
+  pointer-events: none;
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.pubnet-tooltip[hidden] {
+  display: none;
+}
+
+.pubnet-tooltip strong {
+  font-weight: 800;
+}
+
+.pubnet-tooltip span {
+  color: var(--muted);
+}
+
+.pubnet-tooltip em {
+  color: var(--crimson);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pubnet-edge,
+  .pubnet-work,
+  .pubnet-person {
+    transition: none;
+  }
+}
+
 .advising-bars {
   display: grid;
   gap: 16px;
