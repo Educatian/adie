@@ -249,7 +249,7 @@
   ];
   // Ongoing projects that connect students before anything is published.
   const advisingProjects = [
-    { title: "Ongoing AdDIE Lab project", note: "", students: ["Olowolafe", "Sharma"] }
+    { title: "Ongoing project", students: ["Olowolafe", "Sharma"] }
   ];
   const advisingAggregateFallback = {
     underReview: 29,
@@ -421,14 +421,13 @@
     mountChart.innerHTML = `
       <div class="advising-chart-header">
         <div>
-          <h3>Mentorship network</h3>
-          <p>Dr. Moon sits at the center. Each dot is a co-authored work from his CV, linked to him and to every current student on the author list; diamonds are ongoing projects not yet in print. Hover or tap any node to trace its connections.</p>
+          <h3>Research keyword network</h3>
+          <p>Dr. Moon at the center, each current student around him, and the research keywords drawn from their stated interests and co-authored work. Keywords shared by several students sit between them. Hover or tap a student or keyword to trace the connections.</p>
         </div>
         <div class="advising-legend" aria-label="Network legend">
-          <span><i class="legend-solo"></i> Work with one student</span>
-          <span><i class="legend-shared"></i> Shared by 2+ students</span>
+          <span><i class="legend-solo"></i> Individual focus</span>
+          <span><i class="legend-shared"></i> Shared across students</span>
           <span><i class="legend-project"></i> Ongoing project</span>
-          <span><i class="legend-mentor"></i> Link to Dr. Moon</span>
         </div>
       </div>
       <div class="pubnet-shell" data-pubnet></div>
@@ -439,15 +438,35 @@
 
   const advisingNetworkState = { metrics: null, width: 0, bound: false };
 
+  // Research keywords matched against each student's co-authored titles/tags and profile interests.
+  const advisingKeywords = [
+    { label: "Virtual reality & XR", pattern: /virtual reality|\bVR\b|extended reality|immersive|\bXR\b/i, chips: ["vr simulation", "xr"] },
+    { label: "Safety training", pattern: /safety training/i },
+    { label: "Learning analytics", pattern: /learning analytics|behavioral data|machine learning|microgenetic|analytics/i },
+    { label: "Generative AI", pattern: /generative ai|genai|conversational ai|ai-mediated|ai-enhanced/i, chips: ["genai"] },
+    { label: "AI in education", pattern: /\bAI\b|artificial intelligence/, chips: ["ai"] },
+    { label: "AI ethics", pattern: /ethic/i },
+    { label: "Game-based learning", pattern: /game/i, chips: ["game-based"] },
+    { label: "Engineering education", pattern: /engineering|construction/i },
+    { label: "STEM & math education", pattern: /\bSTEM\b|science|mathematic/i, chips: ["math education", "stem"] },
+    { label: "Teacher education", pattern: /teacher|educators|tpack/i, chips: ["teacher ed"] },
+    { label: "Systematic & meta-reviews", pattern: /review|meta-analy/i },
+    { label: "Neurodiversity", pattern: /neurodiver/i, chips: ["neurodiversity"] },
+    { label: "Equity & social change", pattern: /equity|social change/i },
+    { label: "Online & e-learning", pattern: /online learning|e-learning/i, chips: ["online learning", "e-learning"] },
+    { label: "Learning theory", pattern: /learning theor/i, chips: ["learning theory"] }
+  ];
+  const ADVISING_KEYWORDS_PER_STUDENT = 6;
+
   function normalizedWorkKey(title) {
     return String(title || "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim().slice(0, 80);
   }
 
   function advisingMetrics() {
     const records = [
-      ...(siteData.publications || []).map((item) => ({ ...item, kind: "Published" })),
-      ...(siteData.bookChapters || []).map((item) => ({ ...item, kind: item.status || "Book chapter" })),
-      ...(siteData.workingPapers || []).map((item) => ({ ...item, kind: item.status || "In progress" }))
+      ...(siteData.publications || []),
+      ...(siteData.bookChapters || []),
+      ...(siteData.workingPapers || [])
     ];
     const works = new Map();
     records.forEach((record) => {
@@ -460,40 +479,52 @@
         existing.students = Array.from(new Set([...existing.students, ...students]));
         return;
       }
-      works.set(key, {
-        id: `work-${works.size}`,
-        type: "work",
-        title: record.title,
-        venue: record.venue || "",
-        meta: /^\d{4}$/.test(String(record.year || "")) && record.kind === "Published" ? String(record.year) : record.kind,
-        withMoon: /\bMoon,\s*J/.test(haystack),
-        students
-      });
+      works.set(key, { title: record.title, text: `${record.title} ${(record.tags || []).join(" ")}`, students });
     });
     const workList = Array.from(works.values());
-    const projects = advisingProjects.map((project, index) => ({
-      id: `project-${index}`,
-      type: "project",
-      title: project.title,
-      venue: project.note || "",
-      meta: "Ongoing project · not yet published",
-      withMoon: true,
-      students: project.students
-    }));
     const phds = currentPhdStudents();
+
     const students = advisingStudents.map((student) => {
       const person = phds.find((candidate) => candidate.name.includes(student.surname)) || {};
+      const chips = cleanChips(person.chips || []).map((chip) => chip.toLowerCase());
+      const ownWorks = workList.filter((work) => work.students.includes(student.surname));
+      const scored = advisingKeywords.map((keyword) => {
+        const fromWorks = ownWorks.filter((work) => keyword.pattern.test(work.text));
+        const fromProfile = (keyword.chips || []).some((chip) => chips.includes(chip));
+        return { label: keyword.label, score: fromWorks.length + (fromProfile ? 2 : 0), examples: fromWorks.map((work) => work.title) };
+      }).filter((item) => item.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, ADVISING_KEYWORDS_PER_STUDENT);
       return {
         ...student,
         name: person.name || student.label,
         avatar: person.avatar || "",
-        total: workList.filter((work) => work.students.includes(student.surname)).length,
-        projects: projects.filter((project) => project.students.includes(student.surname)).length
+        keywords: scored
       };
     });
+
+    const keywordMap = new Map();
+    students.forEach((student) => {
+      student.keywords.forEach((keyword) => {
+        const entry = keywordMap.get(keyword.label) || { label: keyword.label, students: [], examples: [] };
+        entry.students.push(student.surname);
+        keyword.examples.forEach((title) => { if (!entry.examples.includes(title)) entry.examples.push(title); });
+        keywordMap.set(keyword.label, entry);
+      });
+    });
+    const keywords = Array.from(keywordMap.values()).map((entry, index) => ({ ...entry, id: `kw-${index}`, type: "keyword" }));
+    const projects = advisingProjects.map((project, index) => ({
+      id: `project-${index}`,
+      type: "project",
+      label: project.title,
+      students: project.students,
+      examples: []
+    }));
+
     const director = people.flatMap((group) => group.items).find((person) => /director/i.test(person.role || "")) || {};
     return {
       works: workList,
+      keywords,
       projects,
       students,
       director: { name: director.name || "Dr. Jewoong Moon", avatar: director.avatar || "" },
@@ -503,48 +534,22 @@
     };
   }
 
-  function networkLabelBox(node, labelSize, compact, width) {
-    const nameWidth = node.label.length * labelSize * 0.62;
-    const subWidth = node.sub.length * 6.4;
-    const boxWidth = Math.max(nameWidth, subWidth);
-    let mode;
-    if (node.isHub) mode = "below";
-    else if (!compact && Math.abs(node.ux) > 0.8) mode = node.ux > 0 ? "right" : "left";
-    else mode = node.uy < -0.5 ? "above" : "below";
-    let x;
-    let nameY;
-    let anchor = "middle";
-    if (mode === "right" || mode === "left") {
-      anchor = mode === "right" ? "start" : "end";
-      x = node.x + (mode === "right" ? 1 : -1) * (node.r + 10);
-      nameY = node.y - 1;
-    } else if (mode === "above") {
-      x = node.x;
-      nameY = node.y - node.r - 20;
-    } else {
-      x = node.x;
-      nameY = node.y + node.r + labelSize + 6;
-    }
-    if (anchor === "middle") x = Math.min(width - boxWidth / 2 - 4, Math.max(boxWidth / 2 + 4, x));
-    const subY = nameY + labelSize + 2;
-    const x0 = anchor === "start" ? x : anchor === "end" ? x - boxWidth : x - boxWidth / 2;
-    return { x, nameY, subY, anchor, rect: { x0: x0 - 4, x1: x0 + boxWidth + 4, y0: nameY - labelSize - 2, y1: subY + 4 } };
-  }
-
   function publicationNetworkLayout(metrics, width, height, compact) {
     const cx = width / 2;
     const cy = height / 2;
-    const rx = width * (compact ? 0.35 : 0.36);
-    const ry = height * (compact ? 0.35 : 0.36);
-    const avatarR = compact ? 22 : 28;
-    const hubR = compact ? 30 : 38;
-    const dotR = compact ? 6 : 7.5;
-    const labelSize = compact ? 11.5 : 13;
-    const sublabel = (student) => {
-      const parts = [];
-      if (student.total) parts.push(`${student.total} ${student.total === 1 ? "work" : "works"}`);
-      if (student.projects) parts.push(`${student.projects} ${student.projects === 1 ? "project" : "projects"}`);
-      return parts.join(" · ") || "New member";
+    const rx = width * (compact ? 0.3 : 0.29);
+    const ry = height * (compact ? 0.28 : 0.3);
+    const avatarR = compact ? 21 : 27;
+    const hubR = compact ? 28 : 36;
+    const labelSize = compact ? 11 : 13;
+    const pillFont = compact ? 10 : 12;
+    const pillH = compact ? 20 : 24;
+
+    const labelRect = (node) => {
+      const w = node.label.length * labelSize * 0.62 + 8;
+      const top = node.y + node.r + 4;
+      const lines = node.sub ? 2 : 1;
+      return { x0: node.x - w / 2, x1: node.x + w / 2, y0: top, y1: top + lines * (labelSize + 3) + 2 };
     };
     const hub = {
       isHub: true,
@@ -552,11 +557,9 @@
       label: metrics.director.name,
       name: metrics.director.name,
       avatar: metrics.director.avatar,
-      sub: `Advisor · ${metrics.works.length} works`,
+      sub: "Advisor",
       x: cx,
       y: cy,
-      ux: 0,
-      uy: 1,
       r: hubR
     };
     const students = metrics.students.map((student, index) => {
@@ -564,98 +567,99 @@
       const x = cx + Math.cos(angle) * rx;
       const y = cy + Math.sin(angle) * ry;
       const len = Math.hypot(x - cx, y - cy) || 1;
-      return { ...student, sub: sublabel(student), x, y, ux: (x - cx) / len, uy: (y - cy) / len, r: avatarR };
+      return { ...student, x, y, ux: (x - cx) / len, uy: (y - cy) / len, r: avatarR };
     });
     const everyone = [hub, ...students];
-    everyone.forEach((node) => { node.labelBox = networkLabelBox(node, labelSize, compact, width); });
+    everyone.forEach((node) => { node.labelRect = labelRect(node); });
     const byName = new Map(students.map((student) => [student.surname, student]));
 
-    const items = [...metrics.works, ...metrics.projects];
-    const soloCount = new Map();
+    const items = [...metrics.keywords, ...metrics.projects];
     const soloTotals = new Map();
+    const soloIndex = new Map();
     items.forEach((item) => {
       if (item.students.length === 1) soloTotals.set(item.students[0], (soloTotals.get(item.students[0]) || 0) + 1);
     });
     const nodes = items.map((item) => {
       const linked = item.students.map((name) => byName.get(name)).filter(Boolean);
+      const w = item.label.length * pillFont * 0.58 + (compact ? 14 : 20);
       let tx;
       let ty;
       if (linked.length === 1) {
         const owner = linked[0];
         const count = soloTotals.get(owner.surname) || 1;
-        const index = soloCount.get(owner.surname) || 0;
-        soloCount.set(owner.surname, index + 1);
-        const spread = Math.min(Math.PI * 0.95, 0.4 * Math.max(count - 1, 0));
-        const base = Math.atan2(-owner.uy, -owner.ux);
+        const index = soloIndex.get(owner.surname) || 0;
+        soloIndex.set(owner.surname, index + 1);
+        const spread = Math.min(Math.PI * 0.9, 0.5 * Math.max(count - 1, 0));
+        const base = Math.atan2(owner.uy, owner.ux);
         const angle = count > 1 ? base - spread / 2 + (spread * index) / (count - 1) : base;
-        const dist = avatarR + (compact ? 34 : 46);
+        const dist = avatarR + (compact ? 58 : 84);
         tx = owner.x + Math.cos(angle) * dist;
         ty = owner.y + Math.sin(angle) * dist;
       } else {
         const mx = linked.reduce((sum, s) => sum + s.x, 0) / linked.length;
         const my = linked.reduce((sum, s) => sum + s.y, 0) / linked.length;
-        tx = mx + (cx - mx) * 0.32;
-        ty = my + (cy - my) * 0.32;
+        tx = mx;
+        ty = my;
+        // Keep shared keywords in the ring between students rather than on top of the hub.
+        const minRadius = hubR + (compact ? 52 : 70);
+        const dx = tx - cx;
+        const dy = (ty - cy) * (rx / ry);
+        const dist = Math.hypot(dx, dy);
+        if (dist < minRadius) {
+          const angle = dist > 1 ? Math.atan2(dy, dx) : -Math.PI / 2;
+          tx = cx + Math.cos(angle) * minRadius;
+          ty = cy + (Math.sin(angle) * minRadius * ry) / rx;
+        }
       }
-      const base = item.type === "project" ? dotR + 3 : linked.length > 1 ? dotR + 2 : dotR;
-      return { ...item, linked, tx, ty, x: tx, y: ty, r: base };
+      return { ...item, linked, w, h: pillH, tx, ty, x: tx, y: ty };
     });
 
-    // Deterministic relaxation: keep items near their targets without overlapping portraits, labels, or each other.
-    const pad = 12;
-    const pushFromRect = (node, rect) => {
-      const nx = Math.min(rect.x1, Math.max(rect.x0, node.x));
-      const ny = Math.min(rect.y1, Math.max(rect.y0, node.y));
-      const dx = node.x - nx;
-      const dy = node.y - ny;
-      const dist = Math.hypot(dx, dy);
-      if (dist >= node.r + 2) return;
-      if (dist > 0.001) {
-        node.x += (dx / dist) * (node.r + 2 - dist);
-        node.y += (dy / dist) * (node.r + 2 - dist);
-      } else {
-        const toTop = node.y - rect.y0;
-        const toBottom = rect.y1 - node.y;
-        node.y = toTop < toBottom ? rect.y0 - node.r - 2 : rect.y1 + node.r + 2;
-      }
+    // Deterministic relaxation: keep pills near their targets without overlapping portraits, names, or each other.
+    const pad = 6;
+    const rectOf = (node) => ({ x0: node.x - node.w / 2, x1: node.x + node.w / 2, y0: node.y - node.h / 2, y1: node.y + node.h / 2 });
+    const pushOut = (node, rect, gap) => {
+      const box = rectOf(node);
+      const overlapX = Math.min(box.x1, rect.x1 + gap) - Math.max(box.x0, rect.x0 - gap);
+      const overlapY = Math.min(box.y1, rect.y1 + gap) - Math.max(box.y0, rect.y0 - gap);
+      if (overlapX <= 0 || overlapY <= 0) return;
+      if (overlapX < overlapY) node.x += node.x < (rect.x0 + rect.x1) / 2 ? -overlapX : overlapX;
+      else node.y += node.y < (rect.y0 + rect.y1) / 2 ? -overlapY : overlapY;
     };
-    for (let step = 0; step < 260; step += 1) {
+    for (let step = 0; step < 420; step += 1) {
+      const spring = step < 260 ? 0.05 : 0;
       nodes.forEach((node) => {
-        node.x += (node.tx - node.x) * 0.06;
-        node.y += (node.ty - node.y) * 0.06;
+        node.x += (node.tx - node.x) * spring;
+        node.y += (node.ty - node.y) * spring;
       });
       for (let i = 0; i < nodes.length; i += 1) {
         const a = nodes[i];
         for (let j = i + 1; j < nodes.length; j += 1) {
           const b = nodes[j];
-          const dx = b.x - a.x || 0.01 * (j - i);
-          const dy = b.y - a.y || 0.01;
-          const dist = Math.hypot(dx, dy);
-          const min = a.r + b.r + 5;
-          if (dist < min) {
-            const push = (min - dist) / 2;
-            a.x -= (dx / dist) * push;
-            a.y -= (dy / dist) * push;
-            b.x += (dx / dist) * push;
-            b.y += (dy / dist) * push;
+          const ra = rectOf(a);
+          const rb = rectOf(b);
+          const overlapX = Math.min(ra.x1, rb.x1) - Math.max(ra.x0, rb.x0) + 6;
+          const overlapY = Math.min(ra.y1, rb.y1) - Math.max(ra.y0, rb.y0) + 5;
+          if (overlapX > 0 && overlapY > 0) {
+            if (overlapX < overlapY) {
+              const dir = a.x <= b.x ? -1 : 1;
+              a.x += (dir * overlapX) / 2;
+              b.x -= (dir * overlapX) / 2;
+            } else {
+              const dir = a.y <= b.y ? -1 : 1;
+              a.y += (dir * overlapY) / 2;
+              b.y -= (dir * overlapY) / 2;
+            }
           }
         }
         everyone.forEach((person) => {
-          const dx = a.x - person.x || 0.01;
-          const dy = a.y - person.y || 0.01;
-          const dist = Math.hypot(dx, dy);
-          const min = person.r + a.r + 10;
-          if (dist < min) {
-            a.x += (dx / dist) * (min - dist);
-            a.y += (dy / dist) * (min - dist);
-          }
-          pushFromRect(a, person.labelBox.rect);
+          pushOut(a, { x0: person.x - person.r, x1: person.x + person.r, y0: person.y - person.r, y1: person.y + person.r }, 8);
+          pushOut(a, person.labelRect, 2);
         });
-        a.x = Math.min(width - pad - a.r, Math.max(pad + a.r, a.x));
-        a.y = Math.min(height - pad - a.r, Math.max(pad + a.r, a.y));
+        a.x = Math.min(width - pad - a.w / 2, Math.max(pad + a.w / 2, a.x));
+        a.y = Math.min(height - pad - a.h / 2, Math.max(pad + a.h / 2, a.y));
       }
     }
-    return { hub, students, nodes, labelSize };
+    return { hub, students, nodes, labelSize, pillFont };
   }
 
   function drawPublicationNetwork() {
@@ -664,71 +668,108 @@
     if (!mount || !metrics) return;
     const width = Math.max(300, Math.round(mount.clientWidth || 960));
     const compact = width < 640;
-    const height = compact ? Math.round(width * 1.35) : Math.round(Math.min(600, Math.max(480, width * 0.5)));
     advisingNetworkState.width = width;
-    const { hub, students, nodes, labelSize } = publicationNetworkLayout(metrics, width, height, compact);
-    const cx = width / 2;
-    const cy = height / 2;
+    bindNetworkResize();
+    if (compact) {
+      drawKeywordList(mount, metrics);
+      return;
+    }
+    const height = Math.round(Math.min(600, Math.max(480, width * 0.5)));
+    const { hub, students, nodes, labelSize, pillFont } = publicationNetworkLayout(metrics, width, height, compact);
     const f = (value) => value.toFixed(1);
 
-    const advising = students.map((student) => `
+    const mentorLines = students.map((student) => `
       <line class="pubnet-advise" data-student="${escapeHtml(student.surname)}" x1="${f(hub.x)}" y1="${f(hub.y)}" x2="${f(student.x)}" y2="${f(student.y)}"></line>
     `).join("");
 
-    const mentorEdges = nodes.filter((node) => node.withMoon).map((node) => `
-      <line class="pubnet-edge is-mentor" data-work="${node.id}" x1="${f(hub.x)}" y1="${f(hub.y)}" x2="${f(node.x)}" y2="${f(node.y)}"></line>
-    `).join("");
+    const edges = nodes.flatMap((node) => node.linked.map((student) => `
+      <line class="pubnet-edge${node.type === "project" ? " is-project" : ""}" data-student="${escapeHtml(student.surname)}" data-work="${node.id}" x1="${f(student.x)}" y1="${f(student.y)}" x2="${f(node.x)}" y2="${f(node.y)}"></line>
+    `)).join("");
 
-    const studentEdges = nodes.flatMap((node) => node.linked.map((student) => {
-      const mx = (student.x + node.x) / 2;
-      const my = (student.y + node.y) / 2;
-      const qx = mx + (cx - mx) * 0.08;
-      const qy = my + (cy - my) * 0.08;
-      return `<path class="pubnet-edge" data-student="${escapeHtml(student.surname)}" data-work="${node.id}" d="M${f(student.x)},${f(student.y)} Q${f(qx)},${f(qy)} ${f(node.x)},${f(node.y)}"></path>`;
-    })).join("");
-
-    const items = nodes.map((node) => {
-      const common = `tabindex="0" role="button" data-work="${node.id}" data-students="${escapeHtml(node.linked.map((s) => s.surname).join(" "))}"
-        aria-label="${escapeHtml(`${node.title}. ${[node.venue, node.meta].filter(Boolean).join(". ")}. With Dr. Moon and ${node.linked.map((s) => s.label).join(", ")}`)}"`;
-      if (node.type === "project") {
-        const r = node.r + 1;
-        return `<path class="pubnet-work is-project" ${common} d="M${f(node.x)},${f(node.y - r)} L${f(node.x + r)},${f(node.y)} L${f(node.x)},${f(node.y + r)} L${f(node.x - r)},${f(node.y)} Z"></path>`;
-      }
-      return `<circle class="pubnet-work ${node.linked.length > 1 ? "is-shared" : "is-solo"}" ${common} cx="${f(node.x)}" cy="${f(node.y)}" r="${node.r}"></circle>`;
+    const pills = nodes.map((node) => {
+      const kind = node.type === "project" ? "is-project" : node.linked.length > 1 ? "is-shared" : "is-solo";
+      return `
+        <g class="pubnet-keyword ${kind}" tabindex="0" role="button" data-work="${node.id}" data-students="${escapeHtml(node.linked.map((s) => s.surname).join(" "))}"
+          aria-label="${escapeHtml(`${node.label}: ${node.linked.map((s) => s.label).join(", ")}`)}">
+          <rect x="${f(node.x - node.w / 2)}" y="${f(node.y - node.h / 2)}" width="${f(node.w)}" height="${node.h}" rx="${node.h / 2}"></rect>
+          <text x="${f(node.x)}" y="${f(node.y + pillFont * 0.36)}" text-anchor="middle" font-size="${pillFont}">${escapeHtml(node.label)}</text>
+        </g>
+      `;
     }).join("");
 
     const personMark = (person, index) => {
       const clipId = `pubnet-clip-${index}`;
-      const box = person.labelBox;
       const image = person.avatar
         ? `<image href="${escapeHtml(person.avatar)}" x="${f(person.x - person.r)}" y="${f(person.y - person.r)}" width="${person.r * 2}" height="${person.r * 2}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice"></image>`
         : `<text class="pubnet-initials" x="${f(person.x)}" y="${f(person.y + 5)}" text-anchor="middle">${escapeHtml(initialsFor(person.name))}</text>`;
-      const isNew = !person.isHub && !person.total && !person.projects;
+      const nameY = person.labelRect.y0 + labelSize;
       return `
-        <g class="pubnet-person${person.isHub ? " is-hub" : ""}${isNew ? " is-new" : ""}" data-student="${escapeHtml(person.surname)}" tabindex="0"
-          aria-label="${escapeHtml(`${person.label}: ${person.sub}`)}">
+        <g class="pubnet-person${person.isHub ? " is-hub" : ""}" data-student="${escapeHtml(person.surname)}" tabindex="0"
+          aria-label="${escapeHtml(person.isHub ? `${person.label}, advisor` : `${person.label}: ${(person.keywords || []).map((k) => k.label).join(", ") || "keywords to come"}`)}">
           <clipPath id="${clipId}"><circle cx="${f(person.x)}" cy="${f(person.y)}" r="${person.r}"></circle></clipPath>
           <circle class="pubnet-avatar-bg" cx="${f(person.x)}" cy="${f(person.y)}" r="${person.r}"></circle>
           ${image}
           <circle class="pubnet-ring" cx="${f(person.x)}" cy="${f(person.y)}" r="${person.r + 3}"></circle>
-          <text class="pubnet-name" x="${f(box.x)}" y="${f(box.nameY)}" text-anchor="${box.anchor}" font-size="${person.isHub ? labelSize + 1 : labelSize}">${escapeHtml(person.label)}</text>
-          <text class="pubnet-sub" x="${f(box.x)}" y="${f(box.subY)}" text-anchor="${box.anchor}">${escapeHtml(person.sub)}</text>
+          <text class="pubnet-name" x="${f(person.x)}" y="${f(nameY)}" text-anchor="middle" font-size="${person.isHub ? labelSize + 1 : labelSize}">${escapeHtml(person.label)}</text>
+          ${person.sub ? `<text class="pubnet-sub" x="${f(person.x)}" y="${f(nameY + labelSize + 2)}" text-anchor="middle">${escapeHtml(person.sub)}</text>` : ""}
         </g>
       `;
     };
 
     mount.innerHTML = `
       <svg class="pubnet-svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="group" aria-labelledby="pubnet-title">
-        <title id="pubnet-title">Mentorship network: Dr. Moon at the center, connected to ${students.length} current students through ${metrics.works.length} co-authored works and ${metrics.projects.length} ongoing ${metrics.projects.length === 1 ? "project" : "projects"}</title>
-        <g class="pubnet-advising">${advising}</g>
-        <g class="pubnet-edges">${mentorEdges}${studentEdges}</g>
-        <g class="pubnet-works">${items}</g>
+        <title id="pubnet-title">Research keyword network: Dr. Moon at the center, connected to ${students.length} current students and their research keywords</title>
+        <g class="pubnet-advising">${mentorLines}</g>
+        <g class="pubnet-edges">${edges}</g>
         <g class="pubnet-people">${students.map((student, index) => personMark(student, index + 1)).join("")}${personMark(hub, 0)}</g>
+        <g class="pubnet-keywords">${pills}</g>
       </svg>
       <div class="pubnet-tooltip" role="status" aria-live="polite" hidden></div>
     `;
     bindPublicationNetwork(mount, nodes);
+  }
 
+  function drawKeywordList(mount, metrics) {
+    const kindFor = (label) => {
+      const keyword = metrics.keywords.find((item) => item.label === label);
+      return keyword && keyword.students.length > 1 ? "is-shared" : "is-solo";
+    };
+    const avatar = (person) => person.avatar
+      ? `<img src="${escapeHtml(person.avatar)}" width="44" height="44" alt="" loading="lazy">`
+      : `<span>${escapeHtml(initialsFor(person.name))}</span>`;
+    mount.innerHTML = `
+      <div class="kwlist">
+        <div class="kwlist-hub">
+          <span class="kwlist-avatar is-hub">${avatar(metrics.director)}</span>
+          <span><strong>${escapeHtml(metrics.director.name)}</strong><small>Advisor</small></span>
+        </div>
+        <ul class="kwlist-students">
+          ${metrics.students.map((student) => {
+            const projects = metrics.projects.filter((project) => project.students.includes(student.surname));
+            const chips = [
+              ...student.keywords.map((keyword) => `<li class="kwlist-chip ${kindFor(keyword.label)}">${escapeHtml(keyword.label)}</li>`),
+              ...projects.map((project) => {
+                const partners = project.students.filter((name) => name !== student.surname)
+                  .map((name) => (metrics.students.find((item) => item.surname === name) || {}).label).filter(Boolean);
+                return `<li class="kwlist-chip is-project">${escapeHtml(project.label)}${partners.length ? ` · with ${escapeHtml(partners.join(", "))}` : ""}</li>`;
+              })
+            ];
+            return `
+              <li class="kwlist-student">
+                <span class="kwlist-avatar">${avatar(student)}</span>
+                <div>
+                  <strong>${escapeHtml(student.label)}</strong>
+                  <ul class="kwlist-chips">${chips.join("") || `<li class="kwlist-chip is-solo">Keywords to come</li>`}</ul>
+                </div>
+              </li>
+            `;
+          }).join("")}
+        </ul>
+      </div>
+    `;
+  }
+
+  function bindNetworkResize() {
     if (!advisingNetworkState.bound) {
       advisingNetworkState.bound = true;
       let timer;
@@ -758,17 +799,15 @@
       svg.classList.add("is-focusing");
       light(`.pubnet-person[data-student="Moon"]`);
       if (surname === "Moon") {
-        light(".pubnet-person, .pubnet-work, .pubnet-edge.is-mentor, .pubnet-advise");
+        light(".pubnet-person, .pubnet-advise");
         return;
       }
       light(`[data-student="${surname}"]`);
-      svg.querySelectorAll(".pubnet-work").forEach((el) => {
-        if (!el.dataset.students.split(" ").includes(surname)) return;
-        el.classList.add("is-lit");
-        light(`.pubnet-edge.is-mentor[data-work="${el.dataset.work}"]`);
+      svg.querySelectorAll(".pubnet-keyword").forEach((el) => {
+        if (el.dataset.students.split(" ").includes(surname)) el.classList.add("is-lit");
       });
     };
-    const lightWork = (el) => {
+    const lightKeyword = (el) => {
       const node = byId.get(el.dataset.work);
       if (!node) return;
       clear();
@@ -776,11 +815,15 @@
       el.classList.add("is-lit");
       light(`.pubnet-edge[data-work="${node.id}"]`);
       light(`.pubnet-person[data-student="Moon"]`);
-      node.linked.forEach((student) => light(`.pubnet-person[data-student="${student.surname}"]`));
+      node.linked.forEach((student) => {
+        light(`.pubnet-person[data-student="${student.surname}"]`);
+        light(`.pubnet-advise[data-student="${student.surname}"]`);
+      });
+      const examples = (node.examples || []).slice(0, 2);
       tooltip.innerHTML = `
-        <strong>${escapeHtml(node.title)}</strong>
-        <span>${escapeHtml([node.venue, node.meta].filter(Boolean).join(" · "))}</span>
-        <em>${escapeHtml(["Dr. Moon", ...node.linked.map((s) => s.label)].join(" · "))}</em>
+        <strong>${escapeHtml(node.label)}</strong>
+        ${examples.map((title) => `<span>${escapeHtml(title)}</span>`).join("")}
+        <em>${escapeHtml(node.linked.map((s) => s.label).join(" · "))}</em>
       `;
       tooltip.hidden = false;
       const scale = svg.getBoundingClientRect().width / svg.viewBox.baseVal.width || 1;
@@ -790,17 +833,17 @@
       const tipWidth = Math.min(320, shellWidth - 16);
       tooltip.style.width = `${tipWidth}px`;
       tooltip.style.left = `${Math.min(Math.max(8, left - tipWidth / 2), shellWidth - tipWidth - 8)}px`;
-      const below = top + node.r * scale + 12;
+      const below = top + (node.h / 2) * scale + 10;
       tooltip.style.top = `${below}px`;
       if (below + tooltip.offsetHeight > mount.clientHeight) {
-        tooltip.style.top = `${Math.max(4, top - node.r * scale - 12 - tooltip.offsetHeight)}px`;
+        tooltip.style.top = `${Math.max(4, top - (node.h / 2) * scale - 10 - tooltip.offsetHeight)}px`;
       }
     };
 
-    svg.querySelectorAll(".pubnet-work").forEach((el) => {
-      el.addEventListener("mouseenter", () => lightWork(el));
-      el.addEventListener("focus", () => lightWork(el));
-      el.addEventListener("click", () => lightWork(el));
+    svg.querySelectorAll(".pubnet-keyword").forEach((el) => {
+      el.addEventListener("mouseenter", () => lightKeyword(el));
+      el.addEventListener("focus", () => lightKeyword(el));
+      el.addEventListener("click", () => lightKeyword(el));
       el.addEventListener("mouseleave", clear);
       el.addEventListener("blur", clear);
     });
