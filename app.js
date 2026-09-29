@@ -128,7 +128,8 @@
 
   const people = [
     {
-      group: "People",
+      group: "Current Members",
+      current: true,
       items: [
         {
           name: "Dr. Jewoong Moon",
@@ -145,18 +146,44 @@
           bio: "Researches e-learning, AI in learning, and instructional design. MEd Educational Technology, Federal University of Technology, Minna, Nigeria."
         },
         {
-          name: "Arezoo Ghooreian",
-          avatar: "assets/img/people/ghooreian.jpg",
-          role: "Graduate Research Assistant, PhD",
-          chips: ["GRA", "AI", "Computational Thinking"],
-          bio: "Works on instructional technology, AI in education, and game-making for computational thinking. MA ESL, Azad University, Iran."
-        },
-        {
           name: "Stephen Abu",
           avatar: "assets/img/people/abu.jpg",
           role: "PhD Instructional Technology",
           chips: ["VR Simulation", "XR", "GenAI"],
           bio: "Studies VR simulation, extended reality, gamification, generative AI, and online learning."
+        },
+        {
+          name: 'Mohammad "Mohi" Uddin',
+          avatar: "assets/img/people/uddin.jpg",
+          role: "PhD Instructional Technology; Graduate Senator & Ambassador",
+          chips: ["AI", "Learning Theory", "Neurodiversity"],
+          bio: "Studies AI in education, learning theories, teacher professional development, and neurodiversity in education. Author of 15+ published articles."
+        },
+        {
+          name: "Samuel Opeyemi Olowolafe",
+          avatar: "assets/img/people/olowolafe.jpg",
+          role: "PhD Instructional Technology",
+          chips: ["AI", "Online Learning", "Game-Based", "Math Education"],
+          bio: "Works on education and intelligent transportation systems, with interests in AI in education, online learning, game-based learning, and mathematics education. Over a decade of secondary-school mathematics teaching. MEd Educational Technology, National Open University of Nigeria."
+        },
+        {
+          name: "Vijesh",
+          role: "PhD Instructional Technology",
+          chips: ["PhD Student"],
+          bio: ""
+        }
+      ]
+    },
+    {
+      group: "Former Contributors",
+      current: false,
+      items: [
+        {
+          name: "Arezoo Ghooreian",
+          avatar: "assets/img/people/ghooreian.jpg",
+          role: "Graduate Research Assistant, PhD",
+          chips: ["GRA", "AI", "Computational Thinking"],
+          bio: "Works on instructional technology, AI in education, and game-making for computational thinking. MA ESL, Azad University, Iran."
         },
         {
           name: "Moses Oladele Ogunniran",
@@ -173,25 +200,11 @@
           bio: "Researches gamification, game-based learning, and AR for STEM. Background in graphic design and instructional technology."
         },
         {
-          name: 'Mohammad "Mohi" Uddin',
-          avatar: "assets/img/people/uddin.jpg",
-          role: "PhD Instructional Technology; Graduate Senator & Ambassador",
-          chips: ["AI", "Learning Theory", "Neurodiversity"],
-          bio: "Studies AI in education, learning theories, teacher professional development, and neurodiversity in education. Author of 15+ published articles."
-        },
-        {
           name: "Jihane Amayou",
           avatar: "assets/img/people/amayou.jpg",
           role: "PhD Curriculum & Instruction",
           chips: ["Emerging Tech", "Digital Literacies", "AI"],
           bio: "Studies emerging technologies in education, student engagement, digital literacies, and AI in learning. MA Educational Technology, Bahcesehir University."
-        },
-        {
-          name: "Samuel Opeyemi Olowolafe",
-          avatar: "assets/img/people/olowolafe.jpg",
-          role: "PhD Instructional Technology",
-          chips: ["AI", "Online Learning", "Game-Based", "Math Education"],
-          bio: "Works on education and intelligent transportation systems, with interests in AI in education, online learning, game-based learning, and mathematics education. Over a decade of secondary-school mathematics teaching. MEd Educational Technology, National Open University of Nigeria."
         }
       ]
     }
@@ -229,19 +242,16 @@
   const advisingStudents = [
     { surname: "Awoyemi", shortName: "Idowu \"David\" Awoyemi", fallback: { working: 10, published: 4 } },
     { surname: "Abu", shortName: "Stephen Abu", fallback: { working: 8, published: 2 } },
-    { surname: "Ghooreian", shortName: "Arezoo Ghooreian", fallback: { working: 3, published: 1 } },
     { surname: "Uddin", shortName: "Mohammad \"Mohi\" Uddin", fallback: { working: 1, published: 2 } },
-    { surname: "Amayou", shortName: "Jihane Amayou", fallback: { working: 0, published: 0 } },
-    { surname: "Searight", shortName: "Empress Searight", fallback: { working: 0, published: 0 } },
-    { surname: "Ogunniran", shortName: "Moses Ogunniran", fallback: { working: 0, published: 0 } },
-    { surname: "Olowolafe", shortName: "Samuel Opeyemi Olowolafe", fallback: { working: 0, published: 0 } }
+    { surname: "Olowolafe", shortName: "Samuel Opeyemi Olowolafe", fallback: { working: 0, published: 0 } },
+    { surname: "Vijesh", shortName: "Vijesh", fallback: { working: 0, published: 0 } }
   ];
   const advisingAggregateFallback = {
     studentCoauthoredTotal: 17,
     workingPapersWithStudents: 11,
     publicationsWithStudents: 6,
     underReview: 29,
-    currentAdvisees: 8
+    currentAdvisees: 5
   };
   const PUBLICATION_COLLAPSED_LIMIT = 12;
   const BOOK_CHAPTER_COLLAPSED_LIMIT = 4;
@@ -375,14 +385,17 @@
   }
 
   function renderPeople() {
-    const members = people.flatMap((group) => group.items);
-    $("[data-people]").innerHTML = `
-      <section class="people-group reveal" aria-label="People">
+    $("[data-people]").innerHTML = people.map((group) => `
+      <section class="people-group reveal${group.current ? "" : " is-former"}" aria-label="${escapeHtml(group.group)}">
+        <div class="people-group-heading">
+          <h3>${escapeHtml(group.group)}</h3>
+          <span>${group.items.length} ${group.items.length === 1 ? "person" : "people"}</span>
+        </div>
         <div class="people-grid">
-          ${members.map((person) => personCard(person)).join("")}
+          ${group.items.map((person) => personCard(person)).join("")}
         </div>
       </section>
-    `;
+    `).join("");
   }
 
   function renderAdvisingImpact() {
@@ -487,6 +500,7 @@
 
   function currentPhdStudents() {
     return people
+      .filter((group) => group.current)
       .flatMap((group) => group.items)
       .filter((person) => !/director/i.test(person.role || ""));
   }
