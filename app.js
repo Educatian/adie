@@ -247,6 +247,10 @@
     { surname: "Sharma", label: "Vijesh Sharma", pattern: /\bSharma,\s*V\b/ },
     { surname: "Uddin", label: "Mohi Uddin", pattern: /\bUddin,\s*M\b/ }
   ];
+  // Ongoing projects that connect students before anything is published.
+  const advisingProjects = [
+    { title: "Ongoing AdDIE Lab project", note: "", students: ["Olowolafe", "Sharma"] }
+  ];
   const advisingAggregateFallback = {
     underReview: 29,
     currentAdvisees: 5
@@ -417,12 +421,14 @@
     mountChart.innerHTML = `
       <div class="advising-chart-header">
         <div>
-          <h3>Student publication network</h3>
-          <p>Each dot is a co-authored work from Dr. Moon's CV, linked to every current student on its author list. Hover or tap a dot to see the work; hover a student to trace their papers.</p>
+          <h3>Mentorship network</h3>
+          <p>Dr. Moon sits at the center. Each dot is a co-authored work from his CV, linked to him and to every current student on the author list; diamonds are ongoing projects not yet in print. Hover or tap any node to trace its connections.</p>
         </div>
         <div class="advising-legend" aria-label="Network legend">
-          <span><i class="legend-solo"></i> One student</span>
+          <span><i class="legend-solo"></i> Work with one student</span>
           <span><i class="legend-shared"></i> Shared by 2+ students</span>
+          <span><i class="legend-project"></i> Ongoing project</span>
+          <span><i class="legend-mentor"></i> Link to Dr. Moon</span>
         </div>
       </div>
       <div class="pubnet-shell" data-pubnet></div>
@@ -456,13 +462,24 @@
       }
       works.set(key, {
         id: `work-${works.size}`,
+        type: "work",
         title: record.title,
         venue: record.venue || "",
         meta: /^\d{4}$/.test(String(record.year || "")) && record.kind === "Published" ? String(record.year) : record.kind,
+        withMoon: /\bMoon,\s*J/.test(haystack),
         students
       });
     });
     const workList = Array.from(works.values());
+    const projects = advisingProjects.map((project, index) => ({
+      id: `project-${index}`,
+      type: "project",
+      title: project.title,
+      venue: project.note || "",
+      meta: "Ongoing project · not yet published",
+      withMoon: true,
+      students: project.students
+    }));
     const phds = currentPhdStudents();
     const students = advisingStudents.map((student) => {
       const person = phds.find((candidate) => candidate.name.includes(student.surname)) || {};
@@ -470,71 +487,139 @@
         ...student,
         name: person.name || student.label,
         avatar: person.avatar || "",
-        total: workList.filter((work) => work.students.includes(student.surname)).length
+        total: workList.filter((work) => work.students.includes(student.surname)).length,
+        projects: projects.filter((project) => project.students.includes(student.surname)).length
       };
     });
+    const director = people.flatMap((group) => group.items).find((person) => /director/i.test(person.role || "")) || {};
     return {
       works: workList,
+      projects,
       students,
+      director: { name: director.name || "Dr. Jewoong Moon", avatar: director.avatar || "" },
       sharedWorks: workList.filter((work) => work.students.length > 1).length,
       underReview: siteData.workingPaperSummary?.submittedOrUnderReview || advisingAggregateFallback.underReview,
       currentAdvisees: phds.length || advisingAggregateFallback.currentAdvisees
     };
   }
 
+  function networkLabelBox(node, labelSize, compact, width) {
+    const nameWidth = node.label.length * labelSize * 0.62;
+    const subWidth = node.sub.length * 6.4;
+    const boxWidth = Math.max(nameWidth, subWidth);
+    let mode;
+    if (node.isHub) mode = "below";
+    else if (!compact && Math.abs(node.ux) > 0.8) mode = node.ux > 0 ? "right" : "left";
+    else mode = node.uy < -0.5 ? "above" : "below";
+    let x;
+    let nameY;
+    let anchor = "middle";
+    if (mode === "right" || mode === "left") {
+      anchor = mode === "right" ? "start" : "end";
+      x = node.x + (mode === "right" ? 1 : -1) * (node.r + 10);
+      nameY = node.y - 1;
+    } else if (mode === "above") {
+      x = node.x;
+      nameY = node.y - node.r - 20;
+    } else {
+      x = node.x;
+      nameY = node.y + node.r + labelSize + 6;
+    }
+    if (anchor === "middle") x = Math.min(width - boxWidth / 2 - 4, Math.max(boxWidth / 2 + 4, x));
+    const subY = nameY + labelSize + 2;
+    const x0 = anchor === "start" ? x : anchor === "end" ? x - boxWidth : x - boxWidth / 2;
+    return { x, nameY, subY, anchor, rect: { x0: x0 - 4, x1: x0 + boxWidth + 4, y0: nameY - labelSize - 2, y1: subY + 4 } };
+  }
+
   function publicationNetworkLayout(metrics, width, height, compact) {
     const cx = width / 2;
     const cy = height / 2;
-    const rx = width * (compact ? 0.36 : 0.3);
-    const ry = height * (compact ? 0.33 : 0.3);
+    const rx = width * (compact ? 0.35 : 0.36);
+    const ry = height * (compact ? 0.35 : 0.36);
     const avatarR = compact ? 22 : 28;
+    const hubR = compact ? 30 : 38;
     const dotR = compact ? 6 : 7.5;
+    const labelSize = compact ? 11.5 : 13;
+    const sublabel = (student) => {
+      const parts = [];
+      if (student.total) parts.push(`${student.total} ${student.total === 1 ? "work" : "works"}`);
+      if (student.projects) parts.push(`${student.projects} ${student.projects === 1 ? "project" : "projects"}`);
+      return parts.join(" · ") || "New member";
+    };
+    const hub = {
+      isHub: true,
+      surname: "Moon",
+      label: metrics.director.name,
+      name: metrics.director.name,
+      avatar: metrics.director.avatar,
+      sub: `Advisor · ${metrics.works.length} works`,
+      x: cx,
+      y: cy,
+      ux: 0,
+      uy: 1,
+      r: hubR
+    };
     const students = metrics.students.map((student, index) => {
       const angle = -Math.PI / 2 + (index / metrics.students.length) * Math.PI * 2;
       const x = cx + Math.cos(angle) * rx;
       const y = cy + Math.sin(angle) * ry;
-      const dx = x - cx;
-      const dy = y - cy;
-      const len = Math.hypot(dx, dy) || 1;
-      return { ...student, x, y, ux: dx / len, uy: dy / len, r: avatarR };
+      const len = Math.hypot(x - cx, y - cy) || 1;
+      return { ...student, sub: sublabel(student), x, y, ux: (x - cx) / len, uy: (y - cy) / len, r: avatarR };
     });
+    const everyone = [hub, ...students];
+    everyone.forEach((node) => { node.labelBox = networkLabelBox(node, labelSize, compact, width); });
     const byName = new Map(students.map((student) => [student.surname, student]));
 
+    const items = [...metrics.works, ...metrics.projects];
     const soloCount = new Map();
-    const nodes = metrics.works.map((work) => {
-      const linked = work.students.map((name) => byName.get(name)).filter(Boolean);
+    const soloTotals = new Map();
+    items.forEach((item) => {
+      if (item.students.length === 1) soloTotals.set(item.students[0], (soloTotals.get(item.students[0]) || 0) + 1);
+    });
+    const nodes = items.map((item) => {
+      const linked = item.students.map((name) => byName.get(name)).filter(Boolean);
       let tx;
       let ty;
       if (linked.length === 1) {
         const owner = linked[0];
-        const count = metrics.works.filter((item) => item.students.length === 1 && item.students[0] === owner.surname).length;
+        const count = soloTotals.get(owner.surname) || 1;
         const index = soloCount.get(owner.surname) || 0;
         soloCount.set(owner.surname, index + 1);
-        const spread = Math.min(Math.PI * 1.1, 0.42 * Math.max(count - 1, 0));
-        let base = Math.atan2(owner.uy, owner.ux);
-        // Names sit under each portrait, so fans never point straight down.
-        if (Math.sin(base) > 0.3) base = owner.ux >= 0 ? 0.3 : Math.PI - 0.3;
+        const spread = Math.min(Math.PI * 0.95, 0.4 * Math.max(count - 1, 0));
+        const base = Math.atan2(-owner.uy, -owner.ux);
         const angle = count > 1 ? base - spread / 2 + (spread * index) / (count - 1) : base;
-        const dist = avatarR + (compact ? 34 : 44);
+        const dist = avatarR + (compact ? 34 : 46);
         tx = owner.x + Math.cos(angle) * dist;
         ty = owner.y + Math.sin(angle) * dist;
       } else {
-        tx = linked.reduce((sum, s) => sum + s.x, 0) / linked.length;
-        ty = linked.reduce((sum, s) => sum + s.y, 0) / linked.length;
-        tx = tx + (cx - tx) * 0.38;
-        ty = ty + (cy - ty) * 0.38;
+        const mx = linked.reduce((sum, s) => sum + s.x, 0) / linked.length;
+        const my = linked.reduce((sum, s) => sum + s.y, 0) / linked.length;
+        tx = mx + (cx - mx) * 0.32;
+        ty = my + (cy - my) * 0.32;
       }
-      return { ...work, linked, tx, ty, x: tx, y: ty, r: linked.length > 1 ? dotR + 2 : dotR };
+      const base = item.type === "project" ? dotR + 3 : linked.length > 1 ? dotR + 2 : dotR;
+      return { ...item, linked, tx, ty, x: tx, y: ty, r: base };
     });
 
-    // Deterministic relaxation: keep dots near their targets without overlapping each other or avatars.
+    // Deterministic relaxation: keep items near their targets without overlapping portraits, labels, or each other.
     const pad = 12;
-    const labelObstacles = students.flatMap((student) => [-1, -0.5, 0, 0.5, 1].map((offset) => ({
-      x: student.x + offset * (compact ? 34 : 44),
-      y: student.y + student.r + (compact ? 18 : 22),
-      r: compact ? 13 : 16
-    })));
-    for (let step = 0; step < 220; step += 1) {
+    const pushFromRect = (node, rect) => {
+      const nx = Math.min(rect.x1, Math.max(rect.x0, node.x));
+      const ny = Math.min(rect.y1, Math.max(rect.y0, node.y));
+      const dx = node.x - nx;
+      const dy = node.y - ny;
+      const dist = Math.hypot(dx, dy);
+      if (dist >= node.r + 2) return;
+      if (dist > 0.001) {
+        node.x += (dx / dist) * (node.r + 2 - dist);
+        node.y += (dy / dist) * (node.r + 2 - dist);
+      } else {
+        const toTop = node.y - rect.y0;
+        const toBottom = rect.y1 - node.y;
+        node.y = toTop < toBottom ? rect.y0 - node.r - 2 : rect.y1 + node.r + 2;
+      }
+    };
+    for (let step = 0; step < 260; step += 1) {
       nodes.forEach((node) => {
         node.x += (node.tx - node.x) * 0.06;
         node.y += (node.ty - node.y) * 0.06;
@@ -555,31 +640,22 @@
             b.y += (dy / dist) * push;
           }
         }
-        students.forEach((student) => {
-          const dx = a.x - student.x || 0.01;
-          const dy = a.y - student.y || 0.01;
+        everyone.forEach((person) => {
+          const dx = a.x - person.x || 0.01;
+          const dy = a.y - person.y || 0.01;
           const dist = Math.hypot(dx, dy);
-          const min = student.r + a.r + 10;
+          const min = person.r + a.r + 10;
           if (dist < min) {
             a.x += (dx / dist) * (min - dist);
             a.y += (dy / dist) * (min - dist);
           }
-        });
-        labelObstacles.forEach((box) => {
-          const dx = a.x - box.x || 0.01;
-          const dy = a.y - box.y || 0.01;
-          const dist = Math.hypot(dx, dy);
-          const min = box.r + a.r + 2;
-          if (dist < min) {
-            a.x += (dx / dist) * (min - dist);
-            a.y += (dy / dist) * (min - dist);
-          }
+          pushFromRect(a, person.labelBox.rect);
         });
         a.x = Math.min(width - pad - a.r, Math.max(pad + a.r, a.x));
         a.y = Math.min(height - pad - a.r, Math.max(pad + a.r, a.y));
       }
     }
-    return { students, nodes, avatarR };
+    return { hub, students, nodes, labelSize };
   }
 
   function drawPublicationNetwork() {
@@ -588,61 +664,70 @@
     if (!mount || !metrics) return;
     const width = Math.max(300, Math.round(mount.clientWidth || 960));
     const compact = width < 640;
-    const height = compact ? Math.round(width * 1.12) : Math.round(Math.min(520, Math.max(420, width * 0.46)));
+    const height = compact ? Math.round(width * 1.35) : Math.round(Math.min(600, Math.max(480, width * 0.5)));
     advisingNetworkState.width = width;
-    const { students, nodes, avatarR } = publicationNetworkLayout(metrics, width, height, compact);
+    const { hub, students, nodes, labelSize } = publicationNetworkLayout(metrics, width, height, compact);
     const cx = width / 2;
     const cy = height / 2;
+    const f = (value) => value.toFixed(1);
 
-    const edges = nodes.flatMap((node) => node.linked.map((student) => {
+    const advising = students.map((student) => `
+      <line class="pubnet-advise" data-student="${escapeHtml(student.surname)}" x1="${f(hub.x)}" y1="${f(hub.y)}" x2="${f(student.x)}" y2="${f(student.y)}"></line>
+    `).join("");
+
+    const mentorEdges = nodes.filter((node) => node.withMoon).map((node) => `
+      <line class="pubnet-edge is-mentor" data-work="${node.id}" x1="${f(hub.x)}" y1="${f(hub.y)}" x2="${f(node.x)}" y2="${f(node.y)}"></line>
+    `).join("");
+
+    const studentEdges = nodes.flatMap((node) => node.linked.map((student) => {
       const mx = (student.x + node.x) / 2;
       const my = (student.y + node.y) / 2;
       const qx = mx + (cx - mx) * 0.08;
       const qy = my + (cy - my) * 0.08;
-      return `<path class="pubnet-edge" data-student="${escapeHtml(student.surname)}" data-work="${node.id}" d="M${student.x.toFixed(1)},${student.y.toFixed(1)} Q${qx.toFixed(1)},${qy.toFixed(1)} ${node.x.toFixed(1)},${node.y.toFixed(1)}"></path>`;
+      return `<path class="pubnet-edge" data-student="${escapeHtml(student.surname)}" data-work="${node.id}" d="M${f(student.x)},${f(student.y)} Q${f(qx)},${f(qy)} ${f(node.x)},${f(node.y)}"></path>`;
     })).join("");
 
-    const dots = nodes.map((node) => `
-      <circle class="pubnet-work ${node.linked.length > 1 ? "is-shared" : "is-solo"}" tabindex="0" role="button"
-        data-work="${node.id}" data-students="${escapeHtml(node.linked.map((s) => s.surname).join(" "))}"
-        cx="${node.x.toFixed(1)}" cy="${node.y.toFixed(1)}" r="${node.r}"
-        aria-label="${escapeHtml(`${node.title}. ${node.venue}. ${node.meta}. Student co-authors: ${node.linked.map((s) => s.label).join(", ")}`)}"></circle>
-    `).join("");
+    const items = nodes.map((node) => {
+      const common = `tabindex="0" role="button" data-work="${node.id}" data-students="${escapeHtml(node.linked.map((s) => s.surname).join(" "))}"
+        aria-label="${escapeHtml(`${node.title}. ${[node.venue, node.meta].filter(Boolean).join(". ")}. With Dr. Moon and ${node.linked.map((s) => s.label).join(", ")}`)}"`;
+      if (node.type === "project") {
+        const r = node.r + 1;
+        return `<path class="pubnet-work is-project" ${common} d="M${f(node.x)},${f(node.y - r)} L${f(node.x + r)},${f(node.y)} L${f(node.x)},${f(node.y + r)} L${f(node.x - r)},${f(node.y)} Z"></path>`;
+      }
+      return `<circle class="pubnet-work ${node.linked.length > 1 ? "is-shared" : "is-solo"}" ${common} cx="${f(node.x)}" cy="${f(node.y)}" r="${node.r}"></circle>`;
+    }).join("");
 
-    const labelSize = compact ? 11.5 : 13;
-    const personMarks = students.map((student, index) => {
+    const personMark = (person, index) => {
       const clipId = `pubnet-clip-${index}`;
-      const halfLabel = student.label.length * labelSize * 0.37;
-      const lx = Math.min(width - halfLabel - 4, Math.max(halfLabel + 4, student.x));
-      const ly = student.y + student.r + labelSize + 6;
-      const anchor = "middle";
-      const sub = student.total ? `${student.total} ${student.total === 1 ? "work" : "works"}` : "New member";
-      const image = student.avatar
-        ? `<image href="${escapeHtml(student.avatar)}" x="${(student.x - student.r).toFixed(1)}" y="${(student.y - student.r).toFixed(1)}" width="${student.r * 2}" height="${student.r * 2}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice"></image>`
-        : `<text class="pubnet-initials" x="${student.x.toFixed(1)}" y="${(student.y + 5).toFixed(1)}" text-anchor="middle">${escapeHtml(initialsFor(student.name))}</text>`;
+      const box = person.labelBox;
+      const image = person.avatar
+        ? `<image href="${escapeHtml(person.avatar)}" x="${f(person.x - person.r)}" y="${f(person.y - person.r)}" width="${person.r * 2}" height="${person.r * 2}" clip-path="url(#${clipId})" preserveAspectRatio="xMidYMid slice"></image>`
+        : `<text class="pubnet-initials" x="${f(person.x)}" y="${f(person.y + 5)}" text-anchor="middle">${escapeHtml(initialsFor(person.name))}</text>`;
+      const isNew = !person.isHub && !person.total && !person.projects;
       return `
-        <g class="pubnet-person${student.total ? "" : " is-new"}" data-student="${escapeHtml(student.surname)}" tabindex="0"
-          aria-label="${escapeHtml(`${student.label}: ${sub}`)}">
-          <clipPath id="${clipId}"><circle cx="${student.x.toFixed(1)}" cy="${student.y.toFixed(1)}" r="${student.r}"></circle></clipPath>
-          <circle class="pubnet-avatar-bg" cx="${student.x.toFixed(1)}" cy="${student.y.toFixed(1)}" r="${student.r}"></circle>
+        <g class="pubnet-person${person.isHub ? " is-hub" : ""}${isNew ? " is-new" : ""}" data-student="${escapeHtml(person.surname)}" tabindex="0"
+          aria-label="${escapeHtml(`${person.label}: ${person.sub}`)}">
+          <clipPath id="${clipId}"><circle cx="${f(person.x)}" cy="${f(person.y)}" r="${person.r}"></circle></clipPath>
+          <circle class="pubnet-avatar-bg" cx="${f(person.x)}" cy="${f(person.y)}" r="${person.r}"></circle>
           ${image}
-          <circle class="pubnet-ring" cx="${student.x.toFixed(1)}" cy="${student.y.toFixed(1)}" r="${student.r + 3}"></circle>
-          <text class="pubnet-name" x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="${anchor}" font-size="${labelSize}">${escapeHtml(student.label)}</text>
-          <text class="pubnet-sub" x="${lx.toFixed(1)}" y="${(ly + labelSize + 2).toFixed(1)}" text-anchor="${anchor}">${escapeHtml(sub)}</text>
+          <circle class="pubnet-ring" cx="${f(person.x)}" cy="${f(person.y)}" r="${person.r + 3}"></circle>
+          <text class="pubnet-name" x="${f(box.x)}" y="${f(box.nameY)}" text-anchor="${box.anchor}" font-size="${person.isHub ? labelSize + 1 : labelSize}">${escapeHtml(person.label)}</text>
+          <text class="pubnet-sub" x="${f(box.x)}" y="${f(box.subY)}" text-anchor="${box.anchor}">${escapeHtml(person.sub)}</text>
         </g>
       `;
-    }).join("");
+    };
 
     mount.innerHTML = `
       <svg class="pubnet-svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="group" aria-labelledby="pubnet-title">
-        <title id="pubnet-title">Student publication network: ${metrics.works.length} co-authored works linked to ${students.length} current students</title>
-        <g class="pubnet-edges">${edges}</g>
-        <g class="pubnet-works">${dots}</g>
-        <g class="pubnet-people">${personMarks}</g>
+        <title id="pubnet-title">Mentorship network: Dr. Moon at the center, connected to ${students.length} current students through ${metrics.works.length} co-authored works and ${metrics.projects.length} ongoing ${metrics.projects.length === 1 ? "project" : "projects"}</title>
+        <g class="pubnet-advising">${advising}</g>
+        <g class="pubnet-edges">${mentorEdges}${studentEdges}</g>
+        <g class="pubnet-works">${items}</g>
+        <g class="pubnet-people">${students.map((student, index) => personMark(student, index + 1)).join("")}${personMark(hub, 0)}</g>
       </svg>
       <div class="pubnet-tooltip" role="status" aria-live="polite" hidden></div>
     `;
-    bindPublicationNetwork(mount, nodes, avatarR);
+    bindPublicationNetwork(mount, nodes);
 
     if (!advisingNetworkState.bound) {
       advisingNetworkState.bound = true;
@@ -657,22 +742,30 @@
     }
   }
 
-  function bindPublicationNetwork(mount, nodes, avatarR) {
+  function bindPublicationNetwork(mount, nodes) {
     const svg = mount.querySelector("svg");
     const tooltip = mount.querySelector(".pubnet-tooltip");
     const byId = new Map(nodes.map((node) => [node.id, node]));
+    const light = (selector) => svg.querySelectorAll(selector).forEach((el) => el.classList.add("is-lit"));
 
     const clear = () => {
       svg.classList.remove("is-focusing");
       svg.querySelectorAll(".is-lit").forEach((el) => el.classList.remove("is-lit"));
       tooltip.hidden = true;
     };
-    const lightStudent = (surname) => {
+    const lightPerson = (surname) => {
       clear();
       svg.classList.add("is-focusing");
-      svg.querySelectorAll(`[data-student="${surname}"]`).forEach((el) => el.classList.add("is-lit"));
+      light(`.pubnet-person[data-student="Moon"]`);
+      if (surname === "Moon") {
+        light(".pubnet-person, .pubnet-work, .pubnet-edge.is-mentor, .pubnet-advise");
+        return;
+      }
+      light(`[data-student="${surname}"]`);
       svg.querySelectorAll(".pubnet-work").forEach((el) => {
-        if (el.dataset.students.split(" ").includes(surname)) el.classList.add("is-lit");
+        if (!el.dataset.students.split(" ").includes(surname)) return;
+        el.classList.add("is-lit");
+        light(`.pubnet-edge.is-mentor[data-work="${el.dataset.work}"]`);
       });
     };
     const lightWork = (el) => {
@@ -681,14 +774,13 @@
       clear();
       svg.classList.add("is-focusing");
       el.classList.add("is-lit");
-      svg.querySelectorAll(`.pubnet-edge[data-work="${node.id}"]`).forEach((edge) => edge.classList.add("is-lit"));
-      node.linked.forEach((student) => {
-        svg.querySelectorAll(`.pubnet-person[data-student="${student.surname}"]`).forEach((p) => p.classList.add("is-lit"));
-      });
+      light(`.pubnet-edge[data-work="${node.id}"]`);
+      light(`.pubnet-person[data-student="Moon"]`);
+      node.linked.forEach((student) => light(`.pubnet-person[data-student="${student.surname}"]`));
       tooltip.innerHTML = `
         <strong>${escapeHtml(node.title)}</strong>
         <span>${escapeHtml([node.venue, node.meta].filter(Boolean).join(" · "))}</span>
-        <em>${escapeHtml(node.linked.map((s) => s.label).join(" · "))}</em>
+        <em>${escapeHtml(["Dr. Moon", ...node.linked.map((s) => s.label)].join(" · "))}</em>
       `;
       tooltip.hidden = false;
       const scale = svg.getBoundingClientRect().width / svg.viewBox.baseVal.width || 1;
@@ -713,8 +805,8 @@
       el.addEventListener("blur", clear);
     });
     svg.querySelectorAll(".pubnet-person").forEach((el) => {
-      el.addEventListener("mouseenter", () => lightStudent(el.dataset.student));
-      el.addEventListener("focus", () => lightStudent(el.dataset.student));
+      el.addEventListener("mouseenter", () => lightPerson(el.dataset.student));
+      el.addEventListener("focus", () => lightPerson(el.dataset.student));
       el.addEventListener("mouseleave", clear);
       el.addEventListener("blur", clear);
     });

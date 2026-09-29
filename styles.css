@@ -1291,6 +1291,53 @@ main > section + section::before {
   background: var(--gold);
 }
 
+.advising-legend i.legend-project {
+  width: 10px;
+  height: 10px;
+  border-radius: 1px;
+  background: var(--teal);
+  transform: rotate(45deg);
+}
+
+.advising-legend i.legend-mentor {
+  height: 2px;
+  background: var(--teal);
+}
+
+.pubnet-advise {
+  stroke: color-mix(in srgb, var(--teal) 45%, transparent);
+  stroke-width: 1.4;
+  stroke-dasharray: 3 6;
+  transition: opacity 160ms ease, stroke 160ms ease;
+}
+
+.pubnet-advise.is-lit {
+  stroke: var(--teal);
+}
+
+.pubnet-edge.is-mentor {
+  stroke: color-mix(in srgb, var(--teal) 30%, transparent);
+  stroke-width: 1;
+}
+
+.pubnet-edge.is-mentor.is-lit {
+  stroke: var(--teal);
+  stroke-width: 1.8;
+}
+
+.pubnet-work.is-project {
+  fill: var(--teal);
+}
+
+.pubnet-person.is-hub .pubnet-ring {
+  stroke: var(--teal);
+  stroke-width: 3.5;
+}
+
+.pubnet-person.is-hub .pubnet-avatar-bg {
+  fill: var(--teal);
+}
+
 .pubnet-shell {
   position: relative;
   width: 100%;
@@ -1392,6 +1439,7 @@ main > section + section::before {
   letter-spacing: 0.02em;
 }
 
+.pubnet-svg.is-focusing .pubnet-advise:not(.is-lit),
 .pubnet-svg.is-focusing .pubnet-edge:not(.is-lit),
 .pubnet-svg.is-focusing .pubnet-work:not(.is-lit),
 .pubnet-svg.is-focusing .pubnet-person:not(.is-lit) {
