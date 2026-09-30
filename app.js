@@ -171,9 +171,11 @@
         },
         {
           name: "Vijesh Sharma",
+          avatar: "assets/img/people/sharma.jpg",
           role: "PhD Instructional Technology",
-          chips: ["PhD Student"],
-          bio: ""
+          chips: ["Adaptive Learning", "VR Simulation", "Learning Analytics", "STEM"],
+          keywords: ["workforce development"],
+          bio: "Studies adaptive immersive learning, VR-based simulation design, learning analytics, and immersive training for STEM education and workforce development."
         }
       ]
     },
@@ -432,7 +434,9 @@
   const advisingKeywords = [
     { label: "Virtual reality & XR", pattern: /virtual reality|\bVR\b|extended reality|immersive|\bXR\b/i, chips: ["vr simulation", "xr"] },
     { label: "Safety training", pattern: /safety training/i },
-    { label: "Learning analytics", pattern: /learning analytics|behavioral data|machine learning|microgenetic|analytics/i },
+    { label: "Learning analytics", pattern: /learning analytics|behavioral data|machine learning|microgenetic|analytics/i, chips: ["learning analytics"] },
+    { label: "Adaptive learning", pattern: /adaptive/i, chips: ["adaptive learning"] },
+    { label: "Workforce development", pattern: /workforce/i, chips: ["workforce development"] },
     { label: "Generative AI", pattern: /generative ai|genai|conversational ai|ai-mediated|ai-enhanced/i, chips: ["genai"] },
     { label: "AI in education", pattern: /\bAI\b|artificial intelligence/, chips: ["ai"] },
     { label: "AI ethics", pattern: /ethic/i },
@@ -476,7 +480,7 @@
 
     const students = advisingStudents.map((student) => {
       const person = phds.find((candidate) => candidate.name.includes(student.surname)) || {};
-      const chips = cleanChips(person.chips || []).map((chip) => chip.toLowerCase());
+      const chips = [...cleanChips(person.chips || []), ...(person.keywords || [])].map((chip) => String(chip).toLowerCase());
       const ownWorks = workList.filter((work) => work.students.includes(student.surname));
       const scored = advisingKeywords.map((keyword) => {
         const fromWorks = ownWorks.filter((work) => keyword.pattern.test(work.text));
