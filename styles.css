@@ -976,8 +976,8 @@ main > section + section::before {
 .project-spotlights,
 .collab-grid,
 .project-rail,
-.grant-summary,
-.grant-columns,
+.grant-overview,
+.grant-timeline,
 .global-layout,
 .open-science-grid,
 .news-honors-layout {
@@ -2811,6 +2811,367 @@ main > section + section::before {
   font-family: var(--font-display);
   font-size: 1.6rem;
   font-weight: 700;
+}
+
+.grant-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 20px;
+}
+
+.grant-lede {
+  max-width: 640px;
+  margin: 0 0 14px;
+  color: var(--muted);
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+
+.grant-lede strong {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+}
+
+.grant-filter {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+
+.grant-filter button {
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.grant-filter button[aria-pressed="true"] {
+  background: var(--crimson);
+  color: #fff;
+}
+
+.grant-funders {
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+}
+
+.grant-funders-label {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.grant-funders-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.grant-funders-row .grant-funder-mark,
+.grant-row-detail .grant-funder-mark {
+  flex: 0 0 auto;
+  width: 3.4rem;
+  height: 3.4rem;
+}
+
+.grant-funder-mark.is-text {
+  display: inline-grid;
+  place-items: center;
+  color: var(--crimson);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.grant-timeline {
+  --grant-label: minmax(0, 38%);
+  padding: clamp(14px, 2.4vw, 26px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface-strong) 90%, transparent);
+  box-shadow: var(--shadow);
+}
+
+.grant-axis,
+.grant-row > summary {
+  display: grid;
+  grid-template-columns: var(--grant-label) minmax(0, 1fr) 88px;
+  gap: 14px;
+  align-items: center;
+}
+
+.grant-axis {
+  position: sticky;
+  top: 72px;
+  z-index: 2;
+  padding: 8px 0 10px;
+  border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface-strong) 96%, transparent);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.grant-axis-amount,
+.grant-row-amount {
+  text-align: right;
+}
+
+.grant-axis-track {
+  position: relative;
+  height: 1.2em;
+}
+
+.grant-axis-track span {
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.grant-axis-track span:first-child {
+  transform: none;
+}
+
+.grant-axis-track span.is-last {
+  transform: translateX(-100%);
+}
+
+.grant-today-tag {
+  position: absolute;
+  top: -1.3em;
+  transform: translateX(-50%);
+  color: var(--teal);
+  font-style: normal;
+}
+
+.grant-group + .grant-group {
+  margin-top: 18px;
+}
+
+.grant-group-title {
+  margin: 16px 0 6px;
+  color: var(--crimson);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.grant-group-title small {
+  margin-left: 8px;
+  color: var(--muted);
+  font-size: 0.66rem;
+}
+
+.grant-row {
+  border-bottom: 1px solid var(--line);
+}
+
+.grant-row > summary {
+  padding: 10px 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+.grant-row > summary::-webkit-details-marker {
+  display: none;
+}
+
+.grant-row > summary:hover .grant-row-title,
+.grant-row[open] .grant-row-title {
+  color: var(--crimson);
+}
+
+.grant-row > summary:focus-visible {
+  outline: 2px solid var(--crimson);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.grant-row-label {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.grant-row-title {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 0.92rem;
+  font-weight: 750;
+  line-height: 1.3;
+}
+
+.grant-row[open] .grant-row-title {
+  display: block;
+}
+
+.grant-row-sub {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.grant-row-track {
+  position: relative;
+  height: 18px;
+  border-radius: 999px;
+  background: repeating-linear-gradient(
+    to right,
+    color-mix(in srgb, var(--ink) 10%, transparent) 0 1px,
+    transparent 1px calc(100% / var(--grant-years, 8))
+  );
+}
+
+.grant-today {
+  position: absolute;
+  top: -8px;
+  bottom: -8px;
+  width: 0;
+  border-left: 1.5px dashed var(--teal);
+}
+
+.grant-bar {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  min-width: 6px;
+  border-radius: 999px;
+}
+
+.grant-row.is-funded .grant-bar {
+  background: linear-gradient(90deg, var(--crimson), var(--crimson-2));
+}
+
+.grant-row.is-pending .grant-bar {
+  border: 1.5px solid var(--gold);
+  background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--gold) 38%, transparent) 0 4px, transparent 4px 8px);
+}
+
+.grant-undated {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.grant-row-amount {
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.grant-row.is-funded .grant-row-amount {
+  color: var(--crimson);
+}
+
+.grant-row.is-pending .grant-row-amount {
+  color: var(--gold);
+}
+
+.grant-row-detail {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 16px;
+  margin: 0 0 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--paper) 55%, transparent);
+}
+
+.grant-row-detail dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 10px 20px;
+  margin: 0;
+}
+
+.grant-row-detail dt {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.grant-row-detail dd {
+  margin: 2px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 760px) {
+  .grant-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .grant-funders {
+    justify-items: start;
+  }
+
+  .grant-funders-row {
+    justify-content: flex-start;
+  }
+
+  .grant-axis,
+  .grant-row > summary {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 12px;
+  }
+
+  .grant-axis-label,
+  .grant-axis-amount {
+    display: none;
+  }
+
+  .grant-axis-track,
+  .grant-row-track {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .grant-axis {
+    top: 60px;
+  }
+
+  .grant-axis-track {
+    grid-row: 1;
+  }
+
+  .grant-axis-track span.is-odd {
+    display: none;
+  }
+
+  .grant-row-detail {
+    grid-template-columns: 1fr;
+  }
 }
 
 .join {

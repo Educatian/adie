@@ -1690,6 +1690,18 @@
   };
 
   function getGrantFunderMark(grant) {
+    // Structured records from the CV pipeline carry the funder directly.
+    if (grant.funderKey && grantFunderMarks[grant.funderKey]) return grantFunderMarks[grant.funderKey];
+    if (grant.funder && !grant.funderKey) {
+      const initials = grant.funder
+        .replace(/\(.*?\)/g, "")
+        .split(/[\s·]+/)
+        .filter((word) => /^[A-Z]/.test(word) && !/^(The|Of|And|For)$/.test(word))
+        .slice(0, 2)
+        .map((word) => word[0])
+        .join("");
+      return { name: grant.funder, text: initials || grant.funder.slice(0, 2), shape: "is-text" };
+    }
     const searchable = `${grant.title || ""} ${grant.meta || ""}`.toLowerCase();
     if (searchable.includes("museum and library services") || searchable.includes("imls")) return grantFunderMarks.imls;
     if (searchable.includes("national research foundation of korea") || searchable.includes("(nrf)")) return grantFunderMarks.nrf;
@@ -1702,8 +1714,11 @@
     return grantFunderMarks.ua;
   }
 
-  function grantFunderLogo(grant) {
-    const funder = getGrantFunderMark(grant);
+  function grantFunderLogo(grant, knownMark) {
+    const funder = knownMark || getGrantFunderMark(grant);
+    if (funder.text) {
+      return `<span class="grant-funder-mark is-text" title="${escapeHtml(funder.name)}" aria-label="${escapeHtml(funder.name)}">${escapeHtml(funder.text)}</span>`;
+    }
     return `
       <span class="grant-funder-mark ${funder.shape}" title="${escapeHtml(funder.name)}">
         <img src="${escapeHtml(funder.src)}" alt="${escapeHtml(`${funder.name} logo`)}" loading="lazy" decoding="async">
@@ -1711,43 +1726,165 @@
     `;
   }
 
+
   function renderGrants() {
+    const overviewMount = $("[data-grant-summary]");
+    const timelineMount = $("[data-grants]");
+    if (!overviewMount || !timelineMount) return;
     const portfolio = siteData.grantPortfolio || {};
-    $("[data-grant-summary]").innerHTML = [
-      { value: `$${formatNumber(portfolio.fundedTotal || 0)}`, label: "Funded total" },
-      { value: String(portfolio.fundedCount || 0), label: "Funded awards" },
-      { value: `$${formatNumber(portfolio.pendingTotal || 0)}`, label: "Pending total" },
-      { value: String(portfolio.pendingCount || 0), label: "Pending proposals" }
-    ].map((item) => statCell(item.value, item.label)).join("");
+    const funded = (siteData.grants?.funded || []).map((grant) => ({ ...grant, status: "funded" }));
+    const pending = (siteData.grants?.pending || []).map((grant) => ({ ...grant, status: "pending" }));
+    const all = [...funded, ...pending];
 
-    const funded = siteData.grants?.funded || [];
-    const pending = siteData.grants?.pending || [];
-    $("[data-grants]").innerHTML = `
-      ${grantColumn("Funded", funded.slice(0, 6))}
-      ${grantColumn("Pending", pending.slice(0, 5))}
-    `;
-  }
+    const funderTotals = new Map();
+    funded.forEach((grant) => {
+      const mark = getGrantFunderMark(grant);
+      const entry = funderTotals.get(mark.name) || { mark, total: 0 };
+      entry.total += Number(grant.amountValue) || 0;
+      funderTotals.set(mark.name, entry);
+    });
+    const funders = Array.from(funderTotals.values()).sort((a, b) => b.total - a.total);
 
-  function grantColumn(title, grants) {
-    return `
-      <div class="grant-column">
-        <h3>${escapeHtml(title)}</h3>
-        ${grants.map((grant) => `
-          <article class="grant-card">
-            <div class="grant-card-main">
-              ${grantFunderLogo(grant)}
-              <div class="grant-card-copy">
-                <span class="grant-funder-name">${escapeHtml(getGrantFunderMark(grant).name)}</span>
-                <h3>${escapeHtml(grant.title)}</h3>
-                <p>${escapeHtml(grant.meta)}</p>
-                <span class="amount">${escapeHtml(grant.amount)}</span>
-              </div>
-            </div>
-          </article>
-        `).join("")}
+    overviewMount.innerHTML = `
+      <div class="grant-overview-copy">
+        <p class="grant-lede">
+          <strong>$${formatNumber(portfolio.fundedTotal || 0)}</strong> awarded across ${portfolio.fundedCount || funded.length} grants, fellowships, and student-support awards,
+          with <strong>$${formatNumber(portfolio.pendingTotal || 0)}</strong> requested in ${portfolio.pendingCount || pending.length} proposals under review.
+        </p>
+        <div class="grant-filter" role="group" aria-label="Filter funding records">
+          ${[["all", `All ${all.length}`], ["funded", `Funded ${funded.length}`], ["pending", `Under review ${pending.length}`]]
+            .map(([value, label], index) => `<button type="button" data-grant-filter="${value}" aria-pressed="${index === 0}">${escapeHtml(label)}</button>`)
+            .join("")}
+        </div>
+      </div>
+      <div class="grant-funders" aria-label="Funders of awarded work">
+        <span class="grant-funders-label">Awarded by</span>
+        <div class="grant-funders-row">${funders.map((item) => grantFunderLogo(null, item.mark)).join("")}</div>
       </div>
     `;
+
+    const spans = new Map(all.map((grant) => [grant, grantSpan(grant)]));
+    const dated = Array.from(spans.values()).filter(Boolean);
+    const minYear = Math.floor(Math.min(...dated.map((span) => span.start), new Date().getFullYear()));
+    const maxYear = Math.ceil(Math.max(...dated.map((span) => span.end), new Date().getFullYear() + 1));
+    const years = maxYear - minYear;
+    const now = new Date();
+    const todayPct = ((now.getFullYear() + now.getMonth() / 12 - minYear) / years) * 100;
+    const pct = (value) => `${(((value - minYear) / years) * 100).toFixed(2)}%`;
+
+    const byStart = (a, b) => (spans.get(b)?.start ?? -Infinity) - (spans.get(a)?.start ?? -Infinity);
+    const groups = [
+      { status: "funded", label: "Funded awards", note: "Newest first", items: [...funded].sort(byStart) },
+      {
+        status: "pending",
+        label: "Under review",
+        note: "By proposed start",
+        items: [...pending].sort((a, b) => (spans.get(a)?.start ?? Infinity) - (spans.get(b)?.start ?? Infinity))
+      }
+    ];
+
+    const axis = Array.from({ length: years + 1 }, (_, index) => minYear + index)
+      .map((year, index) => `<span style="left:${pct(year)}" class="${[index === years ? "is-last" : "", index % 2 ? "is-odd" : ""].join(" ").trim()}">${year}</span>`)
+      .join("");
+
+    timelineMount.style.setProperty("--grant-years", years);
+    timelineMount.innerHTML = `
+      <div class="grant-axis" aria-hidden="true">
+        <span class="grant-axis-label">Project</span>
+        <span class="grant-axis-track">${axis}<i class="grant-today-tag" style="left:${todayPct.toFixed(2)}%">Today</i></span>
+        <span class="grant-axis-amount">Amount</span>
+      </div>
+      ${groups.map((group) => `
+        <div class="grant-group" data-grant-group="${group.status}">
+          <h3 class="grant-group-title">${escapeHtml(group.label)} <small>${escapeHtml(group.note)}</small></h3>
+          ${group.items.map((grant) => grantRow(grant, spans.get(grant), pct, todayPct)).join("")}
+        </div>
+      `).join("")}
+    `;
+
+    overviewMount.querySelectorAll("[data-grant-filter]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const value = button.dataset.grantFilter;
+        overviewMount.querySelectorAll("[data-grant-filter]").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+        timelineMount.querySelectorAll("[data-grant-group]").forEach((group) => {
+          group.hidden = value !== "all" && group.dataset.grantGroup !== value;
+        });
+      });
+    });
   }
+
+  const GRANT_MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+
+  function grantSpan(grant) {
+    const period = String(grant.period || "");
+    const parts = period.split(/\s+[–-]\s+|–/).map((part) => part.trim()).filter(Boolean);
+    const point = (text, isEnd) => {
+      const year = Number((text.match(/(19|20)\d{2}/) || [])[0]);
+      if (!year) return null;
+      const month = GRANT_MONTHS.findIndex((name) => text.toLowerCase().includes(name));
+      if (month < 0) return isEnd ? year + 1 : year;
+      return isEnd ? year + (month + 1) / 12 : year + month / 12;
+    };
+    if (!parts.length) {
+      const fallback = Number(grant.startYear);
+      return fallback ? { start: fallback, end: fallback + 1 } : null;
+    }
+    const start = point(parts[0], false);
+    const end = point(parts[parts.length - 1], true);
+    if (start == null || end == null) return null;
+    return { start, end: Math.max(end, start + 1 / 12) };
+  }
+
+  // Show the sponsor line only when it adds something beyond the funder name.
+  function grantProgramLabel(sponsor, funderName) {
+    if (!sponsor) return "";
+    const funderWords = String(funderName || "").toLowerCase().match(/[a-z]{3,}/g) || [];
+    const leftover = (sponsor.toLowerCase().match(/[a-z]{3,}/g) || []).filter((word) => !funderWords.includes(word));
+    return leftover.join("").length < 6 ? "" : sponsor;
+  }
+
+  function grantRow(grant, span, pct, todayPct) {
+    const mark = getGrantFunderMark(grant);
+    const funderName = grant.funder || mark.name;
+    const role = grant.role && grant.role !== "Awardee" ? grant.role : grant.status === "funded" ? "Awardee" : "";
+    const team = (grant.collaborators || []).map((member) => `${member.name}${member.role ? ` (${member.role})` : ""}`);
+    const bar = span
+      ? `<span class="grant-bar" style="left:${pct(span.start)};width:calc(${pct(span.end)} - ${pct(span.start)})"></span>`
+      : `<span class="grant-undated">${escapeHtml((grant.notes || [])[0] || "Dates to be set")}</span>`;
+    const amountLabel = grant.amount === "pending" ? "TBD" : grant.amount;
+    const details = [
+      ["Role", role],
+      ["Team", team.length ? `Dr. Moon with ${team.join(", ")}` : ""],
+      ["Funder", funderName],
+      ["Program", grantProgramLabel(grant.sponsor, funderName)],
+      ["Period", grant.period || ""],
+      [grant.amountLabel || "Amount", grant.amount === "pending" ? "Not specified" : grant.amount],
+      ["Amount detail", grant.amountDetail || ""],
+      ["Notes", (grant.notes || []).join(" · ")]
+    ].filter(([, value]) => value);
+    return `
+      <details class="grant-row is-${grant.status}">
+        <summary>
+          <span class="grant-row-label">
+            <span class="grant-row-title">${escapeHtml(grant.title)}</span>
+            <span class="grant-row-sub">${escapeHtml([role, funderName].filter(Boolean).join(" · "))}</span>
+          </span>
+          <span class="grant-row-track">
+            <i class="grant-today" style="left:${todayPct.toFixed(2)}%"></i>
+            ${bar}
+          </span>
+          <span class="grant-row-amount">${escapeHtml(amountLabel)}</span>
+        </summary>
+        <div class="grant-row-detail">
+          ${grantFunderLogo(grant)}
+          <dl>
+            ${details.map(([label, value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join("")}
+          </dl>
+        </div>
+      </details>
+    `;
+  }
+
 
   function setupNavigation() {
     const header = $("[data-header]");
