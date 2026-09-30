@@ -45,20 +45,23 @@
 
   const scholarFallback = {
     profileUrl: verifiedLinks.scholar,
+    // Verified against the Google Scholar profile on 2026-09-29 (all-time figures).
+    asOf: "2026-09-29",
     summary: {
-      totalCitations: 2712,
-      hIndex: 24,
-      i10Index: 43,
-      sinceLabel: "Since 2021"
+      totalCitations: 3351,
+      hIndex: 26,
+      i10Index: 47,
+      sinceLabel: "All time · Sep 2026"
     },
     annualCitations: [
       { year: 2019, citations: 9 },
-      { year: 2020, citations: 38 },
-      { year: 2021, citations: 96 },
+      { year: 2020, citations: 36 },
+      { year: 2021, citations: 98 },
       { year: 2022, citations: 151 },
-      { year: 2023, citations: 222 },
-      { year: 2024, citations: 498 },
-      { year: 2025, citations: 1130 }
+      { year: 2023, citations: 211 },
+      { year: 2024, citations: 483 },
+      { year: 2025, citations: 1124 },
+      { year: 2026, citations: 1167 }
     ]
   };
 
@@ -2221,12 +2224,16 @@
       if (!res.ok) return;
       const fresh = await res.json();
       if (!fresh || typeof fresh !== "object") return;
+      // Ignore empty or stale snapshots (a failed Scholar scrape returns zeros and no yearly data).
+      const freshTotal = Number(fresh.summary?.totalCitations) || 0;
+      const freshYears = Array.isArray(fresh.annualCitations) ? fresh.annualCitations.filter((item) => Number(item.citations) > 0) : [];
+      if (freshTotal < scholarFallback.summary.totalCitations || !freshYears.length) return;
       scholarAnalytics = {
         ...scholarFallback,
         ...fresh,
         profileUrl: verifiedLinks.scholar,
         summary: { ...scholarFallback.summary, ...(fresh.summary || {}) },
-        annualCitations: Array.isArray(fresh.annualCitations) ? fresh.annualCitations : scholarFallback.annualCitations
+        annualCitations: freshYears
       };
       renderResearchImpact();
     } catch {
