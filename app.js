@@ -401,23 +401,10 @@
   }
 
   function renderAdvisingImpact() {
-    const mountStats = $("[data-advising-stats]");
     const mountChart = $("[data-advising-chart]");
-    if (!mountStats || !mountChart) return;
+    if (!mountChart) return;
 
     const metrics = advisingMetrics();
-    mountStats.innerHTML = [
-      { value: metrics.works.length, label: "student-coauthored works" },
-      { value: metrics.sharedWorks, label: "works linking two or more students" },
-      { value: metrics.underReview, label: "manuscripts submitted or under review" },
-      { value: metrics.currentAdvisees, label: "current PhD advisees" }
-    ].map((item) => `
-      <article class="advising-stat">
-        <strong data-counter="${item.value}">${item.value}</strong>
-        <span>${escapeHtml(item.label)}</span>
-      </article>
-    `).join("");
-
     mountChart.innerHTML = `
       <div class="advising-chart-header">
         <div>
