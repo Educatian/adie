@@ -1,10 +1,10 @@
 # AdDIE / CV Public Project Inventory
 
-Updated: 2026-08-09
+Updated: 2026-10-03
 
-This inventory reconciles the public portfolio with the active, non-archived repositories in the `Educatian` GitHub organization. The public websites currently present 40 unique research, teaching, design, and open-infrastructure projects.
+This inventory reconciles the public portfolio with the active, non-archived repositories in the `Educatian` GitHub organization. The public websites currently present 41 unique research, teaching, design, and open-infrastructure projects.
 
-## Included public projects (40)
+## Included public projects (41)
 
 ### AI agents and adaptive systems (11)
 
@@ -20,8 +20,9 @@ This inventory reconciles the public portfolio with the active, non-archived rep
 - CivilForm
 - CoReg Companion
 
-### Immersive, simulation, analytics, and research tools (18)
+### Immersive, simulation, analytics, and research tools (19)
 
+- Cobot Lab — Embodied Engineering with an AI Coworker (Unity XR; trailer on site)
 - Virtual Makerspace
 - Chalk & Chance — Teacher Simulation
 - Discourse Lens
@@ -33,7 +34,7 @@ This inventory reconciles the public portfolio with the active, non-archived rep
 - DataSandbox Toolkit
 - CounselCue — VR Counselor Training
 - Korean Classroom VR Teacher Response Simulator
-- VR Safety Training Explorer
+- Competent Person — Construction Safety Serious Game (repo: vr-safety-training)
 - GeckoGrip Lab
 - PineMorph Lab
 - Concussion VR Prototype

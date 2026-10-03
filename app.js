@@ -1580,9 +1580,8 @@
     `).join("");
 
     const priority = [
-      "ethobot-vr", "campus-digital-twin", "Swarm_ID", "reboot-seoul-2050", "forma",
+      "cobot-lab", "vr-safety-training", "ethobot-vr", "campus-digital-twin", "Swarm_ID", "reboot-seoul-2050", "forma",
       "TeachPlay",
-      "vr-safety-training",
       "korean-classroom-ai-teacher-training-sim",
       "counselcue",
       "TINA1.01",
@@ -1626,7 +1625,7 @@
       const filtered = projects.filter((project) => projectFilterKeys(project).includes(activeFilter));
       $("[data-project-count]").textContent = `Showing ${filtered.length} of ${projects.length} public projects`;
       $("[data-projects]").innerHTML = filtered.map((project) => {
-        const destination = project.live || project.repo || "";
+        const destination = project.live || project.trailer || project.repo || "";
         const thumb = project.thumb
           ? `<a class="project-thumb" href="${escapeHtml(destination)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(project.title)}"><img src="${escapeHtml(project.thumb)}" width="640" height="400" alt="${escapeHtml(project.imageAlt || ("Project image from " + project.title))}" loading="lazy"></a>`
           : "";
@@ -1644,6 +1643,9 @@
         const repo = project.repo
           ? `<a class="project-card-action" href="${escapeHtml(project.repo)}" target="_blank" rel="noopener noreferrer">Source</a>`
           : "";
+        const trailer = project.trailer
+          ? `<a class="project-card-action${project.live ? "" : " project-card-action-primary"}" href="${escapeHtml(project.trailer)}" target="_blank" rel="noopener noreferrer">Watch trailer</a>`
+          : "";
         return `
           <article class="project-card reveal${project.thumb ? "" : " project-card-no-thumb"}">
             <figure class="archive-project-preview">${thumb}${project.thumbnailCaption ? `<figcaption>${escapeHtml(project.thumbnailCaption)}</figcaption>` : ""}</figure>
@@ -1653,7 +1655,7 @@
               <h3>${escapeHtml(project.title)}</h3>
               <p>${escapeHtml(project.summary)}</p>
               ${screenshotStrip}
-              <div class="project-card-actions">${live}${repo}</div>
+              <div class="project-card-actions">${live}${trailer}${repo}</div>
             </div>
           </article>`;
       }).join("");

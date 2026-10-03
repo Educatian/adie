@@ -523,18 +523,35 @@ window.__cvProjects = {
     },
     {
       "name": "vr-safety-training",
-      "title": "VR Safety Training Explorer",
+      "title": "Competent Person — Construction Safety Serious Game",
       "category": "immersive-analytics",
       "language": "C# / Unity",
-      "summary": "OpenXR safety-training campus with five workplace zones, hands-on hazard controls, deterministic assessment, telemetry, and grounded Rocketbox NPC coaching.",
+      "summary": "One week on an Alabama lift-station job as the new OSHA competent person: find unhighlighted hazards, rate risk, choose and install controls, stop work, speak up to the foreman, and brief the crew — every verb scored as evidence across five episodes.",
       "tags": [
-        "OpenXR",
-        "safety training",
-        "NPC coaching"
+        "construction safety",
+        "serious game",
+        "evidence-centered design"
       ],
       "repo": "https://github.com/Educatian/vr-safety-training",
+      "live": "https://competent-person.pages.dev/",
+      "thumb": "assets/img/projects/competent-person-site-20261003.webp"
+    },
+    {
+      "name": "cobot-lab",
+      "title": "Cobot Lab — Embodied Engineering with an AI Coworker",
+      "category": "immersive-analytics",
+      "language": "C# / Unity XR",
+      "summary": "Job Simulator–style VR factory for first- and second-year mechanical engineering: feel spring–damper, eddy-current and moment physics through pseudo-haptics, predict by sketching, and teach BOLT, a rookie cobot whose models are often wrong.",
+      "tags": [
+        "VR",
+        "embodied learning",
+        "human–AI collaboration"
+      ],
+      "repo": "",
       "live": "",
-      "thumb": "assets/img/projects/vr-safety-training.webp"
+      "trailer": "assets/video/cobotlab-trailer.mp4",
+      "status": "Unity XR development build",
+      "thumb": "assets/img/projects/cobotlab-bolt-20261003.webp"
     },
     {
       "name": "GeckoGripLabUnity",

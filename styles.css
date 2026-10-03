@@ -3964,3 +3964,122 @@ main > section + section::before {
   border-color: rgba(243, 166, 179, 0.55);
   stroke: rgba(243, 166, 179, 0.55);
 }
+
+/* ---------- Hero reel: live Cobot Lab capture behind the title ---------- */
+.hero-bg-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.58;
+  filter: saturate(1) contrast(1.08) brightness(0.95);
+  transform: scale(1.04);
+  transition: opacity 900ms ease;
+}
+
+.hero-bg-media.is-playing {
+  opacity: 0.68;
+}
+
+/* let the live capture read through on the right while the copy panel keeps its contrast */
+.hero:has(.hero-bg-media) .hero-bg::after {
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.05), transparent 32rem),
+    linear-gradient(90deg, rgba(5, 5, 8, 0.72), rgba(5, 5, 8, 0.32) 50%, rgba(5, 5, 8, 0.18)),
+    linear-gradient(180deg, rgba(5, 5, 8, 0.4), rgba(5, 5, 8, 0.06) 40%, rgba(5, 5, 8, 0.55));
+}
+
+.hero:has(.hero-bg-media) .portal-line {
+  opacity: 0.32;
+}
+
+.hero-scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.045) 0 1px, transparent 1px 3px),
+    linear-gradient(90deg, rgba(43, 140, 135, 0.08) 1px, transparent 1px) 0 0 / 64px 64px,
+    linear-gradient(0deg, rgba(43, 140, 135, 0.08) 1px, transparent 1px) 0 0 / 64px 64px;
+  mix-blend-mode: screen;
+}
+
+.hero-scan::after {
+  content: "";
+  position: absolute;
+  inset: -20% 0 auto;
+  height: 22%;
+  background: linear-gradient(180deg, transparent, rgba(102, 224, 232, 0.07), transparent);
+  animation: hero-sweep 7s linear infinite;
+}
+
+@keyframes hero-sweep {
+  from { transform: translateY(0); }
+  to { transform: translateY(560%); }
+}
+
+.hero-reel-tag {
+  position: absolute;
+  right: clamp(16px, 3vw, 40px);
+  bottom: clamp(70px, 12vh, 120px);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px 8px 12px;
+  border: 1px solid rgba(102, 224, 232, 0.35);
+  border-radius: 999px;
+  background: rgba(9, 9, 13, 0.62);
+  backdrop-filter: blur(6px);
+  color: #e9f7f6;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.hero-reel-tag:hover,
+.hero-reel-tag:focus-visible {
+  border-color: rgba(102, 224, 232, 0.8);
+  color: #fff;
+}
+
+.hero-reel-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff4d5e;
+  box-shadow: 0 0 0 0 rgba(255, 77, 94, 0.7);
+  animation: hero-rec 1.6s ease-out infinite;
+}
+
+.hero-reel-label {
+  color: #ff8a95;
+}
+
+.hero-reel-title {
+  color: #cfe9e7;
+}
+
+@keyframes hero-rec {
+  0% { box-shadow: 0 0 0 0 rgba(255, 77, 94, 0.7); }
+  70% { box-shadow: 0 0 0 8px rgba(255, 77, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 77, 94, 0); }
+}
+
+@media (max-width: 720px) {
+  .hero-reel-tag {
+    left: 16px;
+    right: auto;
+    bottom: 22px;
+    font-size: 0.66rem;
+  }
+  .hero-reel-label { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-scan::after,
+  .hero-reel-dot { animation: none; }
+}

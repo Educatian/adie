@@ -24,7 +24,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&family=Newsreader:opsz,wght@6..72,500;6..72,600;6..72,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css?v=20260929-grant-timeline">
+    <link rel="stylesheet" href="styles.css?v=20261003-hero-reel">
     <link rel="stylesheet" href="grant-logos.css?v=20260812">
     <script type="application/ld+json">
       {
@@ -106,6 +106,8 @@
     <main id="main">
       <section id="home" class="hero section-observe">
         <div class="hero-bg" aria-hidden="true">
+          <img class="hero-bg-media" src="assets/img/hero/cobotlab-hero-poster.webp" data-hero-anim="assets/img/hero/cobotlab-hero.gif" width="800" height="450" alt="" decoding="async" fetchpriority="low">
+          <span class="hero-scan"></span>
           <span class="portal-line portal-line-outer"></span>
           <span class="portal-line portal-line-middle"></span>
           <span class="portal-line portal-line-inner"></span>
@@ -125,6 +127,11 @@
             <span>Immersive Frame</span>
           </div>
         </div>
+        <a class="hero-reel-tag" href="#projects" aria-label="Background footage: Cobot Lab, a Unity XR project. Jump to featured projects.">
+          <span class="hero-reel-dot" aria-hidden="true"></span>
+          <span class="hero-reel-label">Live capture</span>
+          <span class="hero-reel-title">Cobot Lab · Unity XR · Meta Quest</span>
+        </a>
       </section>
 
       <section id="mission" class="mission section-observe">
@@ -353,11 +360,12 @@
     <button class="back-to-top" type="button" data-back-to-top aria-label="Back to top">Top</button>
 
     <script defer src="assets/data/cv-site-data.js?v=20260929-grants"></script>
-    <script defer src="assets/data/cv-projects-data.js?v=20260908-project-thumbnails"></script>
-    <script defer src="assets/data/featured-projects.js?v=20260908-project-thumbnails"></script>
-    <script defer src="assets/js/featured-rotation.js?v=20260908-project-thumbnails"></script>
+    <script defer src="assets/data/cv-projects-data.js?v=20261003-cobot-cp"></script>
+    <script defer src="assets/data/featured-projects.js?v=20261003-cobot-cp"></script>
+    <script defer src="assets/js/featured-rotation.js?v=20261003-cobot-cp"></script>
+    <script defer src="assets/js/hero-reel.js?v=20261003"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
-    <script defer src="app.js?v=20260929-grant-timeline"></script>
+    <script defer src="app.js?v=20261003-cobot-cp"></script>
   </body>
 </html>

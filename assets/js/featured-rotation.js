@@ -21,7 +21,10 @@
     const repo = project.repo
       ? `<a class="fp-action fp-action-secondary" href="${escapeHtml(project.repo)}" target="_blank" rel="noopener noreferrer">Source</a>`
       : "";
-    return `<button class="fp-action fp-action-primary" type="button" data-fp-case="${escapeHtml(project.id)}">View case study</button>${compact ? "" : live + repo}`;
+    const trailer = project.trailer
+      ? `<a class="fp-action fp-action-secondary" href="${escapeHtml(project.trailer)}" target="_blank" rel="noopener noreferrer">Watch trailer</a>`
+      : "";
+    return `<button class="fp-action fp-action-primary" type="button" data-fp-case="${escapeHtml(project.id)}">View case study</button>${compact ? "" : trailer + live + repo}`;
   }
 
   function meta(project) {
@@ -104,6 +107,7 @@
             <div><dt>Contribution</dt><dd>${escapeHtml(project.outcome)}</dd></div>
           </dl>
           <div class="fp-actions">
+            ${project.trailer ? `<a class="fp-action fp-action-primary" href="${escapeHtml(project.trailer)}" target="_blank" rel="noopener noreferrer">Watch trailer</a>` : ""}
             ${project.live ? `<a class="fp-action fp-action-primary" href="${escapeHtml(project.live)}" target="_blank" rel="noopener noreferrer">Open live project</a>` : ""}
             ${project.repo ? `<a class="fp-action fp-action-secondary" href="${escapeHtml(project.repo)}" target="_blank" rel="noopener noreferrer">View source</a>` : ""}
           </div>
@@ -119,7 +123,7 @@
       const supports = items.slice(1, 3);
       renderRoot.innerHTML = `
         <div class="fp-stage">
-          <a class="fp-lead-media${lead.current ? " fp-actual-media" : ""}" href="${escapeHtml(lead.live || lead.repo)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(lead.title)}">
+          <a class="fp-lead-media${lead.current ? " fp-actual-media" : ""}" href="${escapeHtml(lead.live || lead.trailer || lead.repo || "#projects")}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(lead.title)}">
             <img src="${imageUrl(lead, base)}" width="960" height="600" alt="${escapeHtml(lead.imageAlt)}">
           </a>
           <div class="fp-lead-copy">
@@ -132,7 +136,7 @@
         </div>
         <div class="fp-support-grid">
           ${supports.map((project) => `<article class="fp-support-card">
-            <a class="fp-support-media${project.current ? " fp-actual-media" : ""}" href="${escapeHtml(project.live || project.repo)}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(project.title)}">
+            <a class="fp-support-media${project.current ? " fp-actual-media" : ""}" href="${escapeHtml(project.live || project.trailer || project.repo || "#projects")}" target="_blank" rel="noopener noreferrer" aria-label="Open ${escapeHtml(project.title)}">
               <img src="${imageUrl(project, base)}" width="640" height="400" alt="${escapeHtml(project.imageAlt)}" loading="lazy">
             </a>
             <div class="fp-support-copy">

@@ -1,5 +1,94 @@
 window.__featuredProjects = [
 {
+  "id": "cobot-lab",
+  "title": "Cobot Lab: Embodied Engineering with an AI Coworker",
+  "shortTitle": "Cobot Lab",
+  "image": "cobotlab-bolt-20261003.webp",
+  "imageAlt": "Actual Cobot Lab headset view: BOLT, a yellow collaborative robot, waves beside the parts bench and conveyor in the arm-repair bay.",
+  "audience": "First- and second-year mechanical engineering undergraduates",
+  "role": "Principal investigator, learning design, and Unity XR development",
+  "status": "Unity XR development build · Meta Quest",
+  "researchArea": "Embodied learning · Human–AI collaboration · Engineering mechanics",
+  "outcome": "Students feel stiffness, damping, speed, acceleration and load with their hands before they predict, test and explain.",
+  "summary": "A Job Simulator–style VR factory where engineering students work beside BOLT, a rookie collaborative robot whose models are often wrong. Across three bays they repair BOLT's spring–damper arm, tune an eddy-current can cannon, and teach and carry with the robot — feeling the physics with their hands before they predict, test and explain.",
+  "details": [
+    "Embodiment comes first: a feel rig loads BOLT's actual spring, shock and mass so stiffness pushes back, damping drags and mass lags; a damper pump makes F = c·v felt; students wind their own spring (k = Gd⁴/8D³n), torque the elbow pin, crank the rotor whose eddy-current brake grows with speed, and teach BOLT to carry coffee — jerky demonstrations slosh (tan θ = a/g) and BOLT copies the spill. Controller pseudo-haptics (glove offset plus vibration) carry weight and resistance.",
+    "Students predict by sketching the expected motion x(t) in the air; the real response is drawn over their sketch. BOLT states its assumptions and gets corrected, so learners sense, judge and lead while the AI computes and copies. Bets, sketches, explanations and goggles use are logged for evidence-centered assessment. Built in Unity 6 with XR Interaction Toolkit; an autopilot plays the full shift for verification, and headset playtesting is the next step."
+  ],
+  "live": "",
+  "repo": "",
+  "trailer": "assets/video/cobotlab-trailer.mp4",
+  "imageCaption": "Actual headset-camera capture · Bay 1 · Arm repair",
+  "gallery": [
+    {
+      "image": "cobotlab-feel-rig-20261003.webp",
+      "label": "Feel rig",
+      "alt": "Actual Cobot Lab capture: the student's glove pulls the feel-rig handle down against BOLT's spring and damper on the assembly bench.",
+      "caption": "Feel rig · spring, damper and mass in your hand"
+    },
+    {
+      "image": "cobotlab-sketch-20261003.webp",
+      "label": "Predict by sketching",
+      "alt": "Actual Cobot Lab capture: the prediction pad shows the student's sketched arm motion with the measured response drawn over it in teal.",
+      "caption": "Gesture prediction · sketch vs. actual response"
+    },
+    {
+      "image": "cobotlab-crank-20261003.webp",
+      "label": "Your hand is the rotor",
+      "alt": "Actual Cobot Lab capture: the student cranks the red rotor wheel of the eddy-current can cannon while BOLT watches.",
+      "caption": "Can cannon · crank speed sets the rotor"
+    },
+    {
+      "image": "cobotlab-torque-20261003.webp",
+      "label": "Torque the pin",
+      "alt": "Actual Cobot Lab capture: a pin driver seated on BOLT's elbow after the student installs a custom spring and large shock.",
+      "caption": "Rebuild · torque BOLT's elbow pin, then retest"
+    }
+  ],
+  "current": true
+},
+{
+  "id": "competent-person",
+  "title": "Competent Person: Construction Safety Serious Game",
+  "shortTitle": "Competent Person",
+  "image": "competent-person-site-20261003.webp",
+  "imageAlt": "Actual Competent Person gameplay: an Alabama lift-station jobsite at golden hour with a crane lifting steel, a crew, and a roof deck.",
+  "audience": "Construction workers, supervisors and safety students learning the OSHA competent-person role",
+  "role": "Principal investigator, serious-game design, and Unity development",
+  "status": "Playable web edition · 5 episodes",
+  "researchArea": "Workplace safety · Serious games · Evidence-centered design",
+  "outcome": "Turns hazard recognition, risk rating, control choice, stop-work and speak-up into scored, inspectable evidence.",
+  "summary": "Over one week on a municipal lift-station job in Alabama, the learner is the new OSHA competent person. Each day they walk a changing site, find hazards nobody has highlighted, rate the risk, choose and install controls, stop work when they must, hold the line when the foreman pushes back, and brief the crew for tomorrow.",
+  "details": [
+    "Every verb is evidence: photograph any surface (the tablet shows only a neutral name until you report), tag the energy source and rate probability × severity, measure with a laser, GFCI tester, penetrometer or dust monitor, then eliminate, engineer, assign or use PPE — weak controls lapse later in the shift. Radio stop-work leads to a speak-up exchange with the foreman, and the next day's toolbox talk asks learners to select, order and justify their findings.",
+    "Five episodes on one evolving site add weather calls, heat strain, near-miss stop-downs, per-area mastery and a branching Friday capstone. Built in Unity 6 (URP) for the browser and desktop with Microsoft Rocketbox crew; play events leave the device only after research opt-in. A training record only — it does not issue an OSHA card or a competent-person designation."
+  ],
+  "live": "https://competent-person.pages.dev/",
+  "repo": "https://github.com/Educatian/vr-safety-training",
+  "imageCaption": "Actual gameplay capture · Episode 4 · Crane lift over the roof deck",
+  "gallery": [
+    {
+      "image": "competent-person-hunt-20261003.webp",
+      "label": "Hazard hunt",
+      "alt": "Actual Competent Person gameplay: first-person hazard hunt beside a trench shoring box with the shift clock, points and site map.",
+      "caption": "First-person hazard hunt · 3:00 on the clock"
+    },
+    {
+      "image": "competent-person-roof-20261003.webp",
+      "label": "Roof edge",
+      "alt": "Actual Competent Person gameplay: a worker near an unprotected roof edge marked by red stakes on the jobsite deck.",
+      "caption": "Episode 4 · roof-edge fall hazard"
+    },
+    {
+      "image": "competent-person-deck-20261003.webp",
+      "label": "Evolving site",
+      "alt": "Actual Competent Person gameplay: overhead view of the roof deck, excavator and crew on day three.",
+      "caption": "One site that changes across the week"
+    }
+  ],
+  "current": true
+},
+{
   "id": "ethobot-vr",
   "title": "ETHOBOT VR",
   "shortTitle": "ETHOBOT VR",
@@ -165,21 +254,7 @@ window.__featuredProjects = [
     live: "https://teachplay.dev/",
     repo: "https://github.com/Educatian/TeachPlay"
   },
-  {
-    id: "vr-safety-training",
-    title: "VR Safety Training Explorer",
-    image: "vr-safety-training.webp",
-    imageAlt: "Virtual reality chemical-safety training scene with PPE controls and a mission HUD.",
-    audience: "Workplace safety learners and training researchers",
-    role: "Principal investigator and immersive simulation designer",
-    status: "Validated Unity/OpenXR prototype",
-    researchArea: "Virtual reality · Safety training",
-    outcome: "Combines five workplace zones, hands-on hazard controls, deterministic scoring, and NPC coaching.",
-    summary: "An OpenXR safety-training campus where learners inspect realistic hazards, complete ordered control tasks, and debrief with grounded virtual coaches.",
-    live: "",
-    repo: "https://github.com/Educatian/vr-safety-training"
-  },
-  {
+    {
     id: "korean-vr-teacher-sim",
     title: "Korean Classroom VR Teacher Response Simulator",
     image: "korean-vr-teacher-sim.webp",

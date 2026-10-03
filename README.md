@@ -4,7 +4,7 @@ Static research-group website for the Adaptive Design of Immersive E-Learning La
 
 ## Site Sections
 
-- Hero with animated canvas network, static image fallback, theme toggle, and above-the-fold lab title.
+- Hero with a live Cobot Lab gameplay capture as background (`assets/img/hero/cobotlab-hero.gif`, swapped in after load by `assets/js/hero-reel.js`; poster WebP for reduced motion / Save-Data), scanline overlay, theme toggle, and above-the-fold lab title.
 - Mission and director profile.
 - Research directions, research constellation, people, Advising Impact, publications, projects and collaborations, funding portfolio, and join/contact sections.
 - Publications include a featured lab-collaboration grid and a capped full-record list with tag filters, show-all toggle, and a link to Dr. Moon's CV.
