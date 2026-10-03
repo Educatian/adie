@@ -17,7 +17,7 @@ window.__featuredProjects = [
   ],
   "live": "",
   "repo": "",
-  "trailer": "assets/video/cobotlab-trailer.mp4",
+  "trailer": "assets/video/cobotlab-trailer.mp4?v=20261003t",
   "imageCaption": "Actual headset-camera capture · Bay 1 · Arm repair",
   "gallery": [
     {

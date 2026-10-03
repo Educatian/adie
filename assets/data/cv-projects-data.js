@@ -549,7 +549,7 @@ window.__cvProjects = {
       ],
       "repo": "",
       "live": "",
-      "trailer": "assets/video/cobotlab-trailer.mp4",
+      "trailer": "assets/video/cobotlab-trailer.mp4?v=20261003t",
       "status": "Unity XR development build",
       "thumb": "assets/img/projects/cobotlab-bolt-20261003.webp"
     },
