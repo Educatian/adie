@@ -39,7 +39,7 @@ window.__cvSiteData = {
   },
   "stats": [
     {
-      "value": "65",
+      "value": "62",
       "label": "Journal articles"
     },
     {
@@ -51,7 +51,7 @@ window.__cvSiteData = {
       "label": "Book chapters"
     },
     {
-      "value": "38",
+      "value": "39",
       "label": "Working papers"
     },
     {
@@ -166,12 +166,12 @@ window.__cvSiteData = {
     {
       "date": "2026",
       "type": "Publication",
-      "text": "Accepted article in AI & Society: Using a generative AI-enhanced chatbot to promote ethical reasoning in higher education: A dilemma-centered learning approach via ill-structured problem pedagogy."
+      "text": "Journal article in Cogent Education: Challenges, safeguards, and professional learning needs for AI integration: insights from a two-week AI literacy module with preservice teachers."
     },
     {
       "date": "2026",
       "type": "Publication",
-      "text": "Journal article in Cogent Education: Challenges, safeguards, and professional learning needs for AI integration: insights from a two-week AI literacy module with preservice teachers."
+      "text": "Journal article in Interactive Learning Environments: From experience to action: Sequential dynamics of experiential learning in immersive virtual reality-supported safety training."
     },
     {
       "date": "2026",
@@ -256,20 +256,6 @@ window.__cvSiteData = {
     },
     {
       "year": "2026",
-      "title": "Using a generative AI-enhanced chatbot to promote ethical reasoning in higher education: A dilemma-centered learning approach via ill-structured problem pedagogy",
-      "authors": "Hong, S., Moon, J., Cho, H., & Lim, C.",
-      "venue": "AI & Society",
-      "link": "",
-      "tags": [
-        "GenAI",
-        "Higher Ed",
-        "Ethics"
-      ],
-      "note": "mentored collaboration",
-      "status": "Accepted"
-    },
-    {
-      "year": "2026",
       "title": "Challenges, safeguards, and professional learning needs for AI integration: insights from a two-week AI literacy module with preservice teachers",
       "authors": "Aldemir, T., Bicer, Al., Kilinc, S., Moon, J., & Kwok, M.",
       "venue": "Cogent Education",
@@ -336,20 +322,6 @@ window.__cvSiteData = {
     },
     {
       "year": "2026",
-      "title": "A cultural-historical activity theory-anchored learning analytics pipeline for early detection and social-epistemic integration in AI literacy education",
-      "authors": "Moon, J.",
-      "venue": "Interactive Learning Environments",
-      "link": "https://doi.org/10.1080/10494820.2026.2690104",
-      "tags": [
-        "GenAI",
-        "Analytics",
-        "STEM"
-      ],
-      "note": "corresponding author",
-      "status": ""
-    },
-    {
-      "year": "2026",
       "title": "Human-centered generative AI in education: Ethical challenges and equity-driven solutions",
       "authors": "Abu, S., Uddin, M., Moon, J., Awoyemi, I., Baah-Mintah, R., & Ghooreian, A.",
       "venue": "Ethics and Behavior",
@@ -386,18 +358,6 @@ window.__cvSiteData = {
         "Ethics"
       ],
       "note": "mentored collaboration",
-      "status": ""
-    },
-    {
-      "year": "2026",
-      "title": "Decoding immersive learning states: A reproducible microgenetic pipeline for behavioral data in virtual reality safety training",
-      "authors": "Moon, J., Awoyemi, I., Abu, S., Marchiori, S., & Song, S.",
-      "venue": "Behaviormetrika",
-      "link": "https://doi.org/10.1007/s41237-025-00286-1",
-      "tags": [
-        "XR"
-      ],
-      "note": "corresponding author",
       "status": ""
     },
     {
@@ -1106,12 +1066,6 @@ window.__cvSiteData = {
     {
       "year": "2026",
       "category": "International",
-      "citation": "* Hong, S., Moon, J., Cho, H., & Lim, C. (Accepted, 2026). Using a generative AI-enhanced chatbot to promote ethical reasoning in higher education: A dilemma-centered learning approach via ill-structured problem pedagogy. AI & Society. [ESCI-indexed, IF = 6.1, IF5 = 2.1]",
-      "link": ""
-    },
-    {
-      "year": "2026",
-      "category": "International",
       "citation": "Aldemir, T., Bicer, Al., Kilinc, S., Moon, J., & Kwok, M. (2026). Challenges, safeguards, and professional learning needs for AI integration: insights from a two-week AI literacy module with preservice teachers. Cogent Education https://doi.org/10.1080/2331186X.2026.2721038 [ESCI-indexed, IF = 2.0, IF5 = 2.1]",
       "link": "https://doi.org/10.1080/2331186X.2026.2721038"
     },
@@ -1142,12 +1096,6 @@ window.__cvSiteData = {
     {
       "year": "2026",
       "category": "International",
-      "citation": "‡ Moon, J. (2026). A cultural-historical activity theory-anchored learning analytics pipeline for early detection and social-epistemic integration in AI literacy education. Interactive Learning Environments. https://doi.org/10.1080/10494820.2026.2690104 [SSCI-indexed, IF =6.7, IF5 = 7.1]",
-      "link": "https://doi.org/10.1080/10494820.2026.2690104"
-    },
-    {
-      "year": "2026",
-      "category": "International",
       "citation": "* Abu, S., Uddin, M., Moon, J., Awoyemi, I., Baah-Mintah, R., & Ghooreian, A. (2026). Human-centered generative AI in education: Ethical challenges and equity-driven solutions. Ethics and Behavior. http://dx.doi.org/10.1080/10508422.2026.2685014 [SSCI-indexed, IF = 2.3, IF5 = 2.5]",
       "link": "http://dx.doi.org/10.1080/10508422.2026.2685014"
     },
@@ -1162,12 +1110,6 @@ window.__cvSiteData = {
       "category": "International",
       "citation": "* Uddin, M., Moon, J., & Abu, S. (2026). An ethical framework for conversational AI in higher education: Toward an evidence-based ethical governance. AI & Ethics. https://doi.org/10.1007/s43681-026-01056-9",
       "link": "https://doi.org/10.1007/s43681-026-01056-9"
-    },
-    {
-      "year": "2026",
-      "category": "International",
-      "citation": "‡ * Moon, J., Awoyemi, I., Abu, S., Marchiori, S., & Song, S. (2026). Decoding immersive learning states: A reproducible microgenetic pipeline for behavioral data in virtual reality safety training. Behaviormetrika. https://doi.org/10.1007/s41237-025-00286-1 [SCOPUS-indexed]",
-      "link": "https://doi.org/10.1007/s41237-025-00286-1"
     },
     {
       "year": "2026",
@@ -1661,6 +1603,17 @@ window.__cvSiteData = {
       "type": "Journal Manuscript",
       "status": "Under review",
       "year": "Pipeline",
+      "title": "Using a generative AI-enhanced chatbot to promote ethical reasoning in higher education: A dilemma-centered learning approach via ill-structured problem pedagogy",
+      "authors": "* Hong, S., Moon, J., Cho, H., & Lim, C.",
+      "venue": "AI & Society",
+      "citation": "* Hong, S., Moon, J., Cho, H., & Lim, C. (Under review). Using a generative AI-enhanced chatbot to promote ethical reasoning in higher education: A dilemma-centered learning approach via ill-structured problem pedagogy. AI & Society. (ESCI-indexed, IF = 6.1, IF5 = 2.1)",
+      "link": ""
+    },
+    {
+      "bucket": "Submitted or Under Review",
+      "type": "Journal Manuscript",
+      "status": "Under review",
+      "year": "Pipeline",
       "title": "The fluency trap: Comparing inquiry trajectories in generative and retrieval-augmented AI-supported learning",
       "authors": "Lim, J., Lee, H., & Moon, J.",
       "venue": "Metacognition and Learning",
@@ -2076,10 +2029,10 @@ window.__cvSiteData = {
     }
   ],
   "workingPaperSummary": {
-    "total": 38,
-    "submittedOrUnderReview": 31,
+    "total": 39,
+    "submittedOrUnderReview": 32,
     "inPreparation": 7,
-    "journalManuscripts": 33,
+    "journalManuscripts": 34,
     "bookChapters": 2,
     "conferenceProposals": 3
   },
@@ -2089,7 +2042,7 @@ window.__cvSiteData = {
         "title": "Immersive Remembrance: AI-Driven Archival Retrieval for VR Learning",
         "meta": "Lead PI | Institute of Museum and Library Services – IMLS | September 2026 – August 2029",
         "amount": "$476,424",
-        "amountValue": 476424.0,
+        "amountValue": 476424,
         "status": "funded",
         "role": "Lead PI",
         "team": [
@@ -2130,7 +2083,7 @@ window.__cvSiteData = {
         "title": "Developing a Generative AI-Integrated Intelligent Simulation to Strengthen Teachers' Competencies in Responding to Students with Emotional and Behavioral Crises",
         "meta": "Co-PI, overseas / UA | National Research Foundation of Korea (NRF) 2026 Joint Research Support Program (International Type) | June 2026 – May 2029",
         "amount": "$23,300",
-        "amountValue": 23300.0,
+        "amountValue": 23300,
         "status": "funded",
         "role": "Co-PI, overseas / UA",
         "team": [
@@ -2154,7 +2107,7 @@ window.__cvSiteData = {
         "title": "University of Alabama COE Dean's Summer Doctoral Student Stipend Program",
         "meta": "The University of Alabama | June 2027 – August 2027",
         "amount": "$5,700",
-        "amountValue": 5700.0,
+        "amountValue": 5700,
         "status": "funded",
         "role": "Awardee",
         "team": [
@@ -2178,7 +2131,7 @@ window.__cvSiteData = {
         "title": "The Alabama Generative Engineering Textbook (AL-GET): AI-enhanced Personalized Learning for STEM Education",
         "meta": "Lead PI | Office for Sponsored Programs, The University of Alabama | January 2026 – December 2026",
         "amount": "$15,000",
-        "amountValue": 15000.0,
+        "amountValue": 15000,
         "status": "funded",
         "role": "Lead PI",
         "team": [
@@ -2202,7 +2155,7 @@ window.__cvSiteData = {
         "title": "Large Language Model-based Cyber Sentinel Co-Pilot: Professional Development for Alabama Secondary Teacher Training",
         "meta": "Lead PI | COE RisingTide Grant, The University of Alabama | January 2026 – May 2027",
         "amount": "$30,000",
-        "amountValue": 30000.0,
+        "amountValue": 30000,
         "status": "funded",
         "role": "Lead PI",
         "team": [
@@ -2243,7 +2196,7 @@ window.__cvSiteData = {
         "title": "TeachPlay: AI-Enhanced Educational Gamelet Design",
         "meta": "Alabama Commission on Higher Education | August 2025 – July 2026",
         "amount": "$5,000",
-        "amountValue": 5000.0,
+        "amountValue": 5000,
         "status": "funded",
         "role": "Awardee",
         "team": [
@@ -2267,7 +2220,7 @@ window.__cvSiteData = {
         "title": "RemixEd: Designing AI- and XR-Enhanced Instructional Modules for Inclusive, Doctoral-Level Online Learning",
         "meta": "Instructional Tide Teaching Grant | September 2025 – Dec 2025",
         "amount": "$1,500",
-        "amountValue": 1500.0,
+        "amountValue": 1500,
         "status": "funded",
         "role": "Awardee",
         "team": [
@@ -2291,7 +2244,7 @@ window.__cvSiteData = {
         "title": "SEC Faculty Travel Grant",
         "meta": "Southeastern Conference (SEC) | September 2025",
         "amount": "$1,574",
-        "amountValue": 1574.0,
+        "amountValue": 1574,
         "status": "funded",
         "role": "Awardee",
         "team": [
@@ -2315,7 +2268,7 @@ window.__cvSiteData = {
         "title": "The Institute for Social Science Research (ISSR) THRIVE Fellowship",
         "meta": "The University of Alabama | September 2025 – August 2026",
         "amount": "$15,000",
-        "amountValue": 15000.0,
+        "amountValue": 15000,
         "status": "funded",
         "role": "Awardee",
         "team": [
@@ -2341,7 +2294,7 @@ window.__cvSiteData = {
         "title": "Enhancing Teacher Problem-Solving and Classroom Management Skills through an Open-Access AI-Powered 3D Simulation Platform",
         "meta": "Lead PI | OSP CREATE Program, The University of Alabama | Jan 2025 – Dec 2025",
         "amount": "$4,000",
-        "amountValue": 4000.0,
+        "amountValue": 4000,
         "status": "funded",
         "role": "Lead PI",
         "team": [
@@ -2365,7 +2318,7 @@ window.__cvSiteData = {
         "title": "The Grant Writing Fellows Program",
         "meta": "College of Education, The University of Alabama | September 2024 – August 2025",
         "amount": "$6,225",
-        "amountValue": 6225.0,
+        "amountValue": 6225,
         "status": "funded",
         "role": "Awardee",
         "team": [
@@ -2389,7 +2342,7 @@ window.__cvSiteData = {
         "title": "University of Alabama COE Dean's Summer Doctoral Student Stipend Program",
         "meta": "The University of Alabama | June 2025 – August 2025",
         "amount": "$5,460",
-        "amountValue": 5460.0,
+        "amountValue": 5460,
         "status": "funded",
         "role": "Awardee",
         "team": [
@@ -2413,7 +2366,7 @@ window.__cvSiteData = {
         "title": "University of Alabama COE Dean's Summer Doctoral Student Stipend Program",
         "meta": "The University of Alabama | June 2024 – August 2024",
         "amount": "$3,500",
-        "amountValue": 3500.0,
+        "amountValue": 3500,
         "status": "funded",
         "role": "Awardee",
         "team": [
@@ -2437,7 +2390,7 @@ window.__cvSiteData = {
         "title": "Examining Preservice Teachers' Digital Literacy Development and Learning Engagement via Art Integrated Technology-Enhanced Learning",
         "meta": "Lead PI | The Collaborative Arts Research Initiative | Jan 2022 – Dec 2024",
         "amount": "$15,000",
-        "amountValue": 15000.0,
+        "amountValue": 15000,
         "status": "funded",
         "role": "Lead PI",
         "team": [
@@ -2504,7 +2457,7 @@ window.__cvSiteData = {
         "title": "Risk-Adaptive Human Oversight for Agentic AI Learning: Testing Teacher Governance and Learner Agency",
         "meta": "Lead PI | Charles Koch Foundation | January 2027 – December 2027",
         "amount": "$110,669",
-        "amountValue": 110669.0,
+        "amountValue": 110669,
         "status": "pending",
         "role": "Lead PI",
         "team": [
@@ -2528,7 +2481,7 @@ window.__cvSiteData = {
         "title": "TRACE-Reg: A Privacy-by-Design, Agency-Preserving Emotion-Regulation Agent for Adult Learners",
         "meta": "Lead PI | Sony Research Award Program 2026, Faculty Innovation Award—Affective Computing, Sony Corporation | September 2026",
         "amount": "$100,000",
-        "amountValue": 100000.0,
+        "amountValue": 100000,
         "status": "pending",
         "role": "Lead PI",
         "team": [
@@ -2552,7 +2505,7 @@ window.__cvSiteData = {
         "title": "From Theme to Transfer: How Tabletop Mechanics Shape Cybersecurity Reasoning",
         "meta": "PI | Game in Lab 2026 International Call for Projects, Asmodee | May 2027 – April 2029",
         "amount": "$23,362",
-        "amountValue": 23362.0,
+        "amountValue": 23362,
         "status": "pending",
         "role": "PI",
         "team": [
@@ -2576,7 +2529,7 @@ window.__cvSiteData = {
         "title": "Beyond the Security Divide: Building a Community-Guided Cybersecurity Education System for Broad and Meaningful Access",
         "meta": "Lead PI | Spencer Foundation Vision Grant | February 2027 – July 2028",
         "amount": "$75,000",
-        "amountValue": 75000.0,
+        "amountValue": 75000,
         "status": "pending",
         "role": "Lead PI",
         "team": [
@@ -2600,7 +2553,7 @@ window.__cvSiteData = {
         "title": "Who Bears the Work of School AI Governance? Policy-Assigned Responsibility, Employer Support, and Unequal District Capacity",
         "meta": "PI | Russell Sage Foundation, Sheldon Danziger Pipeline Grants Competition | August 2027 – July 2028",
         "amount": "$50,000",
-        "amountValue": 50000.0,
+        "amountValue": 50000,
         "status": "pending",
         "role": "PI",
         "team": [
@@ -2650,7 +2603,7 @@ window.__cvSiteData = {
         "title": "OpenPolicy Receipts: Open Receipts and Safety Tests for Accountable Public-Interest AI Agents",
         "meta": "Project Lead/Applicant | Sentient Foundation Open Source AGI Grant Program, Grant Track | Submitted August 2026; proposed four-month project",
         "amount": "$50,000",
-        "amountValue": 50000.0,
+        "amountValue": 50000,
         "status": "pending",
         "role": "Project Lead/Applicant",
         "team": [
@@ -2676,7 +2629,7 @@ window.__cvSiteData = {
         "title": "Who Benefits from High School Computer Science? Heterogeneous Causal Effects of CS Coursework on STEM Major Declaration: A Bayesian Causal Forest Analysis of HSLS:09",
         "meta": "Lead PI | AERA-NSF Research Grant Program | September 2026 – August 2028",
         "amount": "$35,000",
-        "amountValue": 35000.0,
+        "amountValue": 35000,
         "status": "pending",
         "role": "Lead PI",
         "team": [
@@ -2700,7 +2653,7 @@ window.__cvSiteData = {
         "title": "CyberAI Innovation: Teaching AI as Target and Defender through a Full-Stack Immersive AI Ecosystem",
         "meta": "PI | National Science Foundation (NSF) | October 2026 – September 2029",
         "amount": "$497,460",
-        "amountValue": 497460.0,
+        "amountValue": 497460,
         "status": "pending",
         "role": "PI",
         "team": [
@@ -2769,7 +2722,7 @@ window.__cvSiteData = {
         "title": "A Biofeedback-Based Virtual Reality Implementation to Teach Metered Dose Inhaler Technique Education for Pediatric Asthma Patients: A Development and Feasibility Study",
         "meta": "PI | National Institutes of Health (NIH) | April 2027 – March 2029",
         "amount": "$399,946",
-        "amountValue": 399946.0,
+        "amountValue": 399946,
         "status": "pending",
         "role": "PI",
         "team": [
@@ -2991,5 +2944,4 @@ window.__cvSiteData = {
       "meta": "Poster Session, AERA 2026, Los Angeles, United States."
     }
   ]
-}
-;
+};
