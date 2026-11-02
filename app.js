@@ -1223,8 +1223,8 @@
     if (newsMount) {
       const items = (siteData.news || [])
         .slice()
-        .sort((a, b) => Number(b.date) - Number(a.date))
-        .slice(0, 5);
+        .sort((a, b) => String(b.date).localeCompare(String(a.date)))
+        .slice(0, 8);
       newsMount.innerHTML = `
         <h3>News & Updates</h3>
         ${items.map((item) => `
