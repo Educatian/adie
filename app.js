@@ -263,6 +263,7 @@
   const PUBLICATION_COLLAPSED_LIMIT = 12;
   const BOOK_CHAPTER_COLLAPSED_LIMIT = 4;
   const journalCoverProfiles = [
+    { terms: ["journal of research on technology in education"], image: "assets/img/journal-covers/jrte-official.jpg" },
     { terms: ["computers and education: x reality", "computers & education: x reality"], image: "assets/img/journal-covers/cexr.webp" },
     { terms: ["interactive learning environment"], image: "assets/img/journal-covers/ile.webp" },
     { terms: ["educational psychology review"], image: "assets/img/journal-covers/educational-psychology-review.webp" },
