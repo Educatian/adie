@@ -257,7 +257,6 @@
     { title: "Ongoing project", students: ["Olowolafe", "Sharma"] }
   ];
   const advisingAggregateFallback = {
-    underReview: 29,
     currentAdvisees: 5
   };
   const PUBLICATION_COLLAPSED_LIMIT = 12;
@@ -367,9 +366,9 @@
     const stats = siteData.stats || [];
     const researchMentees = (siteData.mentoringMetrics || []).find((item) => item.label.includes("research mentees"));
     const cells = [
-      { value: stats[0]?.value || "59", label: stats[0]?.label || "Journal articles" },
-      { value: `$${formatNumber(siteData.grantPortfolio?.fundedTotal || 107459)}`, label: "Funded research support" },
-      { value: researchMentees?.value || "10", label: "Research mentees" },
+      { value: stats[0]?.value ?? "—", label: stats[0]?.label || "Journal articles" },
+      { value: siteData.grantPortfolio ? `$${formatNumber(siteData.grantPortfolio.fundedTotal)}` : "—", label: "Funded research support" },
+      { value: researchMentees?.value ?? "—", label: "Research mentees" },
       { value: "4", label: "Collaboration tracks" }
     ];
     band.innerHTML = cells.map((item) => statCell(item.value, item.label)).join("");
@@ -524,7 +523,7 @@
       students,
       director: { name: director.name || "Dr. Jewoong Moon", avatar: director.avatar || "" },
       sharedWorks: workList.filter((work) => work.students.length > 1).length,
-      underReview: siteData.workingPaperSummary?.submittedOrUnderReview || advisingAggregateFallback.underReview,
+      underReview: siteData.workingPaperSummary?.submittedOrUnderReview ?? 0,
       currentAdvisees: phds.length || advisingAggregateFallback.currentAdvisees
     };
   }
