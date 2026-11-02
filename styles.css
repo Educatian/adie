@@ -2717,6 +2717,7 @@ main > section + section::before {
 .news-item {
   position: relative;
   display: grid;
+  align-items: start;
   grid-template-columns: 72px auto 1fr;
   gap: 12px;
   padding: 16px 0 16px 18px;
@@ -2746,6 +2747,10 @@ main > section + section::before {
   margin: 0;
   color: var(--muted);
   font-size: 0.92rem;
+}
+
+.news-item > .chip {
+  justify-self: start;
 }
 
 .honor-item {
