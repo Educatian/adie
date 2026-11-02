@@ -2298,7 +2298,8 @@
     "stats",
     "talks",
     "news",
-    "honors"
+    "honors",
+    "teaching"
   ];
 
   function renderCvSyncStatus(source = "bundled snapshot") {
@@ -2353,6 +2354,7 @@
       renderResearchImpact();
       renderGrants();
       renderCvSyncStatus("live CV record");
+      window.__addieCourses?.render();
       drawConstellation();
     } catch (err) {
       // Offline, blocked, or CV data unavailable: keep the bundled snapshot silently.
