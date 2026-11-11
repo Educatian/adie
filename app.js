@@ -1734,8 +1734,18 @@
     const timelineMount = $("[data-grants]");
     if (!overviewMount || !timelineMount) return;
     const portfolio = siteData.grantPortfolio || {};
-    const funded = (siteData.grants?.funded || []).map((grant) => ({ ...grant, status: "funded" }));
-    const pending = (siteData.grants?.pending || []).map((grant) => ({ ...grant, status: "pending" }));
+    const displayGrant = (grant, status) => {
+      const parts = String(grant.meta || "").split(" | ");
+      const last = parts[parts.length - 1] || "";
+      return {
+        ...grant,
+        role: grant.role || (/^(Lead PI|Co-PI|PI|Key Personnel|Project Lead|External Evaluator)\b/.test(parts[0]) ? parts[0] : ""),
+        period: grant.period || (/\b(19|20)\d{2}\b/.test(last) && !last.includes("$") ? last : ""),
+        status
+      };
+    };
+    const funded = (siteData.grants?.funded || []).map((grant) => displayGrant(grant, "funded"));
+    const pending = (siteData.grants?.pending || []).map((grant) => displayGrant(grant, "pending"));
     const all = [...funded, ...pending];
 
     const funderTotals = new Map();
