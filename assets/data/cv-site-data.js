@@ -1,9 +1,9 @@
 window.__cvSiteData = {
-  "generatedAt": "2026-11-02T21:54:12.839873+00:00",
-  "sourceCv": "C:\\Users\\jewoo\\Desktop\\_System\\_projects\\cv\\CV_202605_MOON.docx",
+  "generatedAt": "2026-11-11T19:12:06.878733+00:00",
+  "sourceCv": "C:\\Users\\jewoo\\Downloads\\office\\work\\aatc-cv-20261111\\cv-release\\CV_202605_MOON.docx",
   "profile": {
     "name": "Dr. Jewoong Moon",
-    "cvDate": "November 2, 2026",
+    "cvDate": "November 11, 2026",
     "eyebrow": "Instructional Technology | College of Education",
     "heroTitleMeta": "Assistant Professor of Instructional Technology, The University of Alabama",
     "heroSummary": "Research at The University of Alabama focused on Digital Game-Based Learning, Inclusive and Immersive learning experience design (Extended Reality), Learning Analytics, and Educational Data Mining.",
@@ -20,8 +20,8 @@ window.__cvSiteData = {
     "homepage": "https://educatian.github.io/cv",
     "researchgate": "https://www.researchgate.net/profile/Jewoong-Moon",
     "labWebsite": "https://educatian.github.io/adie",
-    "cvDownloadPath": "CV_202605_MOON.docx?v=791793c64700",
-    "cvDownloadFilename": "CV_20261102_MOON.docx"
+    "cvDownloadPath": "CV_202605_MOON.docx?v=85384dae216f",
+    "cvDownloadFilename": "CV_20261111_MOON.docx"
   },
   "contact": {
     "email": "jmoon19@ua.edu",
@@ -256,6 +256,16 @@ window.__cvSiteData = {
       ]
     },
     {
+      "name": "CER",
+      "badge": "Pending",
+      "summary": "CER: Investigating Transformative Pedagogies for Assured Agentic Twin Computing (AATC)",
+      "tags": [
+        "$1,000,000",
+        "Co-PI",
+        "National Science Foundation (NSF), Total requested $1,000,000"
+      ]
+    },
+    {
       "name": "Risk-Adaptive Human Oversight for Agentic AI Learning",
       "badge": "Pending",
       "summary": "Risk-Adaptive Human Oversight for Agentic AI Learning: Testing Teacher Governance and Learner Agency",
@@ -263,16 +273,6 @@ window.__cvSiteData = {
         "$110,669",
         "Lead PI",
         "Charles Koch Foundation, Requested amount $110,669"
-      ]
-    },
-    {
-      "name": "TRACE-Reg",
-      "badge": "Pending",
-      "summary": "TRACE-Reg: A Privacy-by-Design, Agency-Preserving Emotion-Regulation Agent for Adult Learners",
-      "tags": [
-        "$100,000",
-        "Lead PI",
-        "Sony Research Award Program 2026, Faculty Innovation Award—Affective Computing, Sony Corporation, Total budget $100,000"
       ]
     }
   ],
@@ -2273,6 +2273,12 @@ window.__cvSiteData = {
     ],
     "pending": [
       {
+        "title": "CER: Investigating Transformative Pedagogies for Assured Agentic Twin Computing (AATC)",
+        "meta": "Co-PI | National Science Foundation (NSF), Total requested $1,000,000 | August 2027 - July 2031",
+        "amount": "$1,000,000",
+        "amountValue": 1000000.0
+      },
+      {
         "title": "Risk-Adaptive Human Oversight for Agentic AI Learning: Testing Teacher Governance and Learner Agency",
         "meta": "Lead PI | Charles Koch Foundation, Requested amount $110,669 | January 2027 - December 2027",
         "amount": "$110,669",
@@ -2343,11 +2349,11 @@ window.__cvSiteData = {
   },
   "grantPortfolio": {
     "fundedTotal": 607683,
-    "pendingTotal": 1341437,
+    "pendingTotal": 2341437,
     "fundedCount": 14,
-    "pendingCount": 11,
+    "pendingCount": 12,
     "sourceReportedFundedTotal": 607683,
-    "sourceReportedPendingTotal": 1341437,
+    "sourceReportedPendingTotal": 2341437,
     "withdrawnTotal": 0,
     "withdrawnCount": 0,
     "sourceReportedWithdrawnTotal": 0,
@@ -2521,15 +2527,15 @@ window.__cvSiteData = {
     ],
     "developedCourses": [
       {
-        "code": "AIL 691",
-        "title": "AI, Learning, and Instructional Systems",
+        "code": "AIL 692",
+        "title": "AI in Learning and Instructional Systems",
         "institution": "The University of Alabama",
         "level": "Graduate – Doctoral",
         "terms": "2026"
       },
       {
-        "code": "AIL 692",
-        "title": "Introduction to Literature Synthesis in Instructional Technology Research",
+        "code": "AIL 693",
+        "title": "Introduction to Literature Synthesis",
         "institution": "The University of Alabama",
         "level": "Graduate – Doctoral",
         "terms": "2026"
@@ -2549,8 +2555,8 @@ window.__cvSiteData = {
       "CAT250 Computer Education & Curriculum Development"
     ],
     "courseDevelopment": [
-      "Developed AIL 691 AI, Learning, and Instructional Systems",
-      "Developed AIL 692 Introduction to Literature Synthesis in Instructional Technology Research",
+      "Developed AIL 692 AI in Learning and Instructional Systems",
+      "Developed AIL 693 Introduction to Literature Synthesis",
       "Redesigned AIL 690 Seminar in Instructional Technology, AIL 605 Interactive Multimedia Process, AIL 606 Software Technology, INTE534 Issues and Trends of Instructional Technology, and INTE535 Analysis, Implementation, and Evaluation of Assistive Technology"
     ],
     "earlierTeachingNote": "Earlier teaching at Florida State University included EME6507 Development of Multimedia Instruction and EME6665 Synthesis, Analysis, and Argumentation in Instructional Systems Research."

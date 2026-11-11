@@ -1751,10 +1751,10 @@
       <div class="grant-overview-copy">
         <p class="grant-lede">
           <strong>$${formatNumber(portfolio.fundedTotal || 0)}</strong> awarded across ${portfolio.fundedCount || funded.length} grants, fellowships, and student-support awards,
-          with <strong>$${formatNumber(portfolio.pendingTotal || 0)}</strong> requested in ${portfolio.pendingCount || pending.length} proposals under review.
+          with <strong>$${formatNumber(portfolio.pendingTotal || 0)}</strong> requested in ${portfolio.pendingCount || pending.length} pending proposals.
         </p>
         <div class="grant-filter" role="group" aria-label="Filter funding records">
-          ${[["all", `All ${all.length}`], ["funded", `Funded ${funded.length}`], ["pending", `Under review ${pending.length}`]]
+          ${[["all", `All ${all.length}`], ["funded", `Funded ${funded.length}`], ["pending", `Pending ${pending.length}`]]
             .map(([value, label], index) => `<button type="button" data-grant-filter="${value}" aria-pressed="${index === 0}">${escapeHtml(label)}</button>`)
             .join("")}
         </div>
@@ -1779,7 +1779,7 @@
       { status: "funded", label: "Funded awards", note: "Newest first", items: [...funded].sort(byStart) },
       {
         status: "pending",
-        label: "Under review",
+        label: "Pending proposals",
         note: "By proposed start",
         items: [...pending].sort((a, b) => (spans.get(a)?.start ?? Infinity) - (spans.get(b)?.start ?? Infinity))
       }
