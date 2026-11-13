@@ -1,6 +1,6 @@
-window.__cvSiteData = {
-  "generatedAt": "2026-11-11T19:16:22.311094+00:00",
-  "sourceCv": "C:\\Users\\jewoo\\Downloads\\office\\work\\aatc-cv-20261111\\cv-release\\CV_202605_MOON.docx",
+﻿window.__cvSiteData = {
+  "generatedAt": "2026-11-13T15:49:21.849234+00:00",
+  "sourceCv": "C:\\Users\\jewoo\\Desktop\\_System\\_projects\\cv\\CV_202605_MOON.docx",
   "profile": {
     "name": "Dr. Jewoong Moon",
     "cvDate": "November 11, 2026",
@@ -20,7 +20,7 @@ window.__cvSiteData = {
     "homepage": "https://educatian.github.io/cv",
     "researchgate": "https://www.researchgate.net/profile/Jewoong-Moon",
     "labWebsite": "https://educatian.github.io/adie",
-    "cvDownloadPath": "CV_202605_MOON.docx?v=b406ca9219aa",
+    "cvDownloadPath": "CV_202605_MOON.docx?v=be67ec7da6f9",
     "cvDownloadFilename": "CV_20261111_MOON.docx"
   },
   "contact": {
@@ -256,23 +256,23 @@ window.__cvSiteData = {
       ]
     },
     {
-      "name": "CER",
+      "name": "Whose Ideas Get",
       "badge": "Pending",
-      "summary": "CER: Investigating Transformative Pedagogies for Assured Agentic Twin Computing (AATC)",
+      "summary": "Whose Ideas Get Taken Up? Separating Opportunity to Speak from Teacher Responsiveness in Mathematics Classroom Discourse",
       "tags": [
-        "$1,000,000",
-        "Co-PI",
-        "National Science Foundation (NSF), Total requested $1,000,000"
+        "$49,997",
+        "Lead PI",
+        "Total requested $49,997, AIMS EduData Phase II (EDSI Benchmark Data Collection), Digital Promise"
       ]
     },
     {
-      "name": "Risk-Adaptive Human Oversight for Agentic AI Learning",
+      "name": "Who Should Check",
       "badge": "Pending",
-      "summary": "Risk-Adaptive Human Oversight for Agentic AI Learning: Testing Teacher Governance and Learner Agency",
+      "summary": "Who Should Check the AI? Allocating Scarce Expert Verification in AI-Assisted Online Course Production",
       "tags": [
-        "$110,669",
+        "$75,000",
         "Lead PI",
-        "Charles Koch Foundation, Requested amount $110,669"
+        "Total requested $75,000 (research gift), Microsoft Research AI Economy Institute (AIEI) Open Call 4"
       ]
     }
   ],
@@ -677,8 +677,8 @@ window.__cvSiteData = {
     },
     {
       "year": "2024",
-      "title": "Utilizing generative artificial intelligence for instructional design: Exploring strengths, weaknesses, opportunities, and threats",
-      "authors": "Choi, G. W., Lee, D., Kim, S. H, & Moon, J.",
+      "title": "Utilizing generative AI for instructional design: Exploring strengths, weaknesses, opportunities, and threats",
+      "authors": "Choi, G. W., Kim, S. H., Lee, D., & Moon, J.",
       "venue": "TechTrends",
       "link": "https://doi.org/10.1007/s11528-024-00967-w",
       "tags": [
@@ -1287,7 +1287,7 @@ window.__cvSiteData = {
     {
       "year": "2024",
       "category": "International",
-      "citation": "Choi, G. W., Lee, D., Kim, S. H, & Moon, J. (2024). Utilizing generative artificial intelligence for instructional design: Exploring strengths, weaknesses, opportunities, and threats. TechTrends https://doi.org/10.1007/s11528-024-00967-w [ESCI-indexed, IF = 5.2, IF5 = 4.6]",
+      "citation": "Choi, G. W., Kim, S. H., Lee, D., & Moon, J. (2024). Utilizing generative AI for instructional design: Exploring strengths, weaknesses, opportunities, and threats. TechTrends, 68(4), 832–844. https://doi.org/10.1007/s11528-024-00967-w [ESCI-indexed, IF = 5.2, IF5 = 4.6]",
       "link": "https://doi.org/10.1007/s11528-024-00967-w"
     },
     {
@@ -2273,6 +2273,42 @@ window.__cvSiteData = {
     ],
     "pending": [
       {
+        "title": "Whose Ideas Get Taken Up? Separating Opportunity to Speak from Teacher Responsiveness in Mathematics Classroom Discourse",
+        "meta": "Lead PI | Total requested $49,997, AIMS EduData Phase II (EDSI Benchmark Data Collection), Digital Promise | February 2027 - January 2028",
+        "amount": "$49,997",
+        "amountValue": 49997.0
+      },
+      {
+        "title": "Who Should Check the AI? Allocating Scarce Expert Verification in AI-Assisted Online Course Production",
+        "meta": "Lead PI | Total requested $75,000 (research gift), Microsoft Research AI Economy Institute (AIEI) Open Call 4 | January 2027 - June 2027",
+        "amount": "$75,000",
+        "amountValue": 75000.0
+      },
+      {
+        "title": "Simulations as Interaction Engines: Maximizing Learner Interaction in an Online Graduate Course",
+        "meta": "PI | Total requested $1,500, Tide Teaching Grant, UA Teaching Academy, The University of Alabama | January 2027 - May 2027",
+        "amount": "$1,500",
+        "amountValue": 1500.0
+      },
+      {
+        "title": "Rehearsing Judgment Under Uncertainty: Designing Debriefing in a Game-Based Classroom Simulation for Transfer in Teacher Learning",
+        "meta": "Total requested $80,000 (fellowship stipend), National Academy of Education/Spencer Postdoctoral Fellowship | September 2027 - August 2028",
+        "amount": "$80,000",
+        "amountValue": 80000.0
+      },
+      {
+        "title": "AuditBench-ED: A User-Tested Toolkit for Auditing and Documenting LLM-Assisted Coding and Scoring in Education Research",
+        "meta": "PI | Total requested $339,727, Institute of Education Sciences (IES), Statistical and Research Methodology in Education (84.305D) | July 2027 - June 2029",
+        "amount": "$339,727",
+        "amountValue": 339727.0
+      },
+      {
+        "title": "Developing an Interactive Relational Incident Simulation to Support High-School Students' Cybersecurity Systems Reasoning and Transfer (TRACE-Cyber)",
+        "meta": "PI | Total requested $490,029, Institute of Education Sciences (IES), Early Career Development and Mentoring Program (84.305B) | July 2027 - June 2031",
+        "amount": "$490,029",
+        "amountValue": 490029.0
+      },
+      {
         "title": "CER: Investigating Transformative Pedagogies for Assured Agentic Twin Computing (AATC)",
         "meta": "Co-PI | National Science Foundation (NSF), Total requested $1,000,000 | August 2027 - July 2031",
         "amount": "$1,000,000",
@@ -2343,11 +2379,11 @@ window.__cvSiteData = {
   },
   "grantPortfolio": {
     "fundedTotal": 607683,
-    "pendingTotal": 1941491,
+    "pendingTotal": 2977744,
     "fundedCount": 14,
-    "pendingCount": 11,
+    "pendingCount": 17,
     "sourceReportedFundedTotal": 607683,
-    "sourceReportedPendingTotal": 1941491,
+    "sourceReportedPendingTotal": 2977744,
     "withdrawnTotal": 0,
     "withdrawnCount": 0,
     "sourceReportedWithdrawnTotal": 0,
@@ -2693,4 +2729,6 @@ window.__cvSiteData = {
       "meta": "Poster Session, AERA 2026, Los Angeles, United States."
     }
   ]
-};
+}
+
+;
