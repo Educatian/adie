@@ -993,7 +993,7 @@
           <article class="publication-row">
             ${journalThumbnail(pub, "row")}
             <div>
-              <strong class="publication-row-year">${escapeHtml(pub.year)}</strong>
+              <strong class="publication-row-year">${escapeHtml(pub.year || pub.status || "")}</strong>
               <h3>${escapeHtml(pub.title)}</h3>
               <p>${escapeHtml(pub.authors)}</p>
               ${publicationCopyActions(pub)}
@@ -1042,7 +1042,7 @@
           <article class="publication-row">
             ${journalThumbnail(chapter, "row")}
             <div>
-              <strong class="publication-row-year">${escapeHtml(chapter.year || "")}</strong>
+              <strong class="publication-row-year">${escapeHtml(chapter.year || chapter.status || "")}</strong>
               <h3>${escapeHtml(chapter.title || "Book chapter")}</h3>
               <p>${escapeHtml(chapter.authors || "")}</p>
               ${publicationCopyActions(chapter)}
@@ -1071,7 +1071,7 @@
       <article class="publication-card reveal">
         ${journalThumbnail(pub, "card")}
         <div class="publication-card-body">
-          <span class="year">${escapeHtml(pub.year)}${pub.status ? ` · ${escapeHtml(pub.status)}` : ""}</span>
+          <span class="year">${escapeHtml(pub.year || "")}${pub.status ? `${pub.year ? " · " : ""}${escapeHtml(pub.status)}` : ""}</span>
           <h3>${escapeHtml(pub.title)}</h3>
           <p>${escapeHtml(pub.authors)}</p>
           <p class="publication-venue">${escapeHtml(pub.venue)}</p>
@@ -1128,10 +1128,11 @@
 
   function formatApaCitation(pub) {
     const authors = String(pub.authors || "Author unknown").trim();
-    const year = String(pub.year || "n.d.").trim();
+    const inPress = !pub.year && /in press/i.test(pub.status || "");
+    const year = inPress ? "in press" : String(pub.year || "n.d.").trim();
     const title = sentenceWithPeriod(pub.title || "Untitled work");
     const venue = sentenceWithPeriod(pub.venue || "");
-    const status = pub.status && pub.status !== "Published" ? ` ${sentenceWithPeriod(pub.status)}` : "";
+    const status = pub.status && pub.status !== "Published" && !inPress ? ` ${sentenceWithPeriod(pub.status)}` : "";
     return `${authors} (${year}). ${title} ${venue}${status}`.replace(/\s+/g, " ").trim();
   }
 
